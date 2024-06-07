@@ -1,12 +1,12 @@
 // OutOfServiceScreen.js
 
-import React, { useState } from 'react';
-import { View, Image, Text, Center, Box, Heading, Button } from 'native-base';
-import { statusCheck } from '../service/api';
+import React, {useState} from 'react';
+import {View, Image, Text, Center, Box, Heading, Button} from 'native-base';
+import {statusCheck} from '../service/api';
 import OpenURLButton from '../components/OpenURLButton';
-import { color } from '../service/utils';
+import {color} from '../service/utils';
 
-const OutOfServiceScreen = ({ navigation }) => {
+const OutOfServiceScreen = ({navigation}) => {
   const [status, setStatus] = useState();
   const handleRefresh = async () => {
     const res = await statusCheck();
@@ -28,11 +28,10 @@ const OutOfServiceScreen = ({ navigation }) => {
         borderWidth={1}
         borderColor={'coolGray.700'}
         borderRadius={15}
-        padding={3}
-      >
+        padding={3}>
         {status?.image ? (
           <Image
-            source={{ uri: status.image }}
+            source={{uri: status.image}}
             style={{
               width: 150,
               height: 200,
@@ -58,8 +57,7 @@ const OutOfServiceScreen = ({ navigation }) => {
           size="lg"
           fontWeight="600"
           color={color.primary}
-          textAlign={'center'}
-        >
+          textAlign={'center'}>
           {status?.heading || 'Upgrading Service Quatlity.'}
         </Heading>
         <Heading

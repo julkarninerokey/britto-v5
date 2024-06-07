@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import { VStack, Text, HStack, View, Skeleton} from 'native-base';
+import {VStack, Text, HStack, View, Skeleton} from 'native-base';
 import {color} from '../../service/utils';
 import ProfileCard from '../../components/ProfileCard';
 import AppBar from '../../components/AppBar';
@@ -91,7 +91,7 @@ const Dashboard = ({navigation}) => {
         ) : (
           <FlatGrid
             itemDimension={itemDimension}
-            data={[{},{},{},{},{},{},{},{},{},{},{},{},{},{}]}
+            data={[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]}
             renderItem={({item}) => <ItemSkeleton item={item} />}
           />
         )}

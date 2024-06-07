@@ -9,6 +9,7 @@ import OutOfServiceScreen from './src/screens/OutOfServiceScreen';
 import NavigationListener from './src/components/NavigationListener';
 import FlashMessage from 'react-native-flash-message';
 import Dashboard from './src/screens/dashboard/Dashboard';
+import Profile from './src/screens/dashboard/Profile';
 
 const Stack = createStackNavigator();
 
@@ -32,6 +33,11 @@ const App = () => {
               name="Dashboard"
               component={Dashboard}
               options={{title: 'Dashboard', headerShown: false}}
+            />
+            <Stack.Screen
+              name="Profile"
+              component={Profile}
+              options={{title: 'Profile', headerShown: false}}
             />
           </Stack.Navigator>
           <FlashMessage position="top" />
