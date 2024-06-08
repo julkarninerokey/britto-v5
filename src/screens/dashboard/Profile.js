@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Dimensions, View} from 'react-native';
-import {VStack, Text, HStack, Box} from 'native-base';
+import {VStack, Text, HStack, Box, Skeleton} from 'native-base';
 import ProfileCard from '../../components/ProfileCard';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -109,6 +109,30 @@ const Profile = ({navigation}) => {
     />
   );
 
+    const InfoRowSkeleton = () => (
+      <HStack alignItems="center" py={1} flexWrap="wrap">
+        <Skeleton.Text lines={1} width="40%" />
+        <Text paddingX={4}>:</Text>
+        <Skeleton.Text lines={1} flex={1} />
+      </HStack>
+    );
+
+    const FirstRouteSkeleton = () => (
+      <Box flex={1} p={4} bg="white">
+        <VStack space={2}>
+          <InfoRowSkeleton />
+          <InfoRowSkeleton />
+          <InfoRowSkeleton />
+          <InfoRowSkeleton />
+          <InfoRowSkeleton />
+          <InfoRowSkeleton />
+          <InfoRowSkeleton />
+          <InfoRowSkeleton />
+          <InfoRowSkeleton />
+          <InfoRowSkeleton />
+        </VStack>
+      </Box>
+    );
   return (
     <View style={{flex: 1}}>
       <AppBar title="Profile" />
@@ -123,7 +147,7 @@ const Profile = ({navigation}) => {
             initialLayout={initialLayout}
           />
         ) : (
-          <Text>Data Not Found</Text>
+          <FirstRouteSkeleton/>
         )}
       </VStack>
     </View>
