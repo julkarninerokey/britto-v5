@@ -10,6 +10,7 @@ import NavigationListener from './src/components/NavigationListener';
 import FlashMessage from 'react-native-flash-message';
 import Dashboard from './src/screens/dashboard/Dashboard';
 import Profile from './src/screens/dashboard/Profile';
+import Hall from './src/screens/dashboard/Hall';
 
 const Stack = createStackNavigator();
 
@@ -38,6 +39,11 @@ const App = () => {
               name="Profile"
               component={Profile}
               options={{title: 'Profile', headerShown: false}}
+            />
+            <Stack.Screen
+              name="Hall"
+              component={Hall}
+              options={{title: 'Hall', headerShown: false}}
             />
           </Stack.Navigator>
           <FlashMessage position="top" />

@@ -3,13 +3,11 @@ import {ImageBackground, StyleSheet} from 'react-native';
 import {Box, HStack, Text, VStack, Image} from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ProfileCard = () => {
-  const [studentName, setStudentName] = useState('মুক্তা দত্ত');
-  const [session, setSession] = useState('২০১৫-১৬');
-  const [hallName, setHallName] = useState('রোকেয়া হল');
-  const [photo, setPhoto] = useState(
-    'https://v2.result.du.ac.bd/assets/student.png',
-  );
+const ProfileCard = ({name, year, hall, chobi}) => {
+  const [studentName, setStudentName] = useState(name);
+  const [session, setSession] = useState(year);
+  const [hallName, setHallName] = useState(hall);
+  const [photo, setPhoto] = useState(chobi);
 
   const checkLoginStatus = async () => {
     const name = await AsyncStorage.getItem('name');
@@ -24,8 +22,15 @@ const ProfileCard = () => {
   };
 
   useEffect(() => {
-    checkLoginStatus();
-  }, []);
+    if (!name && !year) {
+      checkLoginStatus();
+    } else {
+      setStudentName(name);
+      setSession(null);
+      setHallName(null);
+      setPhoto(null);
+    }
+  }, [name, year]);
 
   return (
     <Box position="relative" w="100%" h={150}>
@@ -37,25 +42,33 @@ const ProfileCard = () => {
           flex={1}
           alignItems="center"
           justifyContent="space-evenly">
+          {photo && (
+            <VStack space={2}>
+              <Image
+                source={{uri: photo}}
+                style={styles.photo}
+                alt="Profile Photo"
+                size="md"
+                borderRadius={100}
+              />
+            </VStack>
+          )}
           <VStack space={2}>
-            <Image
-              source={{uri: photo}}
-              style={styles.photo}
-              alt="Profile Photo"
-              size="md"
-              borderRadius={100}
-            />
-          </VStack>
-          <VStack space={2}>
-            <Text numberOfLines={1} style={styles.textStyle}>
-              {studentName}
-            </Text>
-            <Text numberOfLines={1} style={styles.textStyle}>
-              Session: {session}
-            </Text>
-            <Text numberOfLines={1} style={styles.textStyle}>
-              {hallName}
-            </Text>
+            {studentName && (
+              <Text numberOfLines={1} style={styles.textStyle}>
+                {studentName}
+              </Text>
+            )}
+            {session && (
+              <Text numberOfLines={1} style={styles.textStyle}>
+                Session: {session}
+              </Text>
+            )}
+            {hallName && (
+              <Text numberOfLines={1} style={styles.textStyle}>
+                {hallName}
+              </Text>
+            )}
           </VStack>
         </HStack>
       </ImageBackground>

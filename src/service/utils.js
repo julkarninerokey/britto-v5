@@ -81,6 +81,7 @@ export const color = {
   gradientBackground: ['#191970', '#3d3e58', '#5f608a', '#8788b8', '#b4b5e0'], // Gradient background colors
 };
 
+export const defaultUserPhoto = require('../assets/icons/user.png');
 // #### TO COMPLE ANDROID BUILD-------------
 
 // #### sudo ./gradlew clean

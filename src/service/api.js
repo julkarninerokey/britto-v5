@@ -5,9 +5,38 @@ import {getLocales} from 'react-native-localize';
 
 const BASE_URL = 'https://britto.result.du.ac.bd/app/'; // Replace with your API base URL
 
+export const hallData = async reg => {
+  if (!reg || reg.length !== 10) {
+    toast(
+      'danger',
+      'Invalid Registration Number',
+      'Logout & Login Again to Continue.',
+    );
+    return false;
+  } else {
+    const data = {
+      reg: reg,
+    };
+
+    try {
+      const response = await axios.get(`${BASE_URL}/getHallData`, {
+        params: data,
+      });
+
+      if (response?.data?.status === 200) {
+        return response?.data;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+};
+
 export const profileData = async reg => {
   if (!reg || reg.length !== 10) {
-    toast('danger', 'Invalid Registration Number');
+    toast('danger', 'Invalid Registration Number', 'Logout & Login Again to Continue.');
   } else {
     const data = {
       reg: reg,
@@ -27,7 +56,6 @@ export const profileData = async reg => {
       throw error;
     }
   }
-  //return false;
 };
 
 export const login = async (reg, pass) => {
