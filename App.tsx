@@ -11,45 +11,96 @@ import FlashMessage from 'react-native-flash-message';
 import Dashboard from './src/screens/dashboard/Dashboard';
 import Profile from './src/screens/dashboard/Profile';
 import Hall from './src/screens/dashboard/Hall';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import Department from './src/screens/dashboard/Department';
+import Syllabus from './src/screens/dashboard/Syllabus';
+import Notice from './src/screens/dashboard/Notice';
+import Examination from './src/screens/dashboard/Examination';
+import Result from './src/screens/dashboard/Result';
+import Marksheet from './src/screens/dashboard/Marksheet';
+import Certificate from './src/screens/dashboard/Certificate';
+import Transcript from './src/screens/dashboard/Transcript';
 
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
-    <NativeBaseProvider>
-      <NavigationContainer>
-        <NavigationListener>
-          <Stack.Navigator initialRouteName={'Login'}>
-            <Stack.Screen
-              name="Login"
-              component={LoginScreen}
-              options={{title: 'Login', headerShown: false}}
-            />
-            <Stack.Screen
-              name="OutOfService"
-              component={OutOfServiceScreen}
-              options={{title: 'Out of Service', headerShown: false}}
-            />
-            <Stack.Screen
-              name="Dashboard"
-              component={Dashboard}
-              options={{title: 'Dashboard', headerShown: false}}
-            />
-            <Stack.Screen
-              name="Profile"
-              component={Profile}
-              options={{title: 'Profile', headerShown: false}}
-            />
-            <Stack.Screen
-              name="Hall"
-              component={Hall}
-              options={{title: 'Hall', headerShown: false}}
-            />
-          </Stack.Navigator>
-          <FlashMessage position="top" />
-        </NavigationListener>
-      </NavigationContainer>
-    </NativeBaseProvider>
+    <SafeAreaProvider>
+      <NativeBaseProvider>
+        <NavigationContainer>
+          <NavigationListener>
+            <Stack.Navigator initialRouteName={'Login'}>
+              <Stack.Screen
+                name="Login"
+                component={LoginScreen}
+                options={{title: 'Login', headerShown: false}}
+              />
+              <Stack.Screen
+                name="OutOfService"
+                component={OutOfServiceScreen}
+                options={{title: 'Out of Service', headerShown: false}}
+              />
+              <Stack.Screen
+                name="Dashboard"
+                component={Dashboard}
+                options={{title: 'Dashboard', headerShown: false}}
+              />
+              <Stack.Screen
+                name="Profile"
+                component={Profile}
+                options={{title: 'Profile', headerShown: false}}
+              />
+              <Stack.Screen
+                name="Hall"
+                component={Hall}
+                options={{title: 'Hall', headerShown: false}}
+              />
+              <Stack.Screen
+                name="Department"
+                component={Department}
+                options={{title: 'Department', headerShown: false}}
+              />
+              <Stack.Screen
+                name="Syllabus"
+                component={Syllabus}
+                options={{title: 'Syllabus', headerShown: false}}
+              />
+              <Stack.Screen
+                name="Notice"
+                component={Notice}
+                options={{title: 'Notice', headerShown: false}}
+              />
+              <Stack.Screen
+                name="Examination"
+                component={Examination}
+                options={{title: 'Examination', headerShown: false}}
+              />
+              <Stack.Screen
+                name="Result"
+                component={Result}
+                options={{title: 'Result', headerShown: false}}
+              />
+              <Stack.Screen
+                name="Marksheet"
+                component={Marksheet}
+                options={{title: 'Marksheet', headerShown: false}}
+              />
+              <Stack.Screen
+                name="Certificate"
+                component={Certificate}
+                options={{title: 'Certificate', headerShown: false}}
+              />
+              <Stack.Screen
+                name="Transcript"
+                component={Transcript}
+                options={{title: 'Transcript', headerShown: false}}
+              />
+            </Stack.Navigator>
+            <FlashMessage position="top" />
+          </NavigationListener>
+        </NavigationContainer>
+      </NativeBaseProvider>
+    </SafeAreaProvider>
   );
 };
 

@@ -3,7 +3,240 @@ import {appInfo, deviceInfo, netInfo, saveLogin, toast} from './utils';
 import DeviceInfo from 'react-native-device-info';
 import {getLocales} from 'react-native-localize';
 
-const BASE_URL = 'https://britto.result.du.ac.bd/app/'; // Replace with your API base URL
+const BASE_URL = 'https://britto.result.du.ac.bd/app/';
+
+export const getCertificate = async reg => {
+  if (!reg || reg.length !== 10) {
+    toast(
+      'danger',
+      'Invalid Registration Number',
+      'Logout & Login Again to Continue.',
+    );
+    return false;
+  } else {
+    const data = {
+      reg: reg,
+    };
+
+    try {
+      const response = await axios.get(`${BASE_URL}/getAllCertificateInfo`, {
+        params: data,
+      });
+
+      if (response?.data?.status === 200) {
+        return response?.data;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      toast(
+        'danger',
+        'Invalid Registration Number',
+        'Logout & Login Again to Continue.',
+      );
+      throw error;
+    }
+  }
+};
+
+export const getMarksheet = async reg => {
+  if (!reg || reg.length !== 10) {
+    toast(
+      'danger',
+      'Invalid Registration Number',
+      'Logout & Login Again to Continue.',
+    );
+    return false;
+  } else {
+    const data = {
+      reg: reg,
+    };
+
+    try {
+      const response = await axios.get(`${BASE_URL}/getAllMarksheetInfo`, {
+        params: data,
+      });
+
+      if (response?.data?.status === 200) {
+        return response?.data;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      toast(
+        'danger',
+        'Invalid Registration Number',
+        'Logout & Login Again to Continue.',
+      );
+      throw error;
+    }
+  }
+};
+
+export const getResult = async reg => {
+  if (!reg || reg.length !== 10) {
+    toast(
+      'danger',
+      'Invalid Registration Number',
+      'Logout & Login Again to Continue.',
+    );
+    return false;
+  } else {
+    const data = {
+      reg: reg,
+    };
+
+    try {
+      const response = await axios.get(`${BASE_URL}/getAllResult`, {
+        params: data,
+      });
+
+      if (response?.data?.status === 200) {
+        return response?.data;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      toast(
+        'danger',
+        'Invalid Registration Number',
+        'Logout & Login Again to Continue.',
+      );
+      throw error;
+    }
+  }
+};
+
+export const getExam = async reg => {
+  if (!reg || reg.length !== 10) {
+    toast(
+      'danger',
+      'Invalid Registration Number',
+      'Logout & Login Again to Continue.',
+    );
+    return false;
+  } else {
+    const data = {
+      reg: reg,
+    };
+
+    try {
+      const response = await axios.get(`${BASE_URL}/getFomFillupData`, {
+        params: data,
+      });
+
+      if (response?.data?.status === 200) {
+        return response?.data;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      toast(
+        'danger',
+        'Invalid Registration Number',
+        'Logout & Login Again to Continue.',
+      );
+      throw error;
+    }
+  }
+};
+
+export const getNotice = async reg => {
+  if (!reg || reg.length !== 10) {
+    toast(
+      'danger',
+      'Invalid Registration Number',
+      'Logout & Login Again to Continue.',
+    );
+    return false;
+  } else {
+    const data = {
+      reg: reg,
+    };
+
+    try {
+      const response = await axios.get(`${BASE_URL}/getAllNotices`, {
+        params: data,
+      });
+
+      if (response?.data?.status === 200) {
+        return response?.data;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      toast(
+        'danger',
+        'Invalid Registration Number',
+        'Logout & Login Again to Continue.',
+      );
+      throw error;
+    }
+  }
+};
+
+export const getSyllabus = async reg => {
+  if (!reg || reg.length !== 10) {
+    toast(
+      'danger',
+      'Invalid Registration Number',
+      'Logout & Login Again to Continue.',
+    );
+    return false;
+  } else {
+    const data = {
+      reg: reg,
+    };
+
+    try {
+      const response = await axios.get(`${BASE_URL}/getSyllabus`, {
+        params: data,
+      });
+
+      if (response?.data?.status === 200) {
+        return response?.data;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      toast(
+        'danger',
+        'Invalid Registration Number',
+        'Logout & Login Again to Continue.',
+      );
+      throw error;
+    }
+  }
+};
+
+export const deptData = async reg => {
+  if (!reg || reg.length !== 10) {
+    toast(
+      'danger',
+      'Invalid Registration Number',
+      'Logout & Login Again to Continue.',
+    );
+    return false;
+  } else {
+    const data = {
+      reg: reg,
+    };
+
+    try {
+      const response = await axios.get(`${BASE_URL}/getDeptData`, {
+        params: data,
+      });
+
+      if (response?.data?.status === 200) {
+        return response?.data;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+};
 
 export const hallData = async reg => {
   if (!reg || reg.length !== 10) {
@@ -36,7 +269,11 @@ export const hallData = async reg => {
 
 export const profileData = async reg => {
   if (!reg || reg.length !== 10) {
-    toast('danger', 'Invalid Registration Number', 'Logout & Login Again to Continue.');
+    toast(
+      'danger',
+      'Invalid Registration Number',
+      'Logout & Login Again to Continue.',
+    );
   } else {
     const data = {
       reg: reg,
@@ -112,6 +349,7 @@ export const login = async (reg, pass) => {
         // errorReport(errorData);
       }
     } catch (error) {
+      toast('danger', 'Invalid Password');
       throw error;
     }
   }

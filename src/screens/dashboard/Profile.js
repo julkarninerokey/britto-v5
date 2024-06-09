@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Dimensions, View} from 'react-native';
-import {VStack, Text, HStack, Box, Skeleton} from 'native-base';
+import {VStack, Text, HStack, Box, Skeleton, ScrollView} from 'native-base';
 import ProfileCard from '../../components/ProfileCard';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,47 +10,37 @@ import 'react-native-pager-view';
 import {color} from '../../service/utils';
 
 const InfoRow = ({label, value}) => (
-  <HStack alignItems="center" flexWrap="wrap">
-    <Text
-      bold
-      fontSize="md"
-      w="30%"
-      flexWrap="wrap"
-      color={color.primary}
-      flexShrink={1}>
+  <HStack alignItems="center">
+    <Text fontSize="md" w="40%" flexWrap="wrap" flexShrink={1}>
       {label}
     </Text>
     <Text paddingX={4}>:</Text>
-    <Text
-      fontSize="md"
-      flexWrap="wrap"
-      color={color.primary}
-      bold
-      w="60%"
-      flexShrink={1}>
+    <Text fontSize="md" flexWrap="wrap" w="50%" flexShrink={1}>
       {value}
     </Text>
   </HStack>
 );
 
 const FirstRoute = ({data, address}) => (
-  <Box flex={1} p={4} bg="white">
-    <VStack space={2}>
-      <InfoRow label="Student Name" value={data.name_en} />
-      <InfoRow label="Student Name (Bn)" value={data.name_bn} />
-      <InfoRow label="Father's Name" value={data.father_name} />
-      <InfoRow label="Mother's Name" value={data.mother_name} />
-      <InfoRow
-        label="Date of Birth"
-        value={`${data.dobD}-${data.dobM}-${data.dobY}`}
-      />
-      <InfoRow label="Address" value={address} />
-      <InfoRow label="Phone" value={data.phone} />
-      <InfoRow label="Email" value={data.email} />
-      <InfoRow label="Blood Group" value={data.blood_group} />
-      <InfoRow label="Religion" value={data.dhormo} />
-    </VStack>
-  </Box>
+  <ScrollView>
+    <Box flex={1} p={4} bg="white">
+      <VStack space={2}>
+        <InfoRow label="Student Name" value={data.name_en} />
+        <InfoRow label="Student Name (Bn)" value={data.name_bn} />
+        <InfoRow label="Father's Name" value={data.father_name} />
+        <InfoRow label="Mother's Name" value={data.mother_name} />
+        <InfoRow
+          label="Date of Birth"
+          value={`${data.dobD}-${data.dobM}-${data.dobY}`}
+        />
+        <InfoRow label="Address" value={address} />
+        <InfoRow label="Phone" value={data.phone} />
+        <InfoRow label="Email" value={data.email} />
+        <InfoRow label="Blood Group" value={data.blood_group} />
+        <InfoRow label="Religion" value={data.dhormo} />
+      </VStack>
+    </Box>
+  </ScrollView>
 );
 
 const SecondRoute = ({data}) => (
@@ -109,30 +99,31 @@ const Profile = ({navigation}) => {
     />
   );
 
-    const InfoRowSkeleton = () => (
-      <HStack alignItems="center" py={1} flexWrap="wrap">
-        <Skeleton.Text lines={1} width="40%" />
-        <Text paddingX={4}>:</Text>
-        <Skeleton.Text lines={1} flex={1} />
-      </HStack>
-    );
+  // eslint-disable-next-line react/no-unstable-nested-components
+  const InfoRowSkeleton = () => (
+    <HStack alignItems="center" py={1} flexWrap="wrap">
+      <Skeleton.Text lines={1} width="40%" />
+      <Text paddingX={4}>:</Text>
+      <Skeleton.Text lines={1} flex={1} />
+    </HStack>
+  );
 
-    const FirstRouteSkeleton = () => (
-      <Box flex={1} p={4} bg="white">
-        <VStack space={2}>
-          <InfoRowSkeleton />
-          <InfoRowSkeleton />
-          <InfoRowSkeleton />
-          <InfoRowSkeleton />
-          <InfoRowSkeleton />
-          <InfoRowSkeleton />
-          <InfoRowSkeleton />
-          <InfoRowSkeleton />
-          <InfoRowSkeleton />
-          <InfoRowSkeleton />
-        </VStack>
-      </Box>
-    );
+  const FirstRouteSkeleton = () => (
+    <Box flex={1} p={4} bg="white">
+      <VStack space={2}>
+        <InfoRowSkeleton />
+        <InfoRowSkeleton />
+        <InfoRowSkeleton />
+        <InfoRowSkeleton />
+        <InfoRowSkeleton />
+        <InfoRowSkeleton />
+        <InfoRowSkeleton />
+        <InfoRowSkeleton />
+        <InfoRowSkeleton />
+        <InfoRowSkeleton />
+      </VStack>
+    </Box>
+  );
   return (
     <View style={{flex: 1}}>
       <AppBar title="Profile" />
@@ -147,7 +138,7 @@ const Profile = ({navigation}) => {
             initialLayout={initialLayout}
           />
         ) : (
-          <FirstRouteSkeleton/>
+          <FirstRouteSkeleton />
         )}
       </VStack>
     </View>

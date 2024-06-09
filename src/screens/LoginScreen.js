@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Image } from 'react-native';
+import React, {useState} from 'react';
+import {Image} from 'react-native';
 import {
   Box,
   Button,
@@ -10,11 +10,11 @@ import {
   VStack,
   KeyboardAvoidingView,
 } from 'native-base';
-import { login } from '../service/api';
-import { color } from '../service/utils';
-import { Platform } from 'react-native';
+import {login} from '../service/api';
+import {color} from '../service/utils';
+import {Platform} from 'react-native';
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = ({navigation}) => {
   const [reg, setReg] = useState('2017417693');
   const [password, setPassword] = useState('597230ask');
   const [loading, setLoading] = useState(false);
@@ -34,27 +34,25 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
-    const setAlt = () => {
-      setReg('2015614614');
-      setPassword('asdf@123');
-    }
+  const setAlt = () => {
+    setReg('2015614614');
+    setPassword('asdf@123');
+  };
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
-    >
+      style={{flex: 1}}>
       <Center flex={1} bg={color.secondaryBackground}>
         <Box
           safeArea
           w={'80%'}
           p={10}
           alignItems="center"
-          bg={color.background}
-        >
+          bg={color.background}>
           <Image
             source={require('../assets/logo.png')}
-            style={{ width: 100, height: 150, marginBottom: 10 }}
+            style={{width: 100, height: 150, marginBottom: 10}}
           />
           <Heading size="lg" fontWeight="600" color={color.primary}>
             Welcome to Britto
@@ -68,7 +66,7 @@ const LoginScreen = ({ navigation }) => {
               <Input
                 value={reg}
                 keyboardType="numeric"
-                type='number'
+                type="number"
                 maxLength={10}
                 onChangeText={setReg}
                 isDisabled={loading}
@@ -89,18 +87,8 @@ const LoginScreen = ({ navigation }) => {
               bg={color.primary}
               isLoading={loading}
               onPress={handleLogin}
-              isDisabled={loading}
-            >
+              isDisabled={loading}>
               Sign in
-            </Button>
-            <Button
-              mt="2"
-              colorScheme="indigo"
-              isLoading={loading}
-              onPress={setAlt}
-              isDisabled={loading}
-            >
-              ALTERNATIVE
             </Button>
           </VStack>
         </Box>

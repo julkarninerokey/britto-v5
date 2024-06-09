@@ -12,7 +12,7 @@ import {
 import ProfileCard from '../../components/ProfileCard';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {hallData} from '../../service/api';
+import {deptData} from '../../service/api';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import 'react-native-pager-view';
 import {color} from '../../service/utils';
@@ -76,7 +76,7 @@ const FourthRoute = ({data}) => (
   </Center>
 );
 
-const Hall = ({navigation}) => {
+const Department = ({navigation}) => {
   const [teacher, setteacher] = useState([]);
   const [staff, setstaff] = useState([]);
   const [student, setstudent] = useState([]);
@@ -86,7 +86,7 @@ const Hall = ({navigation}) => {
   useEffect(() => {
     const checkForData = async () => {
       const reg = await AsyncStorage.getItem('reg');
-      const response = await hallData(reg);
+      const response = await deptData(reg);
       setData(response.data);
       const emp = response?.staff;
       if (emp.length > 0) {
@@ -155,7 +155,7 @@ const Hall = ({navigation}) => {
 
   return (
     <View style={{flex: 1}}>
-      <AppBar title="Hall" />
+      <AppBar title="Department" />
       <VStack w={'100%'} flex={1}>
         <ProfileCard
           name={data && data[0]?.name}
@@ -180,4 +180,4 @@ const Hall = ({navigation}) => {
   );
 };
 
-export default Hall;
+export default Department;

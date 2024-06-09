@@ -64,6 +64,11 @@ const ProfileCard = ({name, year, hall, chobi}) => {
                 Session: {session}
               </Text>
             )}
+            {year && (
+              <Text numberOfLines={1} style={styles.textStyle}>
+                Established: {year}
+              </Text>
+            )}
             {hallName && (
               <Text numberOfLines={1} style={styles.textStyle}>
                 {hallName}

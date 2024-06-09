@@ -1,11 +1,13 @@
 import React from 'react';
-import {StyleSheet, Image} from 'react-native';
+import {StyleSheet, Image, StatusBar, Platform, View} from 'react-native';
 import {Box, HStack, Heading} from 'native-base';
 import {color} from '../service/utils';
 
-const AppBar = ({ title }) => {
+const AppBar = ({title}) => {
+  const statusBarHeight =
+    Platform.OS != 'android' ? StatusBar.currentHeight : 0;
   return (
-    <Box w={'100%'} bg={color.primary}>
+    <Box w={'100%'} bg={color.primary} pt={statusBarHeight}>
       <HStack justifyContent="space-between" alignItems="center" p={3}>
         <Heading color="white" size="lg">
           {title}
