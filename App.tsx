@@ -20,6 +20,8 @@ import Result from './src/screens/dashboard/Result';
 import Marksheet from './src/screens/dashboard/Marksheet';
 import Certificate from './src/screens/dashboard/Certificate';
 import Transcript from './src/screens/dashboard/Transcript';
+import { SafeAreaView, StatusBar } from 'react-native';
+import { color } from './src/service/utils';
 
 const Stack = createStackNavigator();
 
@@ -27,6 +29,8 @@ const App = () => {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <NativeBaseProvider>
+      <SafeAreaView style={{ flex: 1, backgroundColor: color.primary }}>
+      <StatusBar barStyle="light-content" animated />
         <NavigationContainer>
             <Stack.Navigator initialRouteName={'Login'}>
               <Stack.Screen
@@ -97,6 +101,7 @@ const App = () => {
             </Stack.Navigator>
             <FlashMessage position="top" />
         </NavigationContainer>
+        </SafeAreaView>
       </NativeBaseProvider>
     </SafeAreaProvider>
   );
