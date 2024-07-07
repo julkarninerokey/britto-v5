@@ -10,8 +10,15 @@ const NavigationListener = ({children}) => {
   useEffect(() => {
     const unsubscribe = navigation.addListener('state', async () => {
       const check = await statusCheck();
-      if (check?.status != '1') {
+      
+      if (check && check?.status !== '1') {
         navigation.navigate('OutOfService');
+        console.log("🚀 ~ NavigationListener ~ check:", check?.status)
+      console.log("🚀 ~ NavigationListener ~ check:typeof ", typeof check?.status)
+      }else{
+      console.log("🚀 ~ NavigationListener ~ check else:", check)
+      navigation.navigate('Login');
+
       }
     });
 

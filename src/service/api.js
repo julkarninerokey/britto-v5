@@ -5,7 +5,18 @@ import {getLocales} from 'react-native-localize';
 
 const BASE_URL = 'https://britto.result.du.ac.bd/app/';
 
+
+
 export const getCertificate = async reg => {
+  const isConnected = await statusCheck();
+  if(!isConnected || isConnected?.status !== '1'){
+    toast(
+      'danger',
+      isConnected?.title,
+      isConnected?.subtitle,
+    );
+    return null;
+  }
   if (!reg || reg.length !== 10) {
     toast(
       'danger',
@@ -40,6 +51,15 @@ export const getCertificate = async reg => {
 };
 
 export const getMarksheet = async reg => {
+  const isConnected = await statusCheck();
+  if(!isConnected || isConnected?.status !== '1'){
+    toast(
+      'danger',
+      isConnected?.title,
+      isConnected?.subtitle,
+    );
+    return null;
+  }
   if (!reg || reg.length !== 10) {
     toast(
       'danger',
@@ -74,6 +94,15 @@ export const getMarksheet = async reg => {
 };
 
 export const getResult = async reg => {
+  const isConnected = await statusCheck();
+  if(!isConnected || isConnected?.status !== '1'){
+    toast(
+      'danger',
+      isConnected?.title,
+      isConnected?.subtitle,
+    );
+    return null;
+  }
   if (!reg || reg.length !== 10) {
     toast(
       'danger',
@@ -108,6 +137,15 @@ export const getResult = async reg => {
 };
 
 export const getExam = async reg => {
+  const isConnected = await statusCheck();
+  if(!isConnected || isConnected?.status !== '1'){
+    toast(
+      'danger',
+      isConnected?.title,
+      isConnected?.subtitle,
+    );
+    return null;
+  }
   if (!reg || reg.length !== 10) {
     toast(
       'danger',
@@ -142,6 +180,15 @@ export const getExam = async reg => {
 };
 
 export const getNotice = async reg => {
+  const isConnected = await statusCheck();
+  if(!isConnected || isConnected?.status !== '1'){
+    toast(
+      'danger',
+      isConnected?.title,
+      isConnected?.subtitle,
+    );
+    return null;
+  }
   if (!reg || reg.length !== 10) {
     toast(
       'danger',
@@ -176,6 +223,15 @@ export const getNotice = async reg => {
 };
 
 export const getSyllabus = async reg => {
+  const isConnected = await statusCheck();
+  if(!isConnected || isConnected?.status !== '1'){
+    toast(
+      'danger',
+      isConnected?.title,
+      isConnected?.subtitle,
+    );
+    return null;
+  }
   if (!reg || reg.length !== 10) {
     toast(
       'danger',
@@ -210,6 +266,15 @@ export const getSyllabus = async reg => {
 };
 
 export const deptData = async reg => {
+  const isConnected = await statusCheck();
+  if(!isConnected || isConnected?.status !== '1'){
+    toast(
+      'danger',
+      isConnected?.title,
+      isConnected?.subtitle,
+    );
+    return null;
+  }
   if (!reg || reg.length !== 10) {
     toast(
       'danger',
@@ -239,6 +304,15 @@ export const deptData = async reg => {
 };
 
 export const hallData = async reg => {
+  const isConnected = await statusCheck();
+  if(!isConnected || isConnected?.status !== '1'){
+    toast(
+      'danger',
+      isConnected?.title,
+      isConnected?.subtitle,
+    );
+    return null;
+  }
   if (!reg || reg.length !== 10) {
     toast(
       'danger',
@@ -268,6 +342,16 @@ export const hallData = async reg => {
 };
 
 export const profileData = async reg => {
+  const isConnected = await statusCheck();
+  if(!isConnected || isConnected?.status !== '1'){
+    toast(
+      'danger',
+      isConnected?.title,
+      isConnected?.subtitle,
+    );
+    return null;
+  }
+
   if (!reg || reg.length !== 10) {
     toast(
       'danger',
@@ -296,6 +380,17 @@ export const profileData = async reg => {
 };
 
 export const login = async (reg, pass) => {
+
+  const isConnected = await statusCheck();
+  if(!isConnected || isConnected?.status !== '1'){
+    toast(
+      'danger',
+      isConnected?.title,
+      isConnected?.subtitle,
+    );
+    return null;
+  }
+
   if (!reg || reg.length !== 10) {
     toast('danger', 'Invalid Registration Number');
   } else if (!pass || pass.length < 6) {
@@ -364,7 +459,7 @@ export const statusCheck = async () => {
 
     if (!network?.state?.isInternetReachable) {
       return {
-        status: false,
+        status: '300',
         title: 'No Internet',
         subtitle: 'Please Check Your Internet Connection and Try Again.',
       };

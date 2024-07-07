@@ -1,6 +1,6 @@
 // OutOfServiceScreen.js
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Image, Text, Center, Box, Heading, Button} from 'native-base';
 import {statusCheck} from '../service/api';
 import OpenURLButton from '../components/OpenURLButton';
@@ -10,12 +10,26 @@ const OutOfServiceScreen = ({navigation}) => {
   const [status, setStatus] = useState();
   const handleRefresh = async () => {
     const res = await statusCheck();
-    if (res?.status === '1') {
-      navigation.navigate('Login');
-    } else {
-      setStatus(res);
-    }
+
+if (res) {
+  console.log("🚀 ~ OutOfServiceScreen ~ res:", res.status);
+  console.log("🚀 ~ OutOfServiceScreen ~ res:typeof ", typeof res.status);
+
+  if (res.status !== '1') {
+    console.log("Navigating to OutOfService");
+    setStatus(res)
+  } else {
+    console.log("🚀 ~ OutOfServiceScreen ~ res else:", res);
+    navigation.navigate('Login');
+  }
+} else {
+  console.error("res object is null or undefined");
+}
   };
+
+  useEffect(() => {
+    handleRefresh();
+  },[])
 
   return (
     <Center w="100%" flex={1} bg={color.secondaryBackground}>

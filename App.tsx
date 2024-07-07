@@ -11,7 +11,7 @@ import FlashMessage from 'react-native-flash-message';
 import Dashboard from './src/screens/dashboard/Dashboard';
 import Profile from './src/screens/dashboard/Profile';
 import Hall from './src/screens/dashboard/Hall';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {SafeAreaProvider, initialWindowMetrics} from 'react-native-safe-area-context';
 import Department from './src/screens/dashboard/Department';
 import Syllabus from './src/screens/dashboard/Syllabus';
 import Notice from './src/screens/dashboard/Notice';
@@ -25,10 +25,9 @@ const Stack = createStackNavigator();
 
 const App = () => {
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <NativeBaseProvider>
         <NavigationContainer>
-          <NavigationListener>
             <Stack.Navigator initialRouteName={'Login'}>
               <Stack.Screen
                 name="Login"
@@ -97,7 +96,6 @@ const App = () => {
               />
             </Stack.Navigator>
             <FlashMessage position="top" />
-          </NavigationListener>
         </NavigationContainer>
       </NativeBaseProvider>
     </SafeAreaProvider>
