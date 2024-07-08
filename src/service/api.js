@@ -382,14 +382,15 @@ export const profileData = async reg => {
 export const login = async (reg, pass) => {
 
   const isConnected = await statusCheck();
-  if(!isConnected || isConnected?.status !== '1'){
+  if(isConnected && isConnected?.status !== '1'){
     toast(
       'danger',
       isConnected?.title,
       isConnected?.subtitle,
     );
     return null;
-  }
+    }
+  
 
   if (!reg || reg.length !== 10) {
     toast('danger', 'Invalid Registration Number');
@@ -453,16 +454,24 @@ export const login = async (reg, pass) => {
 
 export const statusCheck = async () => {
   try {
+    await netInfo();
     const device = deviceInfo();
     const network = await netInfo();
     const app = await appInfo();
+    
 
-    if (!network?.state?.isInternetReachable) {
-      return {
-        status: '300',
-        title: 'No Internet',
-        subtitle: 'Please Check Your Internet Connection and Try Again.',
-      };
+    if (network && !network?.state?.isInternetReachable) {
+      console.log("🚀 ~ statusCheck ~ network:", network)
+      const checkAgain = await netInfo();
+      if(checkAgain && !checkAgain?.state?.isInternetReachable){
+        console.log("🚀 ~ statusCheck ~ checkAgain:", checkAgain)
+        return {
+          status: '300',
+          title: 'No Internet',
+          subtitle: 'Please Check Your Internet Connection and Try Again.',
+        };
+      }
+      
     } else {
       const response = await axios.post(
         `${BASE_URL}/statusCheck?version=${app}`,
@@ -474,3 +483,7 @@ export const statusCheck = async () => {
     throw error; // Re-throw the error to propagate it to the caller
   }
 };
+
+
+
+// Initial check

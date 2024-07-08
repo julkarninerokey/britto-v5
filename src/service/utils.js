@@ -48,6 +48,8 @@ export const deviceInfo = () => {
 };
 
 export const netInfo = async () => {
+  checkNetworkConnection();
+  await NetInfo.fetch();
   const state = await NetInfo.fetch();
   const ip = state.details.ipAddress; // This may vary depending on how NetInfo provides details
 
@@ -57,6 +59,29 @@ export const netInfo = async () => {
 export const appInfo = async () => {
   return version;
 };
+
+// Function to check network connection and handle the response
+async function checkNetworkConnection() {
+  try {
+    const state = await netInfo();
+    if (state.isConnected && state.isInternetReachable) {
+      console.log('🚀 ~ netInfo ~ state:', state);
+    } else {
+      console.log('No internet connection or internet is not reachable');
+    }
+  } catch (error) {
+    console.error('Error fetching network information:', error);
+  }
+}
+
+// Add an event listener to monitor network changes
+NetInfo.addEventListener(state => {
+  if (state.isConnected) {
+    checkNetworkConnection();
+  } else {
+    console.log('No network connection');
+  }
+});
 
 // For application installation info, you might need to implement custom methods or find suitable packages
 // react-native-device-info provides some relevant methods
