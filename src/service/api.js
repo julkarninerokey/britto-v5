@@ -3,10 +3,10 @@ import {appInfo, deviceInfo, netInfo, saveLogin, toast} from './utils';
 import DeviceInfo from 'react-native-device-info';
 import {getLocales} from 'react-native-localize';
 
-const BASE_URL = 'http://localhost:4100/';
+const BASE_URL = 'http://192.168.0.109:4100/';
 
 const API_URL = `${BASE_URL}api/britto`;
-const API_SECRET_TOKEN = 'your-strong-secret';
+const API_SECRET_TOKEN = '8f3c1e2d3a4b5c6d7e8f9a0b1c2d3e4f';
 
 // Helper for status check (unchanged)
 export const statusCheck = async () => {
@@ -74,16 +74,16 @@ export const profileData = reg => fetchByReg('profileData', reg);
 
 // Login
 export const login = async (reg, pass) => {
-  const isConnected = await statusCheck();
-  if (isConnected && isConnected?.status !== '1') {
-    toast('danger', isConnected?.title, isConnected?.subtitle);
-    return null;
-  }
+  // const isConnected = await statusCheck();
+  // if (isConnected && isConnected?.status !== '1') {
+  //   toast('danger', isConnected?.title, isConnected?.subtitle);
+  //   return null;
+  // }
   if (!reg || reg.length !== 10) {
     toast('danger', 'Invalid Registration Number');
     return false;
   } else if (!pass || pass.length < 6) {
-    toast('danger', 'Invalid Password');
+    toast('danger', 'Invalid Passworxd');
     return false;
   } else {
     const net = await netInfo();
@@ -135,6 +135,7 @@ export const login = async (reg, pass) => {
         // errorReport(errorData);
       }
     } catch (error) {
+      console.error('Login Error:', error);
       toast('danger', 'Invalid Password');
       throw error;
     }
