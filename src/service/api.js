@@ -3,18 +3,33 @@ import {appInfo, deviceInfo, netInfo, saveLogin, toast} from './utils';
 import DeviceInfo from 'react-native-device-info';
 import {getLocales} from 'react-native-localize';
 
-const BASE_URL = 'https://britto.result.du.ac.bd/app/';
+const BASE_URL = 'http://localhost:4100/';
 
+const API_URL = `${BASE_URL}api/britto`;
+const API_SECRET_TOKEN = 'your-strong-secret';
 
+// Helper for status check (unchanged)
+export const statusCheck = async () => {
+  try {
+    const app = await appInfo();
 
-export const getCertificate = async reg => {
-  const isConnected = await statusCheck();
-  if(!isConnected || isConnected?.status !== '1'){
-    toast(
-      'danger',
-      isConnected?.title,
-      isConnected?.subtitle,
+    const response = await axios.post(
+      API_URL,
+      {action: 'statusCheck', version: app},
+      {headers: {'x-api-token': API_SECRET_TOKEN}},
     );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching information:', error);
+    throw error;
+  }
+};
+
+// Unified helper for all reg-based actions
+async function fetchByReg(action, reg) {
+  const isConnected = await statusCheck();
+  if (!isConnected || isConnected?.status !== '1') {
+    toast('danger', isConnected?.title, isConnected?.subtitle);
     return null;
   }
   if (!reg || reg.length !== 10) {
@@ -24,405 +39,80 @@ export const getCertificate = async reg => {
       'Logout & Login Again to Continue.',
     );
     return false;
-  } else {
-    const data = {
-      reg: reg,
-    };
-
-    try {
-      const response = await axios.get(`${BASE_URL}/getAllCertificateInfo`, {
-        params: data,
-      });
-
-      if (response?.data?.status === 200) {
-        return response?.data;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      toast(
-        'danger',
-        'Invalid Registration Number',
-        'Logout & Login Again to Continue.',
-      );
-      throw error;
-    }
   }
-};
-
-export const getMarksheet = async reg => {
-  const isConnected = await statusCheck();
-  if(!isConnected || isConnected?.status !== '1'){
-    toast(
-      'danger',
-      isConnected?.title,
-      isConnected?.subtitle,
+  try {
+    const response = await axios.post(
+      API_URL,
+      {action, reg},
+      {headers: {'x-api-token': API_SECRET_TOKEN}},
     );
-    return null;
-  }
-  if (!reg || reg.length !== 10) {
+    if (response?.data?.status === 200) {
+      return response.data;
+    } else {
+      return false;
+    }
+  } catch (error) {
     toast(
       'danger',
       'Invalid Registration Number',
       'Logout & Login Again to Continue.',
     );
-    return false;
-  } else {
-    const data = {
-      reg: reg,
-    };
-
-    try {
-      const response = await axios.get(`${BASE_URL}/getAllMarksheetInfo`, {
-        params: data,
-      });
-
-      if (response?.data?.status === 200) {
-        return response?.data;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      toast(
-        'danger',
-        'Invalid Registration Number',
-        'Logout & Login Again to Continue.',
-      );
-      throw error;
-    }
+    throw error;
   }
-};
+}
 
-export const getResult = async reg => {
-  const isConnected = await statusCheck();
-  if(!isConnected || isConnected?.status !== '1'){
-    toast(
-      'danger',
-      isConnected?.title,
-      isConnected?.subtitle,
-    );
-    return null;
-  }
-  if (!reg || reg.length !== 10) {
-    toast(
-      'danger',
-      'Invalid Registration Number',
-      'Logout & Login Again to Continue.',
-    );
-    return false;
-  } else {
-    const data = {
-      reg: reg,
-    };
+// All reg-based actions
+export const getCertificate = reg => fetchByReg('getCertificate', reg);
+export const getMarksheet = reg => fetchByReg('getMarksheet', reg);
+export const getResult = reg => fetchByReg('getResult', reg);
+export const getExam = reg => fetchByReg('getExam', reg);
+export const getNotice = reg => fetchByReg('getNotice', reg);
+export const getSyllabus = reg => fetchByReg('getSyllabus', reg);
+export const deptData = reg => fetchByReg('deptData', reg);
+export const hallData = reg => fetchByReg('hallData', reg);
+export const profileData = reg => fetchByReg('profileData', reg);
 
-    try {
-      const response = await axios.get(`${BASE_URL}/getAllResult`, {
-        params: data,
-      });
-
-      if (response?.data?.status === 200) {
-        return response?.data;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      toast(
-        'danger',
-        'Invalid Registration Number',
-        'Logout & Login Again to Continue.',
-      );
-      throw error;
-    }
-  }
-};
-
-export const getExam = async reg => {
-  const isConnected = await statusCheck();
-  if(!isConnected || isConnected?.status !== '1'){
-    toast(
-      'danger',
-      isConnected?.title,
-      isConnected?.subtitle,
-    );
-    return null;
-  }
-  if (!reg || reg.length !== 10) {
-    toast(
-      'danger',
-      'Invalid Registration Number',
-      'Logout & Login Again to Continue.',
-    );
-    return false;
-  } else {
-    const data = {
-      reg: reg,
-    };
-
-    try {
-      const response = await axios.get(`${BASE_URL}/getFomFillupData`, {
-        params: data,
-      });
-
-      if (response?.data?.status === 200) {
-        return response?.data;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      toast(
-        'danger',
-        'Invalid Registration Number',
-        'Logout & Login Again to Continue.',
-      );
-      throw error;
-    }
-  }
-};
-
-export const getNotice = async reg => {
-  const isConnected = await statusCheck();
-  if(!isConnected || isConnected?.status !== '1'){
-    toast(
-      'danger',
-      isConnected?.title,
-      isConnected?.subtitle,
-    );
-    return null;
-  }
-  if (!reg || reg.length !== 10) {
-    toast(
-      'danger',
-      'Invalid Registration Number',
-      'Logout & Login Again to Continue.',
-    );
-    return false;
-  } else {
-    const data = {
-      reg: reg,
-    };
-
-    try {
-      const response = await axios.get(`${BASE_URL}/getAllNotices`, {
-        params: data,
-      });
-
-      if (response?.data?.status === 200) {
-        return response?.data;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      toast(
-        'danger',
-        'Invalid Registration Number',
-        'Logout & Login Again to Continue.',
-      );
-      throw error;
-    }
-  }
-};
-
-export const getSyllabus = async reg => {
-  const isConnected = await statusCheck();
-  if(!isConnected || isConnected?.status !== '1'){
-    toast(
-      'danger',
-      isConnected?.title,
-      isConnected?.subtitle,
-    );
-    return null;
-  }
-  if (!reg || reg.length !== 10) {
-    toast(
-      'danger',
-      'Invalid Registration Number',
-      'Logout & Login Again to Continue.',
-    );
-    return false;
-  } else {
-    const data = {
-      reg: reg,
-    };
-
-    try {
-      const response = await axios.get(`${BASE_URL}/getSyllabus`, {
-        params: data,
-      });
-
-      if (response?.data?.status === 200) {
-        return response?.data;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      toast(
-        'danger',
-        'Invalid Registration Number',
-        'Logout & Login Again to Continue.',
-      );
-      throw error;
-    }
-  }
-};
-
-export const deptData = async reg => {
-  const isConnected = await statusCheck();
-  if(!isConnected || isConnected?.status !== '1'){
-    toast(
-      'danger',
-      isConnected?.title,
-      isConnected?.subtitle,
-    );
-    return null;
-  }
-  if (!reg || reg.length !== 10) {
-    toast(
-      'danger',
-      'Invalid Registration Number',
-      'Logout & Login Again to Continue.',
-    );
-    return false;
-  } else {
-    const data = {
-      reg: reg,
-    };
-
-    try {
-      const response = await axios.get(`${BASE_URL}/getDeptData`, {
-        params: data,
-      });
-
-      if (response?.data?.status === 200) {
-        return response?.data;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
-};
-
-export const hallData = async reg => {
-  const isConnected = await statusCheck();
-  if(!isConnected || isConnected?.status !== '1'){
-    toast(
-      'danger',
-      isConnected?.title,
-      isConnected?.subtitle,
-    );
-    return null;
-  }
-  if (!reg || reg.length !== 10) {
-    toast(
-      'danger',
-      'Invalid Registration Number',
-      'Logout & Login Again to Continue.',
-    );
-    return false;
-  } else {
-    const data = {
-      reg: reg,
-    };
-
-    try {
-      const response = await axios.get(`${BASE_URL}/getHallData`, {
-        params: data,
-      });
-
-      if (response?.data?.status === 200) {
-        return response?.data;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
-};
-
-export const profileData = async reg => {
-  const isConnected = await statusCheck();
-  if(!isConnected || isConnected?.status !== '1'){
-    toast(
-      'danger',
-      isConnected?.title,
-      isConnected?.subtitle,
-    );
-    return null;
-  }
-
-  if (!reg || reg.length !== 10) {
-    toast(
-      'danger',
-      'Invalid Registration Number',
-      'Logout & Login Again to Continue.',
-    );
-  } else {
-    const data = {
-      reg: reg,
-    };
-
-    try {
-      const response = await axios.get(`${BASE_URL}/getProfileData`, {
-        params: data,
-      });
-
-      if (response?.data?.status === 200) {
-        return response?.data;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
-};
-
+// Login
 export const login = async (reg, pass) => {
-
   const isConnected = await statusCheck();
-  if(isConnected && isConnected?.status !== '1'){
-    toast(
-      'danger',
-      isConnected?.title,
-      isConnected?.subtitle,
-    );
+  if (isConnected && isConnected?.status !== '1') {
+    toast('danger', isConnected?.title, isConnected?.subtitle);
     return null;
-    }
-  
-
+  }
   if (!reg || reg.length !== 10) {
     toast('danger', 'Invalid Registration Number');
+    return false;
   } else if (!pass || pass.length < 6) {
     toast('danger', 'Invalid Password');
+    return false;
   } else {
     const net = await netInfo();
     const Device = deviceInfo();
     const osVersion = Device.systemVersion || 0;
     const deviceName = `${DeviceInfo.getBrand()} - ${DeviceInfo.getModel()}`;
-    const statusBarHeight = DeviceInfo.hasNotch() ? 30 : 20; // Assuming 30 if there's a notch, otherwise 20
-    const sessionId = DeviceInfo.getUniqueId(); // Using unique ID as session ID
+    const statusBarHeight = DeviceInfo.hasNotch() ? 30 : 20;
+    const sessionId = DeviceInfo.getUniqueId();
     const lang = getLocales();
     const appVersion = (await appInfo()) || 1;
 
     const data = {
-      reg: reg,
-      pass: pass,
+      action: 'login',
+      reg,
+      pass,
       netInfo: JSON.stringify(net),
-      deviceName: deviceName,
-      osVersion: osVersion,
+      deviceName,
+      osVersion,
       lang: JSON.stringify(lang),
-      statusBarHeight: statusBarHeight,
-      sessionId: sessionId,
+      statusBarHeight,
+      sessionId,
       ipAddress: net?.ip,
       device: JSON.stringify(Device),
       version: appVersion,
     };
 
     try {
-      const response = await axios.get(`${BASE_URL}/checkForLogin`, {
-        params: data,
+      const response = await axios.post(API_URL, data, {
+        headers: {'x-api-token': API_SECRET_TOKEN},
       });
 
       if (response.data.status === 300) {
@@ -449,41 +139,6 @@ export const login = async (reg, pass) => {
       throw error;
     }
   }
-  //return false;
 };
-
-export const statusCheck = async () => {
-  try {
-    await netInfo();
-    const device = deviceInfo();
-    const network = await netInfo();
-    const app = await appInfo();
-    
-
-    if (network && !network?.state?.isInternetReachable) {
-      console.log("🚀 ~ statusCheck ~ network:", network)
-      const checkAgain = await netInfo();
-      if(checkAgain && !checkAgain?.state?.isInternetReachable){
-        console.log("🚀 ~ statusCheck ~ checkAgain:", checkAgain)
-        return {
-          status: '300',
-          title: 'No Internet',
-          subtitle: 'Please Check Your Internet Connection and Try Again.',
-        };
-      }
-      
-    } else {
-      const response = await axios.post(
-        `${BASE_URL}/statusCheck?version=${app}`,
-      );
-      return response.data;
-    }
-  } catch (error) {
-    console.error('Error fetching information:', error);
-    throw error; // Re-throw the error to propagate it to the caller
-  }
-};
-
-
 
 // Initial check

@@ -1,29 +1,37 @@
 // NavigationListener.js
 
 import React, {useEffect} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {statusCheck} from '../service/api';
 
 const NavigationListener = ({children}) => {
   const navigation = useNavigation();
+  const route = useRoute();
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('state', async () => {
-      const check = await statusCheck();
-      
-      if (check && check?.status !== '1') {
-        navigation.navigate('OutOfService');
-        console.log("🚀 ~ NavigationListener ~ check:", check?.status)
-      console.log("🚀 ~ NavigationListener ~ check:typeof ", typeof check?.status)
-      }else{
-      console.log("🚀 ~ NavigationListener ~ check else:", check)
-      navigation.navigate('Login');
-
+    let isActive = true;
+    const unsubscribe = navigation.addListener('focus', async () => {
+      try {
+        const check = await statusCheck();
+        if (!isActive) return;
+        if (check && check?.status !== '1') {
+          if (route.name !== 'OutOfService') {
+            navigation.navigate('OutOfService');
+          }
+        } else {
+          if (route.name !== 'Login') {
+            navigation.navigate('Login');
+          }
+        }
+      } catch (error) {
+         toast('danger', 'Error', 'Failed to check status. Please try again later.');
       }
     });
-
-    return unsubscribe;
-  }, [navigation]);
+    return () => {
+      isActive = false;
+      unsubscribe();
+    };
+  }, [navigation, route.name]);
 
   return <>{children}</>;
 };

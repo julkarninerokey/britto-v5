@@ -67,7 +67,7 @@ async function checkNetworkConnection() {
     if (state.isConnected && state.isInternetReachable) {
       console.log('🚀 ~ netInfo ~ state:', state);
     } else {
-      console.log('No internet connection or internet is not reachable');
+      // console.log('No internet connection or internet is not reachable');
     }
   } catch (error) {
     console.error('Error fetching network information:', error);
