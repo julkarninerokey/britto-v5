@@ -44,7 +44,7 @@ const Dashboard = ({navigation}) => {
               source={{uri: item.icon}}
               alt={item.icon}
               style={{width: '100%', height: '100%'}}
-              onError={error => console.log('Image Error:', error)}
+              onError={error => console.log('Dashboard Icon Error:')}
             />
           </VStack>
         </HStack>

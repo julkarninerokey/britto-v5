@@ -18,7 +18,7 @@ const ProfileCard = ({name, year, hall, chobi}) => {
     setStudentName(name ? name : 'Julkarnine Rokey');
     setSession(session ? session : '2017-18');
     setHallName(hall ? hall : 'রোকেয়া হল');
-    setPhoto(photo || 'https://v2.result.du.ac.bd/assets/student.png');
+    setPhoto(photo || '../assets/icons/user.png');
   };
 
   useEffect(() => {
@@ -49,6 +49,7 @@ const ProfileCard = ({name, year, hall, chobi}) => {
                 style={styles.photo}
                 alt="Profile Photo"
                 size="md"
+                onError={error => {console.log('Profile Photo Error:')}}
                 borderRadius={100}
               />
             </VStack>

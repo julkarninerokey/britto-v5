@@ -1,11 +1,9 @@
 import axios from 'axios';
-import {appInfo, deviceInfo, netInfo, saveLogin, toast} from './utils';
+import {API_URL, appInfo, deviceInfo, netInfo, saveLogin, toast} from './utils';
 import DeviceInfo from 'react-native-device-info';
 import {getLocales} from 'react-native-localize';
 
-const BASE_URL = 'http://192.168.0.108:4100/';
 
-const API_URL = `${BASE_URL}api/britto`;
 const API_SECRET_TOKEN = '8f3c1e2d3a4b5c6d7e8f9a0b1c2d3e4f';
 
 // Helper for status check (unchanged)

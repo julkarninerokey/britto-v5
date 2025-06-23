@@ -74,7 +74,7 @@ const LoginScreen = ({navigation}) => {
           'Unknown Status Code sent For login',
           [reg, password, appVersion],
         ];
-        console.log('🚀 ~ handleLogin ~ errorData:', errorData);
+        // console.log('🚀 ~ handleLogin ~ errorData:', errorData);
         // errorReport(errorData);
       }
     } catch (error) {

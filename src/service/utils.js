@@ -4,7 +4,7 @@ import {showMessage} from 'react-native-flash-message';
 import {version} from '../../package.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const API_URL = 'http://192.168.0.108:4100/api/britto';
+export const API_URL = 'http://172.20.10.8:4100/api/britto';
 export const API_SECRET_TOKEN = '8f3c1e2d3a4b5c6d7e8f9a0b1c2d3e4f';
 
 export const checkUserLoginStatus = async () => {
@@ -12,22 +12,26 @@ export const checkUserLoginStatus = async () => {
   return token;
 };
 
-export const saveLogin = async (loginData, reg) => {
+export const saveLogin = async (loginData2, reg) => {
   try {
-    await AsyncStorage.setItem('reg', reg);
-    await AsyncStorage.setItem('token', JSON.stringify(loginData?.token));
-    await AsyncStorage.setItem('photo', loginData?.photo);
-    await AsyncStorage.setItem('name', loginData?.name);
-    await AsyncStorage.setItem('hall', loginData?.hall);
-    await AsyncStorage.setItem('dept', loginData?.dept);
+    const user = loginData2?.data || {};
+    await AsyncStorage.setItem('reg', (reg || user.reg || '').toString());
+    // Only save token if it exists
+    if (loginData2?.token) {
+      await AsyncStorage.setItem('token', JSON.stringify(loginData2.token));
+    }
+    await AsyncStorage.setItem('photo', user.photo || '');
+    await AsyncStorage.setItem('name', user.name || '');
+    await AsyncStorage.setItem('hall', user.hall || '');
+    await AsyncStorage.setItem('dept', user.dept || '');
     await AsyncStorage.setItem(
       'dashboard',
-      JSON.stringify(loginData?.dashboard),
-    ); // Ensure this is properly stringified if it is an object
+      JSON.stringify(user.dashboard || []),
+    );
 
     return true;
   } catch (error) {
-    console.error('Login Error:', error);
+    console.error('Login Save Error:', error);
   }
 };
 
