@@ -4,6 +4,9 @@ import {showMessage} from 'react-native-flash-message';
 import {version} from '../../package.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+export const API_URL = 'http://192.168.0.108:4100/api/britto';
+export const API_SECRET_TOKEN = '8f3c1e2d3a4b5c6d7e8f9a0b1c2d3e4f';
+
 export const checkUserLoginStatus = async () => {
   const token = await AsyncStorage.getItem('token');
   return token;
@@ -48,11 +51,9 @@ export const deviceInfo = () => {
 };
 
 export const netInfo = async () => {
-  checkNetworkConnection();
-  await NetInfo.fetch();
+  // Removed call to checkNetworkConnection to prevent infinite recursion
   const state = await NetInfo.fetch();
-  const ip = state.details.ipAddress; // This may vary depending on how NetInfo provides details
-
+  const ip = state.details?.ipAddress; // Use optional chaining for safety
   return {ip, state};
 };
 
@@ -63,11 +64,12 @@ export const appInfo = async () => {
 // Function to check network connection and handle the response
 async function checkNetworkConnection() {
   try {
-    const state = await netInfo();
+    const { state } = await netInfo();
     if (state.isConnected && state.isInternetReachable) {
-      console.log('🚀 ~ netInfo ~ state:', state);
+      return state;
+      console.log('Internet is reachable');  
     } else {
-      // console.log('No internet connection or internet is not reachable');
+       console.log('No internet connection or internet is not reachable');
     }
   } catch (error) {
     console.error('Error fetching network information:', error);

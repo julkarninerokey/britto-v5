@@ -10,10 +10,11 @@ ADB_PATH=$(which adb)
 RN_CLI=$(which npx)
 
 # --------------------------
-# 1. Start Metro Bundler
+# 1. Start Metro Bundler (in background)
 # --------------------------
 echo "🌀 Starting Metro Bundler..."
-x-terminal-emulator -e "bash -c 'cd \"$PROJECT_DIR\" && $RN_CLI react-native start --reset-cache; exec bash'" &
+$RN_CLI react-native start --reset-cache &
+METRO_PID=$!
 
 sleep 3
 
@@ -34,3 +35,6 @@ $RN_CLI react-native run-android
 # --------------------------
 echo "📂 If app doesn't reload, open Dev Menu using:"
 echo "    adb shell input keyevent 82  (or press Ctrl+M in emulator)"
+
+# Optionally, wait for Metro Bundler to finish (if you want to keep the script running)
+# wait $METRO_PID
