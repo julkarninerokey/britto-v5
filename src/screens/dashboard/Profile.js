@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {profileData} from '../../service/api';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import 'react-native-pager-view';
-import {color} from '../../service/utils';
+import {color, formatDate, getFullAddress} from '../../service/utils';
 
 const InfoRow = ({label, value}) => (
   <HStack alignItems="center">
@@ -21,23 +21,25 @@ const InfoRow = ({label, value}) => (
   </HStack>
 );
 
-const FirstRoute = ({data, address}) => (
+const FirstRoute = ({data}) => (
   <ScrollView>
     <Box flex={1} p={4} bg="white">
       <VStack space={2}>
-        <InfoRow label="Student Name" value={data.name_en} />
-        <InfoRow label="Student Name (Bn)" value={data.name_bn} />
-        <InfoRow label="Father's Name" value={data.father_name} />
-        <InfoRow label="Mother's Name" value={data.mother_name} />
+        <InfoRow label="Student Name" value={data.ADMITTED_STUDENT_NAME} />
+        <InfoRow label="Student Name (Bn)" value={data.STUDENT_BANGLA_NAME} />
+        <InfoRow label="Father's Name" value={data.ADMITTED_STUDENT_FATHERS_N} />
+        <InfoRow label="Mother's Name" value={data.ADMITTED_STUDENT_MOTHERS_N} />
         <InfoRow
           label="Date of Birth"
-          value={`${data.dobD}-${data.dobM}-${data.dobY}`}
+          value={formatDate(data.ADMITTED_STUDENT_DOB)}
         />
-        <InfoRow label="Address" value={address} />
-        <InfoRow label="Phone" value={data.phone} />
-        <InfoRow label="Email" value={data.email} />
+        <InfoRow label="Present Address" value={getFullAddress(data, 'present')} />
+        <InfoRow label="Permanent Address" value={getFullAddress(data, 'permanent')} />
+        <InfoRow label="Phone" value={data.ADMITTED_STUDENT_CONTACT_NO} />
+        <InfoRow label="Email" value={data.ADMITTED_STUDENT_EMAIL} />
         <InfoRow label="Blood Group" value={data.blood_group} />
-        <InfoRow label="Religion" value={data.dhormo} />
+        <InfoRow label="Religion" value={data.RELIGION} />
+        <InfoRow label="Nationality" value={data.NATIONALITY} />
       </VStack>
     </Box>
   </ScrollView>
@@ -46,12 +48,14 @@ const FirstRoute = ({data, address}) => (
 const SecondRoute = ({data}) => (
   <Box flex={1} p={4} bg="white">
     <VStack space={2}>
-      <InfoRow label="Department" value={data.dept_name} />
-      <InfoRow label="Hall" value={data.hall_name} />
-      <InfoRow label="Registration Number" value={data.reg_num} />
+      <InfoRow label="Department (En)" value={data.SUBJECTS_TITLE_EN} />
+      <InfoRow label="Department (Bn)" value={data.SUBJECTS_TITLE} />
+      <InfoRow label="Hall (En)" value={data.hall_title_en} />
+      <InfoRow label="Hall (Bn)" value={data.hall_title} />
+      <InfoRow label="Registration Number" value={data.ADMITTED_STUDENT_REG_NO} />
       <InfoRow
         label="Session"
-        value={`${data.session}-${parseInt(data.session) + 1}`}
+        value={data.SESSION_NAME}
       />
     </VStack>
   </Box>

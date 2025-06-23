@@ -115,3 +115,55 @@ export const defaultUserPhoto = require('../assets/icons/user.png');
 // ##### sudo ./gradlew assembleDebug
 
 // ####-----------------------------------
+// Format ISO date string (e.g., 1999-06-22T18:00:00.000Z) to DD-MM-YYYY
+export function formatDate(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '';
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
+// Formats address fields into a single string, checking each for existence
+export function formatAddress(addressObj) {
+  if (!addressObj || typeof addressObj !== 'object') return '';
+  const parts = [
+    addressObj.present_house_no,
+    addressObj.present_house_road,
+    addressObj.present_post_office,
+    addressObj.present_post_code,
+    addressObj.present_police_station,
+    addressObj.present_upa_zilla,
+    addressObj.present_district,
+  ];
+  // Filter out null/undefined/empty values and join with comma
+  return parts.filter(Boolean).join(', ');
+}
+
+// Returns full address string for present or permanent address based on type
+export function getFullAddress(data, type = 'present') {
+  if (!data || typeof data !== 'object') return '';
+  if (type === 'present') {
+    return formatAddress({
+      present_house_no: data.present_house_no,
+      present_house_road: data.present_house_road,
+      present_post_office: data.present_post_office,
+      present_post_code: data.present_post_code,
+      present_police_station: data.present_police_station,
+      present_upa_zilla: data.present_upa_zilla,
+      present_district: data.present_district,
+    });
+  } else {
+    return formatAddress({
+      present_house_no: data.house_no, // fallback to house_no
+      present_house_road: data.house_road, // fallback to house_road
+      present_post_office: data.post_office,
+      present_post_code: data.post_code,
+      present_police_station: data.police_station,
+      present_upa_zilla: data.upa_zilla,
+      present_district: data.district,
+    });
+  }
+}
