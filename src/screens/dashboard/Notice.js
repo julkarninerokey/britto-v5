@@ -7,6 +7,7 @@ import {getNotice} from '../../service/api';
 import 'react-native-pager-view';
 import {IconListLoading} from '../../components/LoadingAnimation';
 import AccordionComponent from '../../components/AccordionComponent';
+import { formatDateTime } from '../../service/utils';
 
 const Notice = ({navigation}) => {
   const [data, setData] = useState([]);
@@ -23,9 +24,10 @@ const Notice = ({navigation}) => {
       const response = await getNotice(reg);
       const accordionData = response?.result.map(item => ({
         title: item.text,
+        details: item.description,
         content: item.description,
         icon: 'ios-arrow-down',
-        badges: [`${item.name}`, `${item.dateTime}`], // You can customize the badges as needed
+        badges: [`${item.name}`, `${formatDateTime(item.dateTime)}`], // You can customize the badges as needed
       }));
       setData(accordionData);
     };

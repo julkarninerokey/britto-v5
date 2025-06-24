@@ -46,7 +46,7 @@ const Examination = ({navigation}) => {
                 <Text>Course Language: {item.question_language || 'English'}</Text>
                 {Array.isArray(item.students) && item.students.length > 0 ? (
                   item.students.map((student, sidx) => (
-                    <VStack key={sidx} mt={2} p={2} borderWidth={1} borderRadius={8}>
+                    <VStack key={sidx} mt={2} p={2} >
                       <Text>Roll: {student.REGISTERED_STUDENTS_EXAM_ROLL}</Text>
                       <Text>Class Roll: {student.CLASS_ROLL}</Text>
                       <Text>Type: {student.REGISTERED_STUDENTS_TYPE === 1 ? 'Regular' : 'Improvement'}</Text>
@@ -55,9 +55,9 @@ const Examination = ({navigation}) => {
                       <Text>Payment Status: {student.PAYMENT_STATUS === 1 ? 'Paid' : 'Pending'}</Text>
                       {/* ...other student info as needed... */}
                       {Array.isArray(student.courses) && student.courses.length > 0 ? (
-                        <VStack mt={2}>
-                          <Text bold>Courses:</Text>
-                          <HStack justifyContent="space-between" mb={1}>
+                        <VStack mt={2} borderWidth={1} borderColor="gray.300" p={2} borderRadius={5}>
+                          <Text bold> Selected Courses:</Text>
+                          <HStack justifyContent="space-between" mb={1} >
                             <Text style={{width: 60, fontWeight: 'bold'}}>Code</Text>
                             <Text style={{flex: 1, fontWeight: 'bold'}}>Title</Text>
                             <Text style={{width: 50, fontWeight: 'bold'}}>Credit</Text>

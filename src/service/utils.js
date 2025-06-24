@@ -4,7 +4,7 @@ import {showMessage} from 'react-native-flash-message';
 import {version} from '../../package.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const API_URL = 'http://192.168.0.112:4100/api/britto';
+export const API_URL = 'http://172.20.10.8:4100/api/britto';
 export const API_SECRET_TOKEN = '8f3c1e2d3a4b5c6d7e8f9a0b1c2d3e4f';
 
 export const checkUserLoginStatus = async () => {
@@ -128,6 +128,24 @@ export function formatDate(dateString) {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
   return `${day}-${month}-${year}`;
+}
+
+export function formatDateTime(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '';
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  let hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  const hourStr = String(hours).padStart(2, '0');
+
+  return `${day}-${month}-${year}, ${hourStr}:${minutes} ${ampm}`;
 }
 
 // Formats address fields into a single string, checking each for existence
