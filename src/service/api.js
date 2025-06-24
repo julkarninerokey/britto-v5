@@ -60,6 +60,7 @@ export const getCertificate = reg => fetchByReg('getCertificate', reg);
 export const getMarksheet = reg => fetchByReg('getMarksheet', reg);
 export const getResult = reg => fetchByReg('getResult', reg);
 export const getExam = reg => fetchByReg('getExam', reg);
+export const getFormFillup = reg => fetchByReg('getFormFillup', reg);
 export const getNotice = reg => fetchByReg('getNotice', reg);
 export const getSyllabus = reg => fetchByReg('getSyllabus', reg);
 export const deptData = reg => fetchByReg('deptData', reg);

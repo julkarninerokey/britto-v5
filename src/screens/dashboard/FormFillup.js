@@ -1,15 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {VStack, ScrollView, Text, HStack, Button} from 'native-base';
+import {View, Text} from 'react-native';
+import {VStack, ScrollView, Button, HStack} from 'native-base';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getExam} from '../../service/api';
+import {getFormFillup} from '../../service/api';
 import 'react-native-pager-view';
 import {IconListLoading} from '../../components/LoadingAnimation';
 import AccordionComponent from '../../components/AccordionComponent';
 import { formatDate } from '../../service/utils';
 
-const Examination = ({navigation}) => {
+const FormFillup = ({navigation}) => {
   const [data, setData] = useState([]);
   const [iconUrl, setIconUrl] = useState();
   const [loading, setLoading] = useState(true);
@@ -29,16 +29,16 @@ const Examination = ({navigation}) => {
           console.error('Dashboard JSON parse error:', err);
         }
         setIconUrl(syllabusIcon);
-        const response = await getExam(reg);
+        const response = await getFormFillup(reg);
         if (!response || !Array.isArray(response.result) || response.result.length === 0) {
-          console.log('No examination data found:', response);
+          console.log('No form fillup data found:', response);
           setData([]);
         } else {
-          const accordionData = response.result.map(item => ({
+          const accordionData = response.result
+          .filter(item => !(item.STUDENT_FORM_FILL_UP === 2 && Array.isArray(item.students) && item.students.length === 0))
+          .map((item, idx) => ({
             title: `${item.EXAM_NAME} ${item.REGISTERED_EXAM_YEAR}`,
-            content: `Exam Start: ${formatDate(item.EXAM_START_DATE)},  Hall Verification: ${
-              item.HALL_VERIFY === 1 ? 'Verified' : 'Pending'
-            }, Course Language: ${item.question_language || 'English'}`,
+            content: `Last Date: ${formatDate(item.LAST_DATE)}, Exam Start: ${formatDate(item.EXAM_START_DATE)}, Course Language: ${item.question_language || 'English'}`,
             details: (
               <VStack space={2}>
                 <Text>Last Date: {formatDate(item.LAST_DATE)}</Text>
@@ -76,7 +76,7 @@ const Examination = ({navigation}) => {
                       </Button>
                       )}
                       <Button mt={2} size="sm" onPress={() => handleEdit(student)} variant={'outline'}>
-                        Download Admit Card
+                        Edit
                       </Button>
                     </VStack>
                   ))
@@ -89,18 +89,13 @@ const Examination = ({navigation}) => {
             ),
             icon: 'ios-arrow-down',
             badges: [
-              `${item.ADMIT_CARD_ISSUE === 1 ? 'Download Admit Card' : 'Admit Pending'}`,
-              `${
-                item.REGISTERED_STUDENTS_EXAM_ROLL
-                  ? 'Roll: ' + item.REGISTERED_STUDENTS_EXAM_ROLL
-                  : 'Running'
-              }`,
+              `${item.ADMIT_CARD_ISSUE === 1 ? 'Download Admit Card' : 'Form Fillup Running'}`,
             ],
           }));
           setData(accordionData);
         }
       } catch (error) {
-        console.error('Error loading examination data:', error);
+        console.error('Error loading form fillup data:', error);
         setData([]);
       } finally {
         setLoading(false);
@@ -109,9 +104,14 @@ const Examination = ({navigation}) => {
     checkForData();
   }, []);
 
+  const handleEdit = (student) => {
+    // Implement your edit logic here, e.g., navigate to an edit screen
+    navigation.navigate('EditStudent', { student });
+  };
+
   return (
     <View style={{flex: 1}}>
-      <AppBar title="Examinations" />
+      <AppBar title="Form-Fillup" />
       <VStack w={'100%'} flex={1}>
         {!loading && data && data.length > 0 ? (
           <ScrollView>
@@ -124,7 +124,7 @@ const Examination = ({navigation}) => {
         ) : !loading && data && data.length === 0 ? (
           <ScrollView>
             <VStack w="100%" alignItems="center" p={4}>
-              <Text>No examination data found.</Text>
+              <Text>No form fillup data found.</Text>
             </VStack>
           </ScrollView>
         ) : (
@@ -139,4 +139,4 @@ const Examination = ({navigation}) => {
   );
 };
 
-export default Examination;
+export default FormFillup;

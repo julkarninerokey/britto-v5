@@ -23,8 +23,6 @@ const AccordionComponent = ({data, iconUrl}) => {
         <Accordion.Summary
           _expanded={{
             bg: color.background,
-            borderLeftWidth: 4,
-            borderColor: color.primary,
           }}>
           <HStack alignItems="center" w={'100%'} space={3}>
             <Image
@@ -70,7 +68,7 @@ const AccordionComponent = ({data, iconUrl}) => {
           bg={'white'}
           borderLeftColor={color.primary}
           borderLeftWidth={4}>
-          <Text>{data.content}</Text>
+          {data.details}
         </Accordion.Details>
       </Accordion.Item>
     </Accordion>

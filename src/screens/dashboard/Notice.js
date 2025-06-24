@@ -11,6 +11,7 @@ import AccordionComponent from '../../components/AccordionComponent';
 const Notice = ({navigation}) => {
   const [data, setData] = useState([]);
   const [iconUrl, setIconUrl] = useState();
+
   useEffect(() => {
     const checkForData = async () => {
       const reg = await AsyncStorage.getItem('reg');
@@ -30,7 +31,7 @@ const Notice = ({navigation}) => {
     };
 
     checkForData();
-  }, [data]);
+  }, []);
 
   return (
     <View style={{flex: 1}}>

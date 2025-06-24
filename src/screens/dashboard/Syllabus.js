@@ -20,7 +20,7 @@ const Syllabus = ({navigation}) => {
       ).icon;
       setIconUrl(syllabusIcon);
       const response = await getSyllabus(reg);
-      setData(response.syllabus);
+      setData(response.data || []);
     };
 
     checkForData();
@@ -30,7 +30,7 @@ const Syllabus = ({navigation}) => {
     <View style={{flex: 1}}>
       <AppBar title="Syllabus" />
       <VStack w="100%" flex={1}>
-        {data.length > 0 ? (
+        {data && data.length > 0 ? ( 
           <ScrollView>
             <VStack w="100%" alignItems="flex-start" p={2}>
               {data.map((item, index) => (

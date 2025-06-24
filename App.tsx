@@ -22,6 +22,7 @@ import Certificate from './src/screens/dashboard/Certificate';
 import Transcript from './src/screens/dashboard/Transcript';
 import { SafeAreaView, StatusBar } from 'react-native';
 import { color } from './src/service/utils';
+import FormFillup from './src/screens/dashboard/FormFillup';
 
 const Stack = createStackNavigator();
 
@@ -77,6 +78,11 @@ const App = () => {
                 name="Examination"
                 component={Examination}
                 options={{title: 'Examination', headerShown: false}}
+              />
+              <Stack.Screen
+                name="FormFillup"
+                component={FormFillup}
+                options={{title: 'Form Fillup', headerShown: false}}
               />
               <Stack.Screen
                 name="Result"
