@@ -4,7 +4,7 @@ import {showMessage} from 'react-native-flash-message';
 import {version} from '../../package.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const API_URL = 'http://172.20.10.8:4100/api/britto';
+export const API_URL = 'http://192.168.0.112:4100/api/britto';
 export const API_SECRET_TOKEN = '8f3c1e2d3a4b5c6d7e8f9a0b1c2d3e4f';
 
 export const checkUserLoginStatus = async () => {

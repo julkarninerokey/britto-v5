@@ -1,12 +1,9 @@
 import axios from 'axios';
-import {API_URL, appInfo, deviceInfo, netInfo, saveLogin, toast} from './utils';
+import {API_SECRET_TOKEN, API_URL, appInfo, deviceInfo, netInfo, saveLogin, toast} from './utils';
 import DeviceInfo from 'react-native-device-info';
 import {getLocales} from 'react-native-localize';
 
 
-const API_SECRET_TOKEN = '8f3c1e2d3a4b5c6d7e8f9a0b1c2d3e4f';
-
-// Helper for status check (unchanged)
 export const statusCheck = async () => {
   try {
     const app = await appInfo();
@@ -23,7 +20,6 @@ export const statusCheck = async () => {
   }
 };
 
-// Unified helper for all reg-based actions
 async function fetchByReg(action, reg) {
   const isConnected = await statusCheck();
   if (!isConnected || isConnected?.status !== '1') {

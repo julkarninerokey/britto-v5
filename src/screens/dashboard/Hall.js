@@ -23,12 +23,12 @@ const FirstRoute = ({data}) => (
     <ScrollView>
       <VStack>
         <Text textAlign={'justify'}>
-          {data[0]?.history.replace(/<[^>]+>/g, '')}{' '}
+          {data?.history.replace(/<[^>]+>/g, '')}{' '}
         </Text>
       </VStack>
       <Spacer m={2} />
       <VStack>
-        <Text>{data[0]?.mission_vision.replace(/<[^>]+>/g, '')} </Text>
+        <Text>{data?.mission_vision.replace(/<[^>]+>/g, '')} </Text>
       </VStack>
     </ScrollView>
   </Center>
@@ -158,10 +158,10 @@ const Hall = ({navigation}) => {
       <AppBar title="Hall" />
       <VStack w={'100%'} flex={1}>
         <ProfileCard
-          name={data && data[0]?.name}
-          year={data && data[0]?.estyr}
+          name={data && data?.name}
+          // year={data && data?.estyr}
         />
-        {data[0]?.name ? (
+        {data?.name ? (
           <TabView
             navigationState={{index, routes}}
             renderScene={renderScene}
