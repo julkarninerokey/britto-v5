@@ -29,7 +29,6 @@ const AccordionComponent = ({data, iconUrl}) => {
               source={{uri: iconUrl}}
               size="xs"
               borderRadius={100}
-              alt="Julkarnine Rokey"
             />
             <VStack>
               <Heading
