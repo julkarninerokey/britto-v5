@@ -56,6 +56,7 @@ async function fetchByReg(action, reg) {
 }
 
 // All reg-based actions
+export const getTranscript = reg => fetchByReg('getTranscript', reg);
 export const getCertificate = reg => fetchByReg('getCertificate', reg);
 export const getMarksheet = reg => fetchByReg('getMarksheet', reg);
 export const getResult = reg => fetchByReg('getResult', reg);

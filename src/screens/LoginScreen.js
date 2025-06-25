@@ -17,8 +17,8 @@ import { getLocales } from 'react-native-localize';
 import axios from 'axios';
 
 const LoginScreen = ({navigation}) => {
-  const [reg, setReg] = useState('2017417693');
-  const [password, setPassword] = useState('597230ask');
+  const [reg, setReg] = useState('2017416153');
+  const [password, setPassword] = useState('SaNsEmu130');
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
@@ -140,6 +140,14 @@ const LoginScreen = ({navigation}) => {
               onPress={handleLogin}
               isDisabled={loading}>
               Sign in
+            </Button>
+            <Button
+              mt="2"
+              variant="outline"
+              colorScheme={'indigo'}
+              onPress={setAlt}
+              isDisabled={loading}>
+              Set Alternative Credentials
             </Button>
           </VStack>
         </Box>

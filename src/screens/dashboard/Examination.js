@@ -111,7 +111,7 @@ const Examination = ({navigation}) => {
 
   return (
     <View style={{flex: 1}}>
-      <AppBar title="Examinations" />
+      <AppBar title="Examination" />
       <VStack w={'100%'} flex={1}>
         {!loading && data && data.length > 0 ? (
           <ScrollView>
