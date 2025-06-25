@@ -44,7 +44,7 @@ const FormFillup = ({navigation}) => {
                 <Text>Last Date: {formatDate(item.LAST_DATE)}</Text>
                 <Text>Exam Start: {formatDate(item.EXAM_START_DATE)}</Text>
                 <Text>Course Language: {item.question_language || 'English'}</Text>
-                {Array.isArray(item.students) && item.students.length > 0 ? (
+                {item?.students && Array.isArray(item.students) && item.students.length > 0 ? (
                   item.students.map((student, sidx) => (
                     <VStack key={sidx} mt={2} p={2} borderWidth={1} borderRadius={8}>
                       <Text>Roll: {student.REGISTERED_STUDENTS_EXAM_ROLL}</Text>
@@ -54,7 +54,7 @@ const FormFillup = ({navigation}) => {
                       <Text>Hall Verification: {student.HALL_VERIFY === 1 ? 'Verified' : 'Not Verified'}</Text>
                       <Text>Payment Status: {student.PAYMENT_STATUS === 1 ? 'Paid' : 'Pending'}</Text>
                       {/* ...other student info as needed... */}
-                      {Array.isArray(student.courses) && student.courses.length > 0 ? (
+                      {student?.courses && Array.isArray(student.courses) && student.courses.length > 0 ? (
                         <VStack mt={2}>
                           <Text bold>Courses:</Text>
                           <HStack justifyContent="space-between" mb={1}>

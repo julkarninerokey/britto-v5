@@ -1,9 +1,14 @@
 // App.js
 
+import 'react-native-gesture-handler'; // <- this should be first
 import React from 'react';
-import {NativeBaseProvider} from 'native-base';
-import {createStackNavigator} from '@react-navigation/stack';
-import {NavigationContainer} from '@react-navigation/native';
+import { enableScreens } from 'react-native-screens';
+enableScreens(); // <- this line is mandatoryimport {NativeBaseProvider} from 'native-base';
+
+import { NativeBaseProvider } from 'native-base';
+import { createStackNavigator } from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
+
 import LoginScreen from './src/screens/LoginScreen';
 import OutOfServiceScreen from './src/screens/OutOfServiceScreen';
 import NavigationListener from './src/components/NavigationListener';
@@ -23,6 +28,7 @@ import Transcript from './src/screens/dashboard/Transcript';
 import { SafeAreaView, StatusBar } from 'react-native';
 import { color } from './src/service/utils';
 import FormFillup from './src/screens/dashboard/FormFillup';
+
 
 const Stack = createStackNavigator();
 
