@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
-import {VStack, ScrollView, Text, HStack, Button} from 'native-base';
+import {VStack, ScrollView, Text, HStack, Button, Box} from 'native-base';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getExam} from '../../service/api';
@@ -13,10 +13,12 @@ const Examination = ({navigation}) => {
   const [data, setData] = useState([]);
   const [iconUrl, setIconUrl] = useState();
   const [loading, setLoading] = useState(true);
+  const [noDataMsg, setNoDataMsg] = useState('');
 
   useEffect(() => {
     const checkForData = async () => {
       setLoading(true);
+      setNoDataMsg('');
       try {
         const reg = await AsyncStorage.getItem('reg');
         const dashboard = await AsyncStorage.getItem('dashboard');
@@ -30,10 +32,15 @@ const Examination = ({navigation}) => {
         }
         setIconUrl(syllabusIcon);
         const response = await getExam(reg);
-        if (!response || !Array.isArray(response.result) || response.result.length === 0) {
-          console.log('No examination data found:', response);
+
+        if (response.status === 201) {
           setData([]);
-        } else {
+          setNoDataMsg(response.message || 'No examination data found.');
+        } else if (
+          response.status === 200 &&
+          Array.isArray(response.result) &&
+          response.result.length > 0
+        ) {
           const accordionData = response.result.map(item => ({
             title: `${item.EXAM_NAME} ${item.REGISTERED_EXAM_YEAR}`,
             content: `Exam Start: ${formatDate(item.EXAM_START_DATE)},  Hall Verification: ${
@@ -53,7 +60,6 @@ const Examination = ({navigation}) => {
                       <Text>Department Verification: {student.REGISTERED_STUDENTS_COLLEGE_VERIFY ? 'Verified' : 'Not Verified'}</Text>
                       <Text>Hall Verification: {student.HALL_VERIFY === 1 ? 'Verified' : 'Not Verified'}</Text>
                       <Text>Payment Status: {student.PAYMENT_STATUS === 1 ? 'Paid' : 'Pending'}</Text>
-                      {/* ...other student info as needed... */}
                       {Array.isArray(student.courses) && student.courses.length > 0 ? (
                         <VStack mt={2} borderWidth={1} borderColor="gray.300" p={2} borderRadius={5}>
                           <Text bold> Selected Courses:</Text>
@@ -71,9 +77,9 @@ const Examination = ({navigation}) => {
                           ))}
                         </VStack>
                       ) : (
-                       <Button mt={2} size="sm" onPress={() => handleEdit(student)} variant={'outline'}>
-                        Enroll in Examination
-                      </Button>
+                        <Button mt={2} size="sm" onPress={() => handleEdit(student)} variant={'outline'}>
+                          Enroll in Examination
+                        </Button>
                       )}
                       <Button mt={2} size="sm" onPress={() => handleEdit(student)} variant={'outline'}>
                         Download Admit Card
@@ -81,9 +87,9 @@ const Examination = ({navigation}) => {
                     </VStack>
                   ))
                 ) : (
-                  <Button mt={2} size="sm" onPress={() => handleEdit(student)}>
-                        Start Enrollment
-                      </Button>
+                  <Button mt={2} size="sm" onPress={() => handleEdit()}>
+                    Start Enrollment
+                  </Button>
                 )}
               </VStack>
             ),
@@ -98,10 +104,14 @@ const Examination = ({navigation}) => {
             ],
           }));
           setData(accordionData);
+        } else {
+          setData([]);
+          setNoDataMsg('📝 No examination data is available for you at the moment. Please check back later or contact your department for updates.');
         }
       } catch (error) {
         console.error('Error loading examination data:', error);
         setData([]);
+        setNoDataMsg('Failed to load examination data. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -113,7 +123,13 @@ const Examination = ({navigation}) => {
     <View style={{flex: 1}}>
       <AppBar title="Examination" />
       <VStack w={'100%'} flex={1}>
-        {!loading && data && data.length > 0 ? (
+        {loading ? (
+          <ScrollView>
+            {[...Array(3)].map((_, index) => (
+              <IconListLoading key={index} />
+            ))}
+          </ScrollView>
+        ) : data && data.length > 0 ? (
           <ScrollView>
             <VStack w="100%" alignItems="flex-start" p={1}>
               {data.map((item, index) => (
@@ -121,18 +137,12 @@ const Examination = ({navigation}) => {
               ))}
             </VStack>
           </ScrollView>
-        ) : !loading && data && data.length === 0 ? (
-          <ScrollView>
-            <VStack w="100%" alignItems="center" p={4}>
-              <Text>No examination data found.</Text>
-            </VStack>
-          </ScrollView>
         ) : (
-          <ScrollView>
-            {[...Array(3)].map((_, index) => (
-              <IconListLoading key={index} />
-            ))}
-          </ScrollView>
+          <Box flex={1} alignItems="center" justifyContent="center" p={6}>
+            <Text color="gray.500" fontSize="md" textAlign="center">
+              {noDataMsg}
+            </Text>
+          </Box>
         )}
       </VStack>
     </View>

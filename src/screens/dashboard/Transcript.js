@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
-import {VStack, ScrollView, Text, Button, HStack, Select, CheckIcon} from 'native-base';
+import {VStack, ScrollView, Text, Button, HStack, Select, CheckIcon, Box} from 'native-base';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getTranscript} from '../../service/api';
@@ -15,6 +15,7 @@ const Transcript = ({navigation}) => {
   const [data, setData] = useState([]);
   const [iconUrl, setIconUrl] = useState();
   const [loading, setLoading] = useState(true);
+  const [noDataMessage, setNoDataMessage] = useState('No transcript data found.');
   const [showDrawer, setShowDrawer] = useState(false);
   const [selectedExam, setSelectedExam] = useState(null);
   const [form, setForm] = useState({
@@ -39,57 +40,69 @@ const Transcript = ({navigation}) => {
         }
         setIconUrl(syllabusIcon);
         const response = await getTranscript(reg);
-        const transcriptData = response?.data || [];
-        const accordionData = transcriptData.map((item, idx) => ({
-          title: `${item.exam_title}`,
-          content: `Result: ${item.result}, Published: ${item.result_pub_date}`,
-          details: (
-            <VStack space={2}>
-              <Text>Exam Title: {item.exam_title}</Text>
-              <Text>Result: {item.result}</Text>
-              <Text>Result Published: {item.result_pub_date}</Text>
-              <Text>Held In: {item.exam_held_in}</Text>
-              <Text>Status: {item.result_publication_status}</Text>
-              {/* Applications Table */}
-              {Array.isArray(item.applications) && item.applications.length > 0 ? (
-                <VStack mt={2}>
-                  <Text bold>Applications:</Text>
-                  {item.applications.map((app, aidx) => (
-                    <VStack key={aidx} mt={1} p={2} borderWidth={1} borderRadius={8}>
-                      <Text>Application ID: {app.trannscript_id}</Text>
-                      <Text>Delivery Type: {app.delivery_type}</Text>
-                      <Text>Payment Status: {app.payment_status === 1 ? 'Paid' : 'Unpaid'}</Text>
-                      <Text>Status: {app.app_status}</Text>
-                      <Text>Transaction ID: {app.transaction_id}</Text>
-                      <Text>Amount: {app.amount}</Text>
-                      <Text>Degree Name: {app.degree_name}</Text>
-                      <Text>Degree Level: {app.degree_level}</Text>
-                      <Text>Passing Academic Year: {app.passing_acyr}</Text>
-                      <Text>Number of Transcripts: {app.num_of_transcript}</Text>
-                      <Text>Number of Envelopes: {app.num_of_envelop}</Text>
-                      <Text>Expected Delivery Date: {formatDateTime(app.expected_delivery_date)}</Text>
-                      <Text>Application Time: {formatDateTime(app.create_at)}</Text>
-                      <Text>Last Update: {formatDateTime(app.updated_at)}</Text>
-                      <Text>Comment: {app.comment}</Text>
-                      {/* Add more fields as needed */}
-                    </VStack>
-                  ))}
-                </VStack>
-              ) : (
-                <Button mt={2} onPress={() => { setSelectedExam(item); setShowDrawer(true); }}>
-                  Apply Now
-                </Button>
-              )}
-            </VStack>
-          ),
-          icon: 'ios-arrow-down',
-          badges: [
-            `${item.applications?.length > 0 ? 'View Applications' : 'Apply Now'} `,
-          ],
-        }));
-        setData(accordionData);
+
+        if (response?.status === 201) {
+          setNoDataMessage(response?.message || 'No transcript data found.');
+          setData([]);
+        } else if (
+          response?.status === 200 &&
+          (Array.isArray(response.data) ? response.data.length > 0 : Array.isArray(response.result) && response.result.length > 0)
+        ) {
+          const transcriptData = response?.data || response?.result || [];
+          const accordionData = transcriptData.map((item, idx) => ({
+            title: `${item.exam_title}`,
+            content: `Result: ${item.result}, Published: ${item.result_pub_date}`,
+            details: (
+              <VStack space={2}>
+                <Text>Exam Title: {item.exam_title}</Text>
+                <Text>Held In: {item.exam_held_in}</Text>
+                <Text>Result: {item.result}</Text>
+                <Text>Published: {item.result_pub_date}</Text>
+                {/* Applications Table */}
+                {Array.isArray(item.applications) && item.applications.length > 0 ? (
+                  <VStack mt={2}>
+                    <Text bold>Applications:</Text>
+                    {item.applications.map((app, aidx) => (
+                      <VStack key={aidx} mt={1} p={2} borderWidth={1} borderRadius={8}>
+                        <Text>Application ID: {app.trannscript_id}</Text>
+                        <Text>Delivery Type: {app.delivery_type}</Text>
+                        <Text>Payment Status: {app.payment_status === 1 ? 'Paid' : 'Unpaid'}</Text>
+                        <Text>Status: {app.app_status}</Text>
+                        <Text>Transaction ID: {app.transaction_id}</Text>
+                        <Text>Amount: {app.amount}</Text>
+                        <Text>Degree Name: {app.degree_name}</Text>
+                        <Text>Degree Level: {app.degree_level}</Text>
+                        <Text>Passing Academic Year: {app.passing_acyr}</Text>
+                        <Text>Number of Transcripts: {app.num_of_transcript}</Text>
+                        <Text>Number of Envelopes: {app.num_of_envelop}</Text>
+                        <Text>Expected Delivery Date: {formatDateTime(app.expected_delivery_date)}</Text>
+                        <Text>Application Time: {formatDateTime(app.create_at)}</Text>
+                        <Text>Last Update: {formatDateTime(app.updated_at)}</Text>
+                        <Text>Comment: {app.comment}</Text>
+                        {/* Add more fields as needed */}
+                      </VStack>
+                    ))}
+                  </VStack>
+                ) : (
+                  <Button mt={2} onPress={() => { setSelectedExam(item); setShowDrawer(true); }}>
+                    Apply Now
+                  </Button>
+                )}
+              </VStack>
+            ),
+            icon: 'ios-arrow-down',
+            badges: [
+              `${item.applications?.length > 0 ? 'View Applications' : 'Apply Now'} `,
+            ],
+          }));
+          setData(accordionData);
+        } else {
+          setNoDataMessage('No transcript data found.');
+          setData([]);
+        }
       } catch (error) {
         console.error('Error loading transcript data:', error);
+        setNoDataMessage('No transcript data found.');
         setData([]);
       } finally {
         setLoading(false);
@@ -161,7 +174,13 @@ const Transcript = ({navigation}) => {
     <View style={{flex: 1}}>
       <AppBar title="Transcript" />
       <VStack w={'100%'} flex={1}>
-        {!loading && data.length > 0 ? (
+        {loading ? (
+          <ScrollView>
+            {[...Array(3)].map((_, index) => (
+              <IconListLoading key={index} />
+            ))}
+          </ScrollView>
+        ) : data.length > 0 ? (
           <ScrollView>
             <VStack w="100%" alignItems="flex-start" p={1}>
               {data.map((item, index) => (
@@ -169,17 +188,13 @@ const Transcript = ({navigation}) => {
               ))}
             </VStack>
           </ScrollView>
-        ) : !loading && data.length === 0 ? (
-          <ScrollView>
-            <VStack w="100%" alignItems="center" p={4}>
-              <Text>No transcript data found.</Text>
-            </VStack>
-          </ScrollView>
         ) : (
           <ScrollView>
-            {[...Array(3)].map((_, index) => (
-              <IconListLoading key={index} />
-            ))}
+            <Box flex={1} alignItems="center" justifyContent="center" mt={8} p={6}>
+              <Text color="gray.500" fontSize="md" textAlign="center">
+                {noDataMessage}
+              </Text>
+            </Box>
           </ScrollView>
         )}
         {renderDrawer()}

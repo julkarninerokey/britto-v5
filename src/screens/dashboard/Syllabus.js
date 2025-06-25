@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {View, ScrollView} from 'react-native';
-import {VStack} from 'native-base';
+import {VStack, Text, Box} from 'native-base';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getSyllabus} from '../../service/api';
@@ -10,17 +10,43 @@ import {IconListLoading} from '../../components/LoadingAnimation';
 const Syllabus = ({navigation}) => {
   const [data, setData] = useState([]);
   const [iconUrl, setIconUrl] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [noDataMsg, setNoDataMsg] = useState('');
 
   useEffect(() => {
     const checkForData = async () => {
-      const reg = await AsyncStorage.getItem('reg');
-      const dashboard = await AsyncStorage.getItem('dashboard');
-      const syllabusIcon = JSON.parse(dashboard).find(
-        item => item.screen === 'Syllabus',
-      ).icon;
-      setIconUrl(syllabusIcon);
-      const response = await getSyllabus(reg);
-      setData(response.data || []);
+      setLoading(true);
+      setNoDataMsg('');
+      try {
+        const reg = await AsyncStorage.getItem('reg');
+        const dashboard = await AsyncStorage.getItem('dashboard');
+        if (!reg) {
+          setData([]);
+          setNoDataMsg('No syllabus found for your account.');
+          setLoading(false);
+          return;
+        }
+        const syllabusIcon = JSON.parse(dashboard).find(
+          item => item.screen === 'Syllabus',
+        )?.icon;
+        setIconUrl(syllabusIcon);
+        const response = await getSyllabus(reg);
+
+        if (response.status === 201) {
+          setData([]);
+          setNoDataMsg(response.message || 'No syllabus found.');
+        } else if (response.status === 200 && Array.isArray(response.data) && response.data.length > 0) {
+          setData(response.data);
+        } else {
+          setData([]);
+          setNoDataMsg('🎓 No syllabus is available for you at the moment. Please check back later or contact your department for updates.');
+        }
+      } catch (err) {
+        console.error('Syllabus fetch error:', err);
+        setData([]);
+        setNoDataMsg('Failed to load syllabus. Please try again later.');
+      }
+      setLoading(false);
     };
 
     checkForData();
@@ -30,7 +56,13 @@ const Syllabus = ({navigation}) => {
     <View style={{flex: 1}}>
       <AppBar title="Syllabus" />
       <VStack w="100%" flex={1}>
-        {data && data.length > 0 ? ( 
+        {loading ? (
+          <ScrollView>
+            {[...Array(3)].map((_, index) => (
+              <IconListLoading key={index} />
+            ))}
+          </ScrollView>
+        ) : data && data.length > 0 ? (
           <ScrollView>
             <VStack w="100%" alignItems="flex-start" p={2}>
               {data.map((item, index) => (
@@ -45,11 +77,11 @@ const Syllabus = ({navigation}) => {
             </VStack>
           </ScrollView>
         ) : (
-          <ScrollView>
-            {[...Array(3)].map((_, index) => (
-              <IconListLoading key={index} />
-            ))}
-          </ScrollView>
+          <Box flex={1} p={6} alignItems="center" justifyContent="center">
+            <Text color="gray.500" fontSize="md" textAlign="center">
+              {noDataMsg}
+            </Text>
+          </Box>
         )}
       </VStack>
     </View>

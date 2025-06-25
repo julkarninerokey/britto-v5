@@ -6,7 +6,7 @@ import {getLocales} from 'react-native-localize';
 
 export const statusCheck = async () => {
   try {
-    const app = await appInfo();
+    const app = await appInfo(); 
 
     const response = await axios.post(
       API_URL,
@@ -27,7 +27,7 @@ async function fetchByReg(action, reg) {
     return null;
   }
   if (!reg || reg.length !== 10) {
-    toast(
+    toast( 
       'danger',
       'Invalid Registration Number',
       'Logout & Login Again to Continue.',
@@ -40,17 +40,14 @@ async function fetchByReg(action, reg) {
       {action, reg},
       {headers: {'x-api-token': API_SECRET_TOKEN}},
     );
-    if (response?.data?.status === 200) {
+    if (response?.data?.status === 200 || response?.data?.status === 201) {
       return response.data;
     } else {
       return false;
     }
   } catch (error) {
-    toast(
-      'danger',
-      'Invalid Registration Number',
-      'Logout & Login Again to Continue.',
-    );
+      toast('danger', 'Something Went Wrong, Please Try Again Later.');
+      return false;
     throw error;
   }
 }

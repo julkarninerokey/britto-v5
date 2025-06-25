@@ -12,29 +12,55 @@ import { formatDate } from '../../service/utils';
 const Result = ({navigation}) => {
   const [data, setData] = useState([]);
   const [iconUrl, setIconUrl] = useState();
-  
+  const [noDataMessage, setNoDataMessage] = useState('No result data found');
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const checkForData = async () => {
-      const reg = await AsyncStorage.getItem('reg');
-      const dashboard = await AsyncStorage.getItem('dashboard');
-      const syllabusIcon = JSON.parse(dashboard).find(
-        item => item.screen === 'Result',
-      ).icon;
-      setIconUrl(syllabusIcon);
-      const response = await getResult(reg);
-      const accordionData = response?.data.map(item => ({
-        title: `${item.exam_title}`,
-        content: `Published: ${formatDate(item.result_pub_date)}`,
-        details: renderResultDetails(item),
-        icon: 'ios-arrow-down',
-        badges: [
-          `${item.result || 'Improvement'}`
-        ],
-      }));
-      setData(accordionData);
+      setLoading(true);
+      try {
+        const reg = await AsyncStorage.getItem('reg');
+        const dashboard = await AsyncStorage.getItem('dashboard');
+        let syllabusIcon = undefined;
+        try {
+          syllabusIcon = JSON.parse(dashboard)?.find(
+            item => item.screen === 'Result',
+          )?.icon;
+        } catch (err) {
+          console.error('Dashboard JSON parse error:', err);
+        }
+        setIconUrl(syllabusIcon);
+        const response = await getResult(reg);
+
+        if (response?.status === 201) {
+          setNoDataMessage(response?.message || 'No result data found');
+          setData([]);
+        } else if (response?.status === 200 && Array.isArray(response.data) && response.data.length > 0) {
+          const accordionData = response.data.map(item => ({
+            title: `${item.exam_title}`,
+            content: `Published: ${formatDate(item.result_pub_date)}`,
+            details: renderResultDetails(item),
+            icon: 'ios-arrow-down',
+            badges: [
+              `${item.result || 'Improvement'}`
+            ],
+          }));
+          setData(accordionData);
+        } else {
+          setNoDataMessage('No result data found');
+          setData([]);
+        }
+      } catch (error) {
+        console.error('Error loading result data:', error);
+        setNoDataMessage('No result data found');
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
     checkForData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const renderResultDetails = (item) => (
@@ -146,19 +172,23 @@ const Result = ({navigation}) => {
     <View style={{flex: 1}}>
       <AppBar title="Result" />
       <VStack w={'100%'} flex={1}>
-        {data.length > 0 ? (
+        {loading ? (
+          <ScrollView>
+            {[...Array(3)].map((_, index) => (
+              <IconListLoading key={index} />
+            ))}
+          </ScrollView>
+        ) : !data || data.length === 0 ? (
+            <Box flex={1} w="100%" justifyContent={'center'} alignItems="center" p={4}>
+              <Text>{noDataMessage}</Text>
+            </Box>
+        ) : (
           <ScrollView>
             <VStack w="100%" alignItems="flex-start" p={1}>
               {data.map((item, index) => (
                 <AccordionComponent key={index} data={item} iconUrl={iconUrl} />
               ))}
             </VStack>
-          </ScrollView>
-        ) : (
-          <ScrollView>
-            {[...Array(3)].map((_, index) => (
-              <IconListLoading key={index} />
-            ))}
           </ScrollView>
         )}
       </VStack>

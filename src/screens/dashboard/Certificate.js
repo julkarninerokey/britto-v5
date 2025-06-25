@@ -1,19 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {VStack, ScrollView, Text, Button, HStack, Select, CheckIcon, useToast} from 'native-base';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { VStack, ScrollView, Text, Button, HStack, Select, CheckIcon, useToast, Box } from 'native-base';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getCertificate} from '../../service/api';
+import { getCertificate } from '../../service/api';
 import 'react-native-pager-view';
-import {IconListLoading} from '../../components/LoadingAnimation';
+import { IconListLoading } from '../../components/LoadingAnimation';
 import AccordionComponent from '../../components/AccordionComponent';
 import BottomDrawer from '../../components/BottomDrawer';
 import { formatDateTime } from '../../service/utils';
 
-const Certificate = ({navigation}) => {
+const Certificate = ({ navigation }) => {
   const [data, setData] = useState([]);
   const [iconUrl, setIconUrl] = useState();
   const [loading, setLoading] = useState(true);
+  const [noDataMessage, setNoDataMessage] = useState('No certificate data found.');
   const [showDrawer, setShowDrawer] = useState(false);
   const [selectedExam, setSelectedExam] = useState(null);
   const [form, setForm] = useState({
@@ -39,59 +40,72 @@ const Certificate = ({navigation}) => {
         }
         setIconUrl(syllabusIcon);
         const response = await getCertificate(reg);
-        const certData = response?.data || response?.result || [];
-        const accordionData = certData.map((item, idx) => ({
-          title: `${item.exam_title}`,
-          content: `Result: ${item.result}, Published: ${item.result_pub_date}`,
-          details: (
-            <VStack space={2}>
-              <Text>Exam Title: {item.exam_title}</Text>
-              <Text>Result: {item.result}</Text>
-              <Text>Result Published: {item.result_pub_date}</Text>
-              <Text>Held In: {item.exam_held_in}</Text>
-              <Text>Status: {item.result_publication_status}</Text>
-              {Array.isArray(item.applications) && item.applications.length > 0 ? (
-                <VStack mt={2}>
-                  <Text bold>Applications:</Text>
-                  {item.applications.map((app, aidx) => (
-                    <VStack key={aidx} mt={1} p={2} borderWidth={1} borderRadius={8}>
-                      <Text>Application ID: {app.trannscript_id}</Text>
-                      <Text>Delivery Type: {app.delivery_type}</Text>
-                      <Text>Payment Status: {app.payment_status === 1 ? 'Paid' : 'Unpaid'}</Text>
-                      <Text>Status: {app.app_status}</Text>
-                      <Text>Transaction ID: {app.transaction_id}</Text>
-                      <Text>Amount: {app.amount}</Text>
-                      <Text>Degree Name: {app.degree_name}</Text>
-                      <Text>Degree Level: {app.degree_level}</Text>
-                      <Text>Passing Academic Year: {app.passing_acyr}</Text>
-                      <Text>Number of Certificates: {app.num_of_transcript}</Text>
-                      <Text>Number of Envelopes: {app.num_of_envelop}</Text>
-                      <Text>Expected Delivery Date: {formatDateTime(app.expected_delivery_date)}</Text>
-                      <Text>Application Time: {formatDateTime(app.create_at)}</Text>
-                      <Text>Last Update: {formatDateTime(app.updated_at)}</Text>
-                      <Text>Comment: {app.comment}</Text>
-                      <HStack space={2} mt={2}>
-                        <Button size="sm" colorScheme="primary" onPress={() => {/* update logic here */}}>Update</Button>
-                        <Button size="sm" colorScheme="secondary" onPress={() => {/* edit logic here */}}>Edit</Button>
-                      </HStack>
-                    </VStack>
-                  ))}
-                </VStack>
-              ) : (
-                <Button mt={2} onPress={() => { setSelectedExam(item); setShowDrawer(true); }}>
-                  Apply Now
-                </Button>
-              )}
-            </VStack>
-          ),
-          icon: 'ios-arrow-down',
-          badges: [
-            `${item.applications?.length > 0 ? 'View Applications' : 'Apply Now'} `,
-          ],
-        }));
-        setData(accordionData);
+
+        if (response?.status === 201) {
+          setNoDataMessage(response?.message || 'No certificate data found.');
+          setData([]);
+        } else if (
+          response?.status === 200 &&
+          (Array.isArray(response.data) ? response.data.length > 0 : Array.isArray(response.result) && response.result.length > 0)
+        ) {
+          const certData = response?.data || response?.result || [];
+          const accordionData = certData.map((item, idx) => ({
+            title: `${item.exam_title}`,
+            content: `Result: ${item.result}, Published: ${item.result_pub_date}`,
+            details: (
+              <VStack space={2}>
+                <Text>Exam Title: {item.exam_title}</Text>
+                <Text>Result: {item.result}</Text>
+                <Text>Result Published: {item.result_pub_date}</Text>
+                <Text>Held In: {item.exam_held_in}</Text>
+                <Text>Status: {item.result_publication_status}</Text>
+                {Array.isArray(item.applications) && item.applications.length > 0 ? (
+                  <VStack mt={2}>
+                    <Text bold>Applications:</Text>
+                    {item.applications.map((app, aidx) => (
+                      <VStack key={aidx} mt={1} p={2} borderWidth={1} borderRadius={8}>
+                        <Text>Application ID: {app.trannscript_id}</Text>
+                        <Text>Delivery Type: {app.delivery_type}</Text>
+                        <Text>Payment Status: {app.payment_status === 1 ? 'Paid' : 'Unpaid'}</Text>
+                        <Text>Status: {app.app_status}</Text>
+                        <Text>Transaction ID: {app.transaction_id}</Text>
+                        <Text>Amount: {app.amount}</Text>
+                        <Text>Degree Name: {app.degree_name}</Text>
+                        <Text>Degree Level: {app.degree_level}</Text>
+                        <Text>Passing Academic Year: {app.passing_acyr}</Text>
+                        <Text>Number of Certificates: {app.num_of_transcript}</Text>
+                        <Text>Number of Envelopes: {app.num_of_envelop}</Text>
+                        <Text>Expected Delivery Date: {formatDateTime(app.expected_delivery_date)}</Text>
+                        <Text>Application Time: {formatDateTime(app.create_at)}</Text>
+                        <Text>Last Update: {formatDateTime(app.updated_at)}</Text>
+                        <Text>Comment: {app.comment}</Text>
+                        <HStack space={2} mt={2}>
+                          <Button size="sm" colorScheme="primary" onPress={() => {/* update logic here */ }}>Update</Button>
+                          <Button size="sm" colorScheme="secondary" onPress={() => {/* edit logic here */ }}>Edit</Button>
+                        </HStack>
+                      </VStack>
+                    ))}
+                  </VStack>
+                ) : (
+                  <Button mt={2} onPress={() => { setSelectedExam(item); setShowDrawer(true); }}>
+                    Apply Now
+                  </Button>
+                )}
+              </VStack>
+            ),
+            icon: 'ios-arrow-down',
+            badges: [
+              `${item.applications?.length > 0 ? 'View Applications' : 'Apply Now'} `,
+            ],
+          }));
+          setData(accordionData);
+        } else {
+          setNoDataMessage('No certificate data found.');
+          setData([]);
+        }
       } catch (error) {
         console.error('Error loading certificate data:', error);
+        setNoDataMessage('No certificate data found.');
         setData([]);
       } finally {
         setLoading(false);
@@ -120,7 +134,7 @@ const Certificate = ({navigation}) => {
             minWidth="200"
             accessibilityLabel="Choose Application Type"
             placeholder="Application Type"
-            _selectedItem={{bg: 'teal.600', endIcon: <CheckIcon size="5" />}}
+            _selectedItem={{ bg: 'teal.600', endIcon: <CheckIcon size="5" /> }}
             onValueChange={value => handleFormChange('applicationType', value)}
           >
             <Select.Item label="PROVISIONAL" value="PROVISIONAL" />
@@ -131,7 +145,7 @@ const Certificate = ({navigation}) => {
             minWidth="200"
             accessibilityLabel="Number of Certificate"
             placeholder="Number of Certificate"
-            _selectedItem={{bg: 'teal.600', endIcon: <CheckIcon size="5" />}}
+            _selectedItem={{ bg: 'teal.600', endIcon: <CheckIcon size="5" /> }}
             onValueChange={value => handleFormChange('numCertificate', value)}
           >
             <Select.Item label="URGENT" value="URGENT" />
@@ -144,10 +158,16 @@ const Certificate = ({navigation}) => {
     );
   };
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <AppBar title="Certificate" />
       <VStack w={'100%'} flex={1}>
-        {!loading && data.length > 0 ? (
+        {loading ? (
+          <ScrollView>
+            {[...Array(3)].map((_, index) => (
+              <IconListLoading key={index} />
+            ))}
+          </ScrollView>
+        ) : data.length > 0 ? (
           <ScrollView>
             <VStack w="100%" alignItems="flex-start" p={1}>
               {data.map((item, index) => (
@@ -155,18 +175,10 @@ const Certificate = ({navigation}) => {
               ))}
             </VStack>
           </ScrollView>
-        ) : !loading && data.length === 0 ? (
-          <ScrollView>
-            <VStack w="100%" alignItems="center" p={4}>
-              <Text>No certificate data found.</Text>
-            </VStack>
-          </ScrollView>
         ) : (
-          <ScrollView>
-            {[...Array(3)].map((_, index) => (
-              <IconListLoading key={index} />
-            ))}
-          </ScrollView>
+          <Box flex={1} justifyContent={'center'} w="100%" alignItems="center" p={4}>
+            <Text>{noDataMessage}</Text>
+          </Box>
         )}
         {renderDrawer()}
       </VStack>
