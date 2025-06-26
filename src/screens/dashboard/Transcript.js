@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {VStack, ScrollView, Text, Button, HStack, Select, CheckIcon, Box} from 'native-base';
+import {View, Platform} from 'react-native';
+import {VStack, ScrollView, Text, Button, HStack, Input, Box, Actionsheet, useDisclose} from 'native-base';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getTranscript} from '../../service/api';
@@ -23,6 +23,27 @@ const Transcript = ({navigation}) => {
     numTranscript: '',
     numEnvelope: '',
   });
+
+  const appTypeDisclose = useDisclose();
+  const numTranscriptDisclose = useDisclose();
+  const numEnvelopeDisclose = useDisclose();
+
+  const applicationTypes = [
+    { label: 'URGENT', value: 'URGENT' },
+    { label: 'REGULAR', value: 'REGULAR' },
+  ];
+
+  const numTranscriptOptions = [
+    { label: '1', value: '1' },
+    { label: '2', value: '2' },
+    { label: '3', value: '3' },
+  ];
+
+  const numEnvelopeOptions = [
+    { label: '1', value: '1' },
+    { label: '2', value: '2' },
+    { label: '3', value: '3' },
+  ];
 
   useEffect(() => {
     const checkForData = async () => {
@@ -128,41 +149,35 @@ const Transcript = ({navigation}) => {
         <Text fontSize="lg" bold mb={2}>Apply for Transcript </Text>
         <Text>Exam: {selectedExam.exam_title}</Text>
         <VStack space={3} mt={2}>
-          <Select
-            selectedValue={form.applicationType}
-            minWidth="200"
-            accessibilityLabel="Choose Application Type"
-            placeholder="Application Type"
-            _selectedItem={{bg: 'teal.600', endIcon: <CheckIcon size="5" />}}
-            onValueChange={value => handleFormChange('applicationType', value)}
-          >
-            <Select.Item label="URGENT" value="URGENT" />
-            <Select.Item label="REGULAR" value="REGULAR" />
-          </Select>
-          <Select
-            selectedValue={form.numTranscript}
-            minWidth="200"
-            accessibilityLabel="Number of Transcript"
+          {/* Application Type as Radio Buttons */}
+          <Text mb={1}>Application Type</Text>
+          <HStack space={2}>
+            {applicationTypes.map(opt => (
+              <Button
+                key={opt.value}
+                variant={form.applicationType === opt.value ? 'solid' : 'outline'}
+                colorScheme="primary"
+                onPress={() => handleFormChange('applicationType', opt.value)}
+              >
+                {opt.label}
+              </Button>
+            ))}
+          </HStack>
+          {/* Number of Transcript as Input */}
+          <Input
+            mt={3}
             placeholder="Number of Transcript"
-            _selectedItem={{bg: 'teal.600', endIcon: <CheckIcon size="5" />}}
-            onValueChange={value => handleFormChange('numTranscript', value)}
-          >
-            {[1,2,3,4,5].map(n => (
-              <Select.Item key={n} label={String(n)} value={String(n)} />
-            ))}
-          </Select>
-          <Select
-            selectedValue={form.numEnvelope}
-            minWidth="200"
-            accessibilityLabel="Number of Envelope"
+            keyboardType="numeric"
+            value={form.numTranscript}
+            onChangeText={value => handleFormChange('numTranscript', value.replace(/[^0-9]/g, ''))}
+          />
+          {/* Number of Envelope as Input */}
+          <Input
             placeholder="Number of Envelope"
-            _selectedItem={{bg: 'teal.600', endIcon: <CheckIcon size="5" />}}
-            onValueChange={value => handleFormChange('numEnvelope', value)}
-          >
-            {[1,2,3,4,5].map(n => (
-              <Select.Item key={n} label={String(n)} value={String(n)} />
-            ))}
-          </Select>
+            keyboardType="numeric"
+            value={form.numEnvelope}
+            onChangeText={value => handleFormChange('numEnvelope', value.replace(/[^0-9]/g, ''))}
+          />
         </VStack>
         <Button mt={4} colorScheme="primary" onPress={handleSubmit}>Submit & Pay Now</Button>
         <Button mt={2} variant="ghost" onPress={() => setShowDrawer(false)}>Close</Button>

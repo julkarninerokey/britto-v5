@@ -49,8 +49,9 @@ const ProfileCard = ({name, year, hall, chobi}) => {
                 style={styles.photo}
                 alt="Profile Photo"
                 size="md"
-                onError={error => {console.log('Profile Photo Error:')}}
+                onError={error => {console.log('Profile Photo Error:', error)}}
                 borderRadius={100}
+                onLoad={() => console.log('Profile Photo Loaded from URL- ', photo)}
               />
             </VStack>
           )}

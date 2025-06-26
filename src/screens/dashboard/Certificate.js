@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { VStack, ScrollView, Text, Button, HStack, Select, CheckIcon, useToast, Box } from 'native-base';
+import { VStack, ScrollView, Text, Button, HStack, useToast, Box } from 'native-base';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getCertificate } from '../../service/api';
@@ -122,6 +122,19 @@ const Certificate = ({ navigation }) => {
     toast
     setForm({ applicationType: '', numCertificate: '', numEnvelope: '' });
   };
+  const applicationTypes = [
+    { label: 'PROVISIONAL', value: 'PROVISIONAL' },
+    { label: 'DIPLOMA', value: 'DIPLOMA' },
+  ];
+  const certificateTypes = [
+    { label: 'URGENT', value: 'URGENT' },
+    { label: 'REGULAR', value: 'REGULAR' },
+  ];
+  const numEnvelopeOptions = [
+    { label: '1', value: '1' },
+    { label: '2', value: '2' },
+    { label: '3', value: '3' },
+  ];
   const renderDrawer = () => {
     if (!showDrawer || !selectedExam) return null;
     return (
@@ -129,28 +142,34 @@ const Certificate = ({ navigation }) => {
         <Text fontSize="lg" bold mb={2}>Certificate Application</Text>
         <Text>Exam: {selectedExam.exam_title}</Text>
         <VStack space={3} mt={2}>
-          <Select
-            selectedValue={form.applicationType}
-            minWidth="200"
-            accessibilityLabel="Choose Application Type"
-            placeholder="Application Type"
-            _selectedItem={{ bg: 'teal.600', endIcon: <CheckIcon size="5" /> }}
-            onValueChange={value => handleFormChange('applicationType', value)}
-          >
-            <Select.Item label="PROVISIONAL" value="PROVISIONAL" />
-            <Select.Item label="DIPLOMA" value="DIPLOMA" />
-          </Select>
-          <Select
-            selectedValue={form.numCertificate}
-            minWidth="200"
-            accessibilityLabel="Number of Certificate"
-            placeholder="Number of Certificate"
-            _selectedItem={{ bg: 'teal.600', endIcon: <CheckIcon size="5" /> }}
-            onValueChange={value => handleFormChange('numCertificate', value)}
-          >
-            <Select.Item label="URGENT" value="URGENT" />
-            <Select.Item label="REGULAR" value="REGULAR" />
-          </Select>
+          {/* Application Type as Radio Buttons */}
+          <Text mb={1}>Application Type</Text>
+          <HStack space={2}>
+            {applicationTypes.map(opt => (
+              <Button
+                key={opt.value}
+                variant={form.applicationType === opt.value ? 'solid' : 'outline'}
+                colorScheme="primary"
+                onPress={() => handleFormChange('applicationType', opt.value)}
+              >
+                {opt.label}
+              </Button>
+            ))}
+          </HStack>
+          {/* Number of Certificate as Radio Buttons */}
+          <Text mt={3} mb={1}>Certificate Type</Text>
+          <HStack space={2}>
+            {certificateTypes.map(opt => (
+              <Button
+                key={opt.value}
+                variant={form.numCertificate === opt.value ? 'solid' : 'outline'}
+                colorScheme="primary"
+                onPress={() => handleFormChange('numCertificate', opt.value)}
+              >
+                {opt.label}
+              </Button>
+            ))}
+          </HStack>
         </VStack>
         <Button mt={4} colorScheme="primary" onPress={handleSubmit}>Submit Application</Button>
         <Button mt={2} variant="ghost" onPress={() => setShowDrawer(false)}>Close</Button>
