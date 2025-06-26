@@ -7,13 +7,17 @@ import {getExam} from '../../service/api';
 import 'react-native-pager-view';
 import {IconListLoading} from '../../components/LoadingAnimation';
 import AccordionComponent from '../../components/AccordionComponent';
-import { formatDate } from '../../service/utils';
+import { formatDate, toast } from '../../service/utils';
 
 const Examination = ({navigation}) => {
   const [data, setData] = useState([]);
   const [iconUrl, setIconUrl] = useState();
   const [loading, setLoading] = useState(true);
   const [noDataMsg, setNoDataMsg] = useState('');
+
+  const handleEdit = (student) => {
+   toast('info', 'Edit Examination', 'This feature is under development. Please check back later.');
+  };
 
   useEffect(() => {
     const checkForData = async () => {
