@@ -1,5 +1,3 @@
-// OutOfServiceScreen.js
-
 import React, {useEffect, useState} from 'react';
 import {View, Image, Text, Center, Box, Heading, Button} from 'native-base';
 import {statusCheck} from '../service/api';
@@ -12,8 +10,6 @@ const OutOfServiceScreen = ({navigation}) => {
     const res = await statusCheck();
 
 if (res) {
-  console.log("🚀 ~ OutOfServiceScreen ~ res:", res.status);
-  console.log("🚀 ~ OutOfServiceScreen ~ res:typeof ", typeof res.status);
 
   if (res.status !== '1') {
     console.log("Navigating to OutOfService");

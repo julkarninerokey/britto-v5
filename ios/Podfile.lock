@@ -1220,7 +1220,7 @@ PODS:
     - React
   - RNDeviceInfo (10.14.0):
     - React-Core
-  - RNGestureHandler (2.26.0):
+  - RNGestureHandler (2.16.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1241,7 +1241,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNLocalize (3.4.1):
+  - RNLocalize (3.4.2):
     - React-Core
   - RNScreens (4.11.1):
     - DoubleConversion
@@ -1545,8 +1545,8 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: ec53e44dc3e75b44aa2a9f37618a49c3bc080a7a
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
   RNDeviceInfo: 59344c19152c4b2b32283005f9737c5c64b42fba
-  RNGestureHandler: 76ecf3c40e336e92a0b2d3561d1c74d10632cb1a
-  RNLocalize: 06991b9c31e7a898a9fa6ddb204ce0f53a967248
+  RNGestureHandler: 2282cfbcf86c360d29f44ace393203afd5c6cff7
+  RNLocalize: eda9b753ea03e35a8a364ba20887c2edd3c67422
   RNScreens: 4d8217a364d9e1a1828bd9c081a927c97f2e3517
   RNSVG: d956b40703d2292f808d57c9ee5452c46ac6b4b1
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
