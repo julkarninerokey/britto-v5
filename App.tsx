@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler'; // <- this should be first
 import React from 'react';
-// import { enableScreens } from 'react-native-screens';
-// enableScreens(); // <- this line is mandatoryimport {NativeBaseProvider} from 'native-base';
+import { enableScreens } from 'react-native-screens';
+enableScreens(); // <- this line is mandatory
 
 import { NativeBaseProvider } from 'native-base';
 import { createStackNavigator } from '@react-navigation/stack';
