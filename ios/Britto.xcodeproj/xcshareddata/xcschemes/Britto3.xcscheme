@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "Britto3.app"
-               BlueprintName = "Britto3"
-               ReferencedContainer = "container:Britto3.xcodeproj">
+               BuildableName = "Britto.app"
+               BlueprintName = "Britto"
+               ReferencedContainer = "container:Britto.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "Britto3Tests.xctest"
-               BlueprintName = "Britto3Tests"
-               ReferencedContainer = "container:Britto3.xcodeproj">
+               BuildableName = "BrittoTests.xctest"
+               BlueprintName = "BrittoTests"
+               ReferencedContainer = "container:Britto.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Britto3.app"
-            BlueprintName = "Britto3"
-            ReferencedContainer = "container:Britto3.xcodeproj">
+            BuildableName = "Britto.app"
+            BlueprintName = "Britto"
+            ReferencedContainer = "container:Britto.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Britto3.app"
-            BlueprintName = "Britto3"
-            ReferencedContainer = "container:Britto3.xcodeproj">
+            BuildableName = "Britto.app"
+            BlueprintName = "Britto"
+            ReferencedContainer = "container:Britto.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

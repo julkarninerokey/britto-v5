@@ -1,8 +1,8 @@
-# Britto3 - Student Portal Application
+# Britto - Student Portal Application
 
 ## Project Overview
 
-**Britto3** is a React Native mobile application designed as a comprehensive student portal for Dhaka University (DU). The app provides students with easy access to various academic services and information through a modern, user-friendly interface.
+**Britto** is a React Native mobile application designed as a comprehensive student portal for Dhaka University (DU). The app provides students with easy access to various academic services and information through a modern, user-friendly interface.
 
 ## Current Features
 

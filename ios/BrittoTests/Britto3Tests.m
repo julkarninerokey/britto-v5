@@ -7,11 +7,11 @@
 #define TIMEOUT_SECONDS 600
 #define TEXT_TO_LOOK_FOR @"Welcome to React"
 
-@interface Britto3Tests : XCTestCase
+@interface BrittoTests : XCTestCase
 
 @end
 
-@implementation Britto3Tests
+@implementation BrittoTests
 
 - (BOOL)findSubviewInView:(UIView *)view matching:(BOOL (^)(UIView *view))test
 {

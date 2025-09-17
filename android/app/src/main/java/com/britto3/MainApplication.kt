@@ -1,4 +1,4 @@
-package com.britto3
+package com.Britto
 
 import android.app.Application
 import com.facebook.react.PackageList
