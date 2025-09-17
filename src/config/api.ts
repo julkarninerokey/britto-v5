@@ -3,6 +3,9 @@ export const API_CONFIG = {
   // Main API endpoints
   BASE_URL: 'https://appapi.eco.du.ac.bd',
   
+  // Payment API endpoints (different base URL)
+  PAYMENT_BASE_URL: 'https://student.eco.du.ac.bd',
+  
   // Legacy API (if still needed)
   LEGACY_BASE_URL: 'https://du-backend.pitech.com.bd/api/britto',
   
@@ -11,6 +14,16 @@ export const API_CONFIG = {
     LOGIN: '/login',
     STUDENT_ME: '/student/me',
     GET_FILE: '/get-file',
+    GET_ALL_ENROLLMENTS: '/student/get-all-enrollments',
+    GET_YEAR_SEMESTER_FOR_ENROLLMENT: '/student/get-year-semester-for-enrollmen',
+    GET_PAYMENT_HEAD: '/student/get-payment-head',
+    
+    // Payment endpoints (these use PAYMENT_BASE_URL)
+    PAYMENT_APPLICATION_DETAILS: '/student/application/payment-details',
+    PAYMENT_SSL: '/api/payment/ssl',
+    PAYMENT_VERIFY: '/student/payment/verify',
+    PAYMENT_STATUS: '/student/payment/status',
+    SUBMIT_ENROLLED_COURSES: '/student/submit-enrolled-courses',
   },
   
   // Headers
@@ -24,6 +37,16 @@ export const API_CONFIG = {
 
 // Helper functions to build URLs
 export const buildUrl = (endpoint: string, baseUrl: string = API_CONFIG.BASE_URL): string => {
+  return `${baseUrl}${endpoint}`;
+};
+
+// Helper function specifically for payment URLs
+export const buildPaymentUrl = (endpoint: string): string => {
+  // Payment endpoints use the student portal base URL
+  const paymentEndpoints = ['/api/payment/ssl', '/student/payment/verify', '/student/payment/status'];
+  const shouldUsePaymentBase = paymentEndpoints.some(paymentEndpoint => endpoint.includes(paymentEndpoint));
+  
+  const baseUrl = shouldUsePaymentBase ? API_CONFIG.PAYMENT_BASE_URL : API_CONFIG.BASE_URL;
   return `${baseUrl}${endpoint}`;
 };
 

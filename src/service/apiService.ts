@@ -30,7 +30,7 @@ class ApiService {
   private setupInterceptors() {
     const addAuthToken = async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
       try {
-        const token = await getAsyncStoreData('session');
+        const token = await getAsyncStoreData('token');
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }

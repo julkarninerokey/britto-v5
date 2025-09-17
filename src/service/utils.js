@@ -25,6 +25,15 @@ export const dashboardButtons = [
     createdAt: "2024-04-25 01:47:05",
   },
   {
+    id: 3,
+    screen: "Enrollment",
+    title: "Enrollment",
+    priority: 7,
+    icon: "https://result.7college.du.ac.bd/static/media/britto/icons/enrollment.png",
+    status: 1,
+    createdAt: "2024-04-25 12:19:18",
+  },
+  {
     id: 2,
     screen: "Examination",
     title: "Examination",
@@ -245,20 +254,47 @@ export const appInstallInfo = async () => {
 
   return {time, from};
 };
-
+// #191970
 export const color = {
-  primary: '#191970', // Brand color (navy blue)
-  secondary: '#6c757d', // Dark gray
-  text: '#343a40', // Dark text color
+  primary: '#191970', // Softer blue (instead of navy)
+  primaryLight: 'rgba(25, 25, 112, 0.55)', // Primary with opacity (proper RGBA format)
+  secondary: '#64748b', // Softer gray
+  text: '#1e293b', // Softer dark text
   background: '#ffffff', // White background
-  secondaryBackground: '#f8f9fa', // Light gray for secondary background
-  accent: '#fd7e14', // Orange accent color
-  success: '#28a745', // Success color (green)
-  danger: '#dc3545', // Danger color (red)
-  warning: '#ffc107', // Warning color (yellow)
-  info: '#17a2b8', // Info color (cyan)
-  gradientBackground: ['#191970', '#3d3e58', '#5f608a', '#8788b8', '#b4b5e0'], // Gradient background colors
+  secondaryBackground: '#f8fafc', // Very light blue-gray
+  accent: '#f59e0b', // Softer orange
+  success: '#10b981', // Softer green
+  danger: '#ef4444', // Softer red
+  warning: '#f59e0b', // Softer yellow/orange
+  info: '#06b6d4', // Softer cyan
+  light: '#e2e8f0', // Light gray
+  lightBlue: '#e0f2fe', // Light blue background
+  muted: '#94a3b8', // Muted gray
+  gray: '#6b7280', // Standard gray
+  gradientBackground: ['#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#dbeafe'], // Softer gradient
 };
+
+// Defensive color getter to prevent empty string errors
+export const getColor = (colorName) => {
+  const colorValue = color[colorName];
+  if (!colorValue || colorValue === '' || colorValue === 'undefined') {
+    console.warn(`Color '${colorName}' is undefined or empty, falling back to default`);
+    return color.text || '#000000'; // fallback to text color or black
+  }
+  return colorValue;
+};
+
+// Safe color object with validation
+export const safeColor = new Proxy(color, {
+  get(target, prop) {
+    const value = target[prop];
+    if (!value || value === '' || value === 'undefined') {
+      console.warn(`Color '${prop}' is undefined or empty, using fallback`);
+      return target.text || '#000000';
+    }
+    return value;
+  }
+});
 
 export const defaultUserPhoto = require('../assets/icons/user.png');
 // #### TO COMPLE ANDROID BUILD-------------
@@ -269,13 +305,24 @@ export const defaultUserPhoto = require('../assets/icons/user.png');
 // ####-----------------------------------
 // Format ISO date string (e.g., 1999-06-22T18:00:00.000Z) to DD-MM-YYYY
 export function formatDate(dateString) {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return '';
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
+  if (!dateString || dateString === '' || dateString === 'undefined' || dateString === 'null') {
+    return 'N/A';
+  }
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'Invalid Date';
+    }
+    
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  } catch (error) {
+    console.warn('Error formatting date:', dateString, error);
+    return 'Invalid Date';
+  }
 }
 
 export function formatDateTime(dateString) {

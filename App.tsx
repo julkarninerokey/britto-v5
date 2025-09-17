@@ -23,10 +23,13 @@ import Result from './src/screens/dashboard/Result';
 import Marksheet from './src/screens/dashboard/Marksheet';
 import Certificate from './src/screens/dashboard/Certificate';
 import Transcript from './src/screens/dashboard/Transcript';
+import Payment from './src/screens/dashboard/Payment';
+import DirectPaymentWebView from './src/screens/payment/DirectPaymentWebView';
 import { SafeAreaView, StatusBar } from 'react-native';
 import { color } from './src/service/utils';
 import FormFillup from './src/screens/dashboard/FormFillup';
 import { isAuthenticated } from './src/service/auth';
+import Enrollment from './src/screens/dashboard/Enrollment';
 
 
 const Stack = createStackNavigator();
@@ -87,6 +90,11 @@ const App = () => {
                 options={{title: 'Dashboard', headerShown: false}}
               />
               <Stack.Screen
+                name="Enrollment"
+                component={Enrollment}
+                options={{title: 'Enrollment', headerShown: false}}
+              />
+              <Stack.Screen
                 name="Profile"
                 component={Profile}
                 options={{title: 'Profile', headerShown: false}}
@@ -140,6 +148,16 @@ const App = () => {
                 name="Transcript"
                 component={Transcript}
                 options={{title: 'Transcript', headerShown: false}}
+              />
+              <Stack.Screen
+                name="Payment"
+                component={Payment}
+                options={{title: 'Payment', headerShown: false}}
+              />
+              <Stack.Screen
+                name="DirectPaymentWebView"
+                component={DirectPaymentWebView}
+                options={{title: 'Payment Gateway', headerShown: false}}
               />
             </Stack.Navigator>
             <FlashMessage position="top" />

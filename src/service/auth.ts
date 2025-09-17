@@ -96,7 +96,7 @@ export async function login(email: string, password: string): Promise<AuthRespon
     }
 
     const token = loginResponse.data.token;
-    await setAsyncStoreData('session', token);
+    await setAsyncStoreData('token', token);
 
     try {
       // Fetch student details
@@ -106,7 +106,6 @@ export async function login(email: string, password: string): Promise<AuthRespon
           'Content-Type': API_CONFIG.HEADERS.CONTENT_TYPE,
         }
       });
-      console.log("🚀 ~ login ~ studentResponse:", studentResponse)
 
       if (studentResponse.data?.status) {
         const student = studentResponse.data.student;
