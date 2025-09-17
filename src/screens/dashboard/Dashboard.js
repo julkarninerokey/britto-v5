@@ -34,7 +34,6 @@ const Dashboard = ({navigation}) => {
     try {
       const result = await logout();
       if (result.success) {
-        toast('success', 'Logged out successfully');
         navigation.reset({
           index: 0,
           routes: [{name: 'Login'}],
