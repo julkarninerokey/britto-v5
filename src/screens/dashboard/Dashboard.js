@@ -5,26 +5,50 @@ import {
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import {VStack, Text, HStack, View, Skeleton} from 'native-base';
-import {color} from '../../service/utils';
+import {VStack, Text, HStack, View, Skeleton, Button, Box} from 'native-base';
+import {color, dashboardButtons} from '../../service/utils';
 import ProfileCard from '../../components/ProfileCard';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {FlatGrid} from 'react-native-super-grid';
+import {logout} from '../../service/auth';
 
 const Dashboard = ({navigation}) => {
   const [buttons, setButtons] = useState([]);
 
   useEffect(() => {
     const checkForButtons = async () => {
-      const storedToken = await AsyncStorage.getItem('dashboard');
+      const storedToken = dashboardButtons;
       if (storedToken) {
-        setButtons(JSON.parse(storedToken));
+        setButtons(storedToken);
       }
     };
 
     checkForButtons();
   }, []);
+
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      const result = await logout();
+      if (result.success) {
+        toast('success', 'Logged out successfully');
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Login'}],
+        });
+      } else {
+        toast('danger', result.message || 'Logout failed');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast('danger', 'Failed to logout. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   const windowWidth = useWindowDimensions().width;
   const columnCount = Math.floor(windowWidth / 120);
@@ -87,6 +111,16 @@ const Dashboard = ({navigation}) => {
               data={buttons}
               renderItem={({item}) => <Item item={item} />}
             />
+            <Box w="80%" margin="auto" bg="white" shadow={2}>
+              <Button
+                bg={color.danger || 'red.500'}
+                onPress={handleLogout}
+                isLoading={isLoggingOut}
+                isLoadingText="Logging out..."
+                _pressed={{bg: 'red.600'}}>
+                Logout
+              </Button>
+            </Box>
           </ScrollView>
         ) : (
           <FlatGrid

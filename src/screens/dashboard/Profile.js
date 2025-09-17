@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {Dimensions, View} from 'react-native';
-import {VStack, Text, HStack, Box, Skeleton, ScrollView} from 'native-base';
+import {VStack, Text, HStack, Box, Skeleton, ScrollView, Button} from 'native-base';
 import ProfileCard from '../../components/ProfileCard';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {profileData} from '../../service/api';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import 'react-native-pager-view';
-import {color, formatDate, getFullAddress} from '../../service/utils';
+import {color, formatDate, getFullAddress, toast} from '../../service/utils';
 
 const InfoRow = ({label, value}) => (
   <HStack alignItems="center">
@@ -65,6 +65,7 @@ const Profile = ({navigation}) => {
   const [data, setData] = useState(null); // Change to null initially
   const [index, setIndex] = useState(0);
   const [address, setAddress] = useState();
+
 
   useEffect(() => {
     const checkForProfileData = async () => {
@@ -144,6 +145,7 @@ const Profile = ({navigation}) => {
         ) : (
           <FirstRouteSkeleton />
         )}
+        
       </VStack>
     </View>
   );

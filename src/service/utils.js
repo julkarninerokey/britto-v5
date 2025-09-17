@@ -3,16 +3,163 @@ import NetInfo from '@react-native-community/netinfo';
 import {showMessage} from 'react-native-flash-message';
 import {version} from '../../package.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_CONFIG } from '../config/api';
 
-// export const API_URL = 'http://172.20.10.8:4100/api/britto';
-export const API_URL = 'https://du-backend.pitech.com.bd/api/britto';
-export const API_SECRET_TOKEN = '8f3c1e2d3a4b5c6d7e8f9a0b1c2d3e4f';
+// Legacy API URL - now imported from centralized config
+export const API_URL = API_CONFIG.LEGACY_BASE_URL;
+export const API_SECRET_TOKEN = API_CONFIG.LEGACY_API_TOKEN;
 
 export const checkUserLoginStatus = async () => {
   const token = await AsyncStorage.getItem('token');
   return token;
 };
 
+export const dashboardButtons = [
+  {
+    id: 1,
+    screen: "Profile",
+    title: "Profile",
+    priority: 1,
+    icon: "https://result.7college.du.ac.bd/static/media/britto/icons/profile.png",
+    status: 1,
+    createdAt: "2024-04-25 01:47:05",
+  },
+  {
+    id: 2,
+    screen: "Examination",
+    title: "Examination",
+    priority: 7,
+    icon: "https://result.7college.du.ac.bd/static/media/britto/icons/examination.png",
+    status: 1,
+    createdAt: "2024-04-25 12:19:18",
+  },
+  {
+    id: 6,
+    screen: "Result",
+    title: "Result",
+    priority: 8,
+    icon: "https://result.7college.du.ac.bd/static/media/brit...",
+    status: 1,
+    createdAt: "2024-04-25 12:19:18",
+  },
+  {
+    id: 7,
+    screen: "Marksheet",
+    title: "Marksheet",
+    priority: 9,
+    icon: "https://result.7college.du.ac.bd/static/media/brit...",
+    status: 1,
+    createdAt: "2024-04-25 12:23:34",
+  },
+  {
+    id: 8,
+    screen: "Certificate",
+    title: "Certificate",
+    priority: 10,
+    icon: "https://result.7college.du.ac.bd/static/media/brit...",
+    status: 1,
+    createdAt: "2024-04-25 12:23:34",
+  },
+  {
+    id: 9,
+    screen: "Notice",
+    title: "Notice",
+    priority: 6,
+    icon: "https://result.7college.du.ac.bd/static/media/brit...",
+    status: 1,
+    createdAt: "2024-04-25 12:26:34",
+  },
+  {
+    id: 10,
+    screen: "Hall",
+    title: "Hall",
+    priority: 2,
+    icon: "https://result.7college.du.ac.bd/static/media/brit...",
+    status: 1,
+    createdAt: "2024-04-25 12:31:48",
+  },
+  {
+    id: 11,
+    screen: "Syllabus",
+    title: "Syllabus",
+    priority: 5,
+    icon: "https://result.7college.du.ac.bd/static/media/brit...",
+    status: 1,
+    createdAt: "2024-04-25 12:31:48",
+  },
+  {
+    id: 20,
+    screen: "Department",
+    title: "Department",
+    priority: 3,
+    icon: "https://result.7college.du.ac.bd/static/media/brit...",
+    status: 1,
+    createdAt: "2024-04-25 01:47:05",
+  },
+  {
+    id: 21,
+    screen: "Department",
+    title: "Class Schedule",
+    priority: 100,
+    icon: "https://result.7college.du.ac.bd/static/media/brit...",
+    status: 1,
+    createdAt: "2024-04-25 01:47:05",
+  },
+  {
+    id: 22,
+    screen: "Department",
+    title: "Bus Schedule",
+    priority: 14,
+    icon: "https://result.7college.du.ac.bd/static/media/brit...",
+    status: 1,
+    createdAt: "2024-04-25 01:47:05",
+  },
+  {
+    id: 23,
+    screen: "Department",
+    title: "Campus Map",
+    priority: 12,
+    icon: "https://result.7college.du.ac.bd/static/media/brit...",
+    status: 1,
+    createdAt: "2024-04-25 01:47:05",
+  },
+  {
+    id: 24,
+    screen: "Department",
+    title: "Calender",
+    priority: 13,
+    icon: "https://result.7college.du.ac.bd/static/media/brit...",
+    status: 1,
+    createdAt: "2024-04-25 01:47:05",
+  },
+  {
+    id: 25,
+    screen: "Department",
+    title: "Applications",
+    priority: 11,
+    icon: "https://result.7college.du.ac.bd/static/media/brit...",
+    status: 1,
+    createdAt: "2024-04-25 01:47:05",
+  },
+  {
+    id: 26,
+    screen: "Transcript",
+    title: "Transcript",
+    priority: 10,
+    icon: "https://result.7college.du.ac.bd/static/media/brit...",
+    status: 1,
+    createdAt: "2024-04-25 12:23:34",
+  },
+  {
+    id: 27,
+    screen: "FormFillup",
+    title: "Form Fill-up",
+    priority: 8,
+    icon: "https://result.7college.du.ac.bd/static/media/brit...",
+    status: 1,
+    createdAt: "2024-04-25 12:19:18",
+  },
+]
 export const saveLogin = async (loginData2, reg) => {
   try {
     const user = loginData2?.data || {};

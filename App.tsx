@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler'; // <- this should be first
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { enableScreens } from 'react-native-screens';
-enableScreens(); // <- this line is mandatory
+// enableScreens(); // <- this line is mandatory
 
 import { NativeBaseProvider } from 'native-base';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -26,18 +26,51 @@ import Transcript from './src/screens/dashboard/Transcript';
 import { SafeAreaView, StatusBar } from 'react-native';
 import { color } from './src/service/utils';
 import FormFillup from './src/screens/dashboard/FormFillup';
+import { isAuthenticated } from './src/service/auth';
 
 
 const Stack = createStackNavigator();
 
 const App = () => {
+  const [initialRoute, setInitialRoute] = useState('Login');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  const checkAuthStatus = async () => {
+    try {
+      const authenticated = await isAuthenticated();
+      setInitialRoute(authenticated ? 'Dashboard' : 'Login');
+    } catch (error) {
+      console.error('Auth check error:', error);
+      setInitialRoute('Login');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <NativeBaseProvider>
+          <SafeAreaView style={{ flex: 1, backgroundColor: color.primary }}>
+            <StatusBar barStyle="light-content" animated />
+            {/* Add a loading screen here if needed */}
+          </SafeAreaView>
+        </NativeBaseProvider>
+      </SafeAreaProvider>
+    );
+  }
+
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <NativeBaseProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: color.primary }}>
       <StatusBar barStyle="light-content" animated />
         <NavigationContainer>
-            <Stack.Navigator initialRouteName={'Login'}>
+            <Stack.Navigator initialRouteName={initialRoute}>
               <Stack.Screen
                 name="Login"
                 component={LoginScreen}
