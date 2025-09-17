@@ -25,7 +25,7 @@ export interface ApplicationDetails {
 export interface PaymentInitRequest {
   applicationId: number;
   amount: number;
-  type: 'ENROLMENT' | 'FORM_FILLUP' | 'TRANSCRIPT' | 'CERTIFICATE';
+  type: 'ENROLMENT' | 'FORM_FILLUP' | 'EXAMINATION' | 'TRANSCRIPT' | 'CERTIFICATE';
   studentInfo?: {
     name?: string;
     email?: string;
@@ -184,6 +184,16 @@ export const initializeSSLCommerzPayment = async (
           note: "You are required to select the paper codes to complete the exam form fill-up process.",
           color: "#7B61FF",
           icon: "Edit",
+        },
+        {
+          title: "Examination",
+          path: "examination",
+          type: "EXAMINATION",
+          psid: "3",
+          description: "Register for examinations and complete required procedures",
+          note: "You are required to select your courses and complete the examination registration.",
+          color: "#2196F3",
+          icon: "Assessment",
         },
         {
           title: "Official Transcripts",
