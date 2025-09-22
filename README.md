@@ -6,6 +6,7 @@
 
 #### NOTES FOR JAHID VAI
 1. Should Have valid start date and end date for enrollment and formfillup.
+2. update result pereametar, lots of missing like result pub date, sub result date, held in, memo etc.
 
 
 ## Current Features

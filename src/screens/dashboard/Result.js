@@ -92,7 +92,7 @@ const ResultCard = ({ result, isExpanded, onToggle }) => {
                     color={color.text}
                     numberOfLines={2}
                   >
-                    {result.examName} ({result.examYear})
+                    {result.examName} {result.examYear}
                   </Text>
                   
                   {/* Unified Status */}
@@ -140,7 +140,6 @@ const ResultCard = ({ result, isExpanded, onToggle }) => {
             <VStack space={1} pl={4}>
               <DetailRow label="Exam Name" value={result.examName} />
               <DetailRow label="Exam Year" value={result.examYear} />
-              <DetailRow label="Subject" value={result.subject} />
               <DetailRow label="Student Type" value={result.registeredStudentsType} />
               <DetailRow label="Enrollment Date" value={formatDate(result.enrollmentDateTime)} />
               
