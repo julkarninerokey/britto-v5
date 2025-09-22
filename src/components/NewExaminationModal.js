@@ -65,9 +65,9 @@ const NewExaminationModal = ({ isOpen, onClose, navigation, onExaminationSuccess
       if (paymentResponse.success && paymentResponse.data) {
         setPaymentHeads(paymentResponse.data);
         const examinationHead = paymentResponse.data.find(head => 
-          head.category === 'EXAMINATION' || 
-          head.name.toLowerCase().includes('examination') ||
-          head.name.toLowerCase().includes('exam')
+          head.category === 'FORM_FILLUP' || 
+          head.name.toLowerCase().includes('form fill-up') ||
+          head.name.toLowerCase().includes('form')
         );
         setExaminationFee(examinationHead ? examinationHead.unit_price : 100);
       }
@@ -243,7 +243,7 @@ const NewExaminationModal = ({ isOpen, onClose, navigation, onExaminationSuccess
       <Modal isOpen={isOpen} onClose={onClose} size="full">
         <Modal.Content maxWidth="100%" maxHeight="100%" borderRadius={0} bg={color.background}>
           <Modal.Header bg={color.background} borderBottomWidth={1} borderColor={color.light} py={3}>
-            <Text fontSize="lg" fontWeight="600" color={color.text}>New Examination </Text>
+            <Text fontSize="lg" fontWeight="600" color={color.text}>New Form Fill-up </Text>
           </Modal.Header>
           <Modal.CloseButton />
           <Modal.Body p={4}>
@@ -290,7 +290,7 @@ const NewExaminationModal = ({ isOpen, onClose, navigation, onExaminationSuccess
           <HStack alignItems="center" space={2}>
             <Text fontSize="lg">📝</Text>
             <Text fontSize="lg" fontWeight="600" color={color.text}>
-              New Examination
+              New Form Fill-up
             </Text>
           </HStack>
         </Modal.Header>
@@ -403,7 +403,7 @@ const NewExaminationModal = ({ isOpen, onClose, navigation, onExaminationSuccess
               {selectedCourses.length > 0 && (
                 <VStack space={3}>
                   <Text fontSize="md" fontWeight="600" color={color.text}>
-                    Examination Summary
+                     Form Fill-up Summary
                   </Text>
 
                   <Box bg={color.light} p={3} borderRadius={8}>
@@ -492,7 +492,7 @@ const NewExaminationModal = ({ isOpen, onClose, navigation, onExaminationSuccess
               }}
             >
               {selectedCourses.length > 0 
-                ? `Pay ৳${getTotalCost()} & Register` 
+                ? `Pay ৳${getTotalCost()} & Continue` 
                 : 'Select Courses'
               }
             </Button>

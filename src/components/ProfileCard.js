@@ -142,7 +142,6 @@ const ProfileCard = ({name, year, hall, chobi}) => {
                         console.log('Profile Photo Error:', error);
                         setPhoto(null);
                       }}
-                      onLoad={() => console.log('Profile Photo Loaded from URL- ', photo)}
                     />
                   ) : (
                     <Box

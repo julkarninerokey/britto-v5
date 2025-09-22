@@ -45,7 +45,7 @@ const getEnrollmentStatus = (enrollment) => {
 } else {
   return {
     status: 'Payment Pending',
-    icon: '💰',               // cross mark, more formal than 💰/💳
+    icon: '⌛',               // cross mark, more formal than 💰/💳
     color: '#191970',
     bgColor: '#3e4857ff'        // muted red background
   };

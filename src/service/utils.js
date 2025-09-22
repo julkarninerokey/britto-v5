@@ -35,8 +35,8 @@ export const dashboardButtons = [
   },
   {
     id: 2,
-    screen: "Examination",
-    title: "Examination",
+    screen: "FormFillup",
+    title: "Form Fill-up",
     priority: 7,
     icon: "https://result.7college.du.ac.bd/static/media/britto/icons/examination.png",
     status: 1,

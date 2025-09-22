@@ -50,29 +50,34 @@ export async function getAllExaminations(): Promise<ExaminationResponse> {
       }
     });
 
-    if (response.data?.status) {
+    if (response.data?.form_fillups) {
       // Map the API response to our interface
-      const examinations: ExaminationData[] = response.data.examinations?.map((item: any) => ({
-        id: item.registered_students_id || item.id || item.exam_id,
-        examName: item.exam_name || item.EXAM_NAME,
-        examYear: item.registered_exam_year || item.exam_year || item.REGISTERED_EXAM_YEAR,
-        examStartDate: item.exam_start_date || item.EXAM_START_DATE || new Date().toISOString(),
-        lastDate: item.last_date || item.LAST_DATE || new Date().toISOString(),
+      const examinations: ExaminationData[] = response.data.form_fillups?.map((item: any) => ({
+        id: item.registered_students_id || item.id,
+        examName: item.exam_name,
+        examYear: item.registered_exam_year,
+        examStartDate: item.exam_start_date || new Date().toISOString(),
+        lastDate: item.last_date || new Date().toISOString(),
         questionLanguage: item.question_language || 'English',
-        hallVerify: item.hall_verify === 1 || item.HALL_VERIFY === 1 || item.hall_verify === 'YES',
-        admitCardIssue: item.admit_card_issue === 1 || item.ADMIT_CARD_ISSUE === 1 || item.admit_card_issue === 'YES',
-        examinationStatus: item.examination_status || item.enrollment_status || 'Active',
-        paymentStatus: item.examination_payment_status === 'YES' || item.enrolment_payment_status === 'YES' || item.payment_status === 1 ? 'Paid' : 'Pending',
-        examRoll: item.exam_roll || item.REGISTERED_STUDENTS_EXAM_ROLL,
-        classRoll: item.class_roll || item.CLASS_ROLL,
-        studentType: item.registered_students_type || item.student_type || 'Regular',
-        departmentVerify: item.examination_department_verification === 'YES' || item.enrolment_department_verification === 'YES' || item.department_verify === 1 || item.REGISTERED_STUDENTS_COLLEGE_VERIFY === 1,
-        courses: item.enrolled_courses?.map((course: any) => ({
-          courseCode: course.course_code || course.COURSE_CODE_TITLE_CODE,
-          courseTitle: course.course_title || course.COURSE_CODE_TITLE,
-          courseCredit: course.course_credit?.toString() || course.COURSE_CODE_TITLE_CREDIT?.toString() || '0',
+        hallVerify: item.hall_verify === '1' || item.hall_verify === 1,
+        admitCardIssue: item.admit_card_issue === '1' || item.admit_card_issue === 1,
+        examinationStatus: item.examination_status || 'Active',
+        paymentStatus: item.payment_details && item.payment_details.length > 0 ? 'YES' : 'NO',
+        examRoll: item.registered_students_exam_roll,
+        classRoll: item.class_roll,
+        studentType: item.registered_students_type || 'Regular',
+        departmentVerify: item.registered_students_college_verify === '1' || item.registered_students_college_verify === 1,
+        courses: item.courses?.map((course: any) => ({
+          courseCode: course.course_code,
+          courseTitle: course.course_title,
+          courseCredit: course.course_credit?.toString() || '0',
         })) || []
       })) || [];
+
+      return {
+        success: true,
+        data: examinations,
+      };
 
       return {
         success: true,

@@ -47,8 +47,8 @@ const LoginScreen = ({navigation}) => {
   };
 
   const setAlt = () => {
-    setEmail('test@example.com');
-    setPassword('password123');
+    setEmail('s-2017918219@econ.du.ac.bd');
+    setPassword('12345678');
   };
 
   return (

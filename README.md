@@ -4,6 +4,10 @@
 
 **Britto** is a React Native mobile application designed as a comprehensive student portal for Dhaka University (DU). The app provides students with easy access to various academic services and information through a modern, user-friendly interface.
 
+#### NOTES FOR JAHID VAI
+1. Should Have valid start date and end date for enrollment and formfillup.
+
+
 ## Current Features
 
 ### 🔐 Authentication System

@@ -18,7 +18,6 @@ import {SafeAreaProvider, initialWindowMetrics} from 'react-native-safe-area-con
 import Department from './src/screens/dashboard/Department';
 import Syllabus from './src/screens/dashboard/Syllabus';
 import Notice from './src/screens/dashboard/Notice';
-import Examination from './src/screens/dashboard/Examination';
 import Result from './src/screens/dashboard/Result';
 import Marksheet from './src/screens/dashboard/Marksheet';
 import Certificate from './src/screens/dashboard/Certificate';
@@ -119,11 +118,7 @@ const App = () => {
                 component={Notice}
                 options={{title: 'Notice', headerShown: false}}
               />
-              <Stack.Screen
-                name="Examination"
-                component={Examination}
-                options={{title: 'Examination', headerShown: false}}
-              />
+              
               <Stack.Screen
                 name="FormFillup"
                 component={FormFillup}
