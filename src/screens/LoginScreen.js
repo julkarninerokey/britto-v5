@@ -33,7 +33,6 @@ const LoginScreen = ({navigation}) => {
       const authResponse = await login(email, password);
       
       if (authResponse.success) {
-        toast('success', 'Login successful!');
         navigation.navigate('Dashboard');
       } else {
         toast('danger', authResponse.message || 'Login failed');
