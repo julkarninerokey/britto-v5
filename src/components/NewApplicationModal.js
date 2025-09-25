@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useMemo, useCallback} from 'react';
 import {
   Modal,
   VStack,
@@ -6,9 +6,7 @@ import {
   Text,
   Button,
   FormControl,
-  Select,
   Input,
-  CheckIcon,
   Radio,
   useToast,
   Divider,
@@ -16,37 +14,72 @@ import {
   Box,
   Checkbox,
 } from 'native-base';
-import { getPaymentHeads } from '../service/newEnrollmentService';
-import { getAsyncStoreData } from '../utils/async-storage';
-import { isDirectPaymentEnabled } from '../config/paymentConfig';
-import { handleDirectPayment } from '../service/directPaymentService';
-import { color } from '../service/utils';
-import { 
-  getCompletedDegrees, 
-  getAllDepartments, 
-  getPrograms, 
+import {getPaymentHeads} from '../service/newEnrollmentService';
+import {color} from '../service/utils';
+import {
+  getCompletedDegrees,
+  getAllDepartments,
+  getPrograms,
   getAllHalls,
-  submitCertificateApplication 
+  submitCertificateApplication,
 } from '../service/applicationService';
+import DropdownSelect from './DropdownSelect';
 
-const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess, applicationType = 'CERTIFICATE' }) => {
+const DEFAULT_APPLICATION_FEE = 100;
+
+const certificateTypes = [
+  {label: 'Provisional', value: 'Provisional'},
+  {label: 'Main', value: 'Main'},
+];
+
+const deliveryTypes = [
+  {label: 'Regular', value: 'Regular'},
+  {label: 'Emergency', value: 'Emergency'},
+];
+
+const reasonOptions = [
+  {label: 'New Application', value: 'New Application'},
+  {label: 'Lost or Stolen', value: 'Lost or Stolen'},
+  {label: 'Information Updated', value: 'Information Updated'},
+  {label: 'Destroyed', value: 'Destroyed'},
+];
+
+const countryOptions = [
+  {label: 'Bangladesh', value: 'Bangladesh'},
+  {label: 'India', value: 'India'},
+  {label: 'Pakistan', value: 'Pakistan'},
+  {label: 'United States', value: 'United States'},
+  {label: 'United Kingdom', value: 'United Kingdom'},
+  {label: 'Canada', value: 'Canada'},
+  {label: 'Australia', value: 'Australia'},
+  {label: 'Germany', value: 'Germany'},
+  {label: 'France', value: 'France'},
+  {label: 'Other', value: 'Other'},
+];
+
+const NewApplicationModal = ({
+  isOpen,
+  onClose,
+  navigation,
+  onApplicationSuccess,
+  applicationType = 'CERTIFICATE',
+}) => {
   const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [applicationFee, setApplicationFee] = useState(100);
+  const [applicationFee, setApplicationFee] = useState(DEFAULT_APPLICATION_FEE);
+  const [emergencyFee, setEmergencyFee] = useState(0);
   const [emailFee, setEmailFee] = useState(0);
   const [postalLocalFee, setPostalLocalFee] = useState(0);
   const [postalAbroadFee, setPostalAbroadFee] = useState(0);
   const [hallDevelopmentFee, setHallDevelopmentFee] = useState(0);
-  const [paymentHeads, setPaymentHeads] = useState([]);
-  const [studentRegNo, setStudentRegNo] = useState('');
+  const [envelopeFee, setEnvelopeFee] = useState(0);
   const [completedDegrees, setCompletedDegrees] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [halls, setHalls] = useState([]);
   const toast = useToast();
-  
+
   const [formData, setFormData] = useState({
-    // Basic info
     program: '',
     examSelect: '',
     subjectName: '',
@@ -55,67 +88,26 @@ const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess
     examRollInput: '',
     department: '',
     hall: '',
-    
-    // Manual degree entry flag
     isCustomDegree: false,
-    
-    // Certificate/Application type
     certificateType: 'Provisional',
     deliveryTypeMethod: 'Regular',
     reasonOfApplication: 'New Application',
-    applicationType: applicationType,
-    
-    // Delivery methods (checkboxes)
+    applicationType,
+    admitCard: null,
+    isShowPdf: true,
     overCounter: false,
     emailDelivery: false,
     postalMail: false,
-    
-    // Over counter details
     isSelf: true,
     isAuthorisedPerson: false,
     overCounterName: '',
     overCounterMobile: '',
     photoUpload: null,
-    
-    // Email delivery
     emailAddress: '',
-    
-    // Postal delivery
     postalCountry: 'Bangladesh',
     postalAddress: '',
-    postalType: 'Local', // Local or Abroad
+    postalType: 'Local',
   });
-
-  const certificateTypes = [
-    { label: 'Provisional Certificate', value: 'Provisional' },
-    { label: 'Final Certificate', value: 'Final' },
-    { label: 'Diploma Certificate', value: 'Diploma' },
-  ];
-
-  const deliveryTypes = [
-    { label: 'Regular', value: 'Regular' },
-    { label: 'Urgent', value: 'Urgent' },
-  ];
-
-  const reasonOptions = [
-    { label: 'New Application', value: 'New Application' },
-    { label: 'Damaged', value: 'Damaged' },
-    { label: 'Information Updated', value: 'Information Updated' },
-    { label: 'Lost or Stolen', value: 'Lost or Stolen' },
-  ];
-
-  const countries = [
-    { label: 'Bangladesh', value: 'Bangladesh' },
-    { label: 'India', value: 'India' },
-    { label: 'Pakistan', value: 'Pakistan' },
-    { label: 'United States', value: 'United States' },
-    { label: 'United Kingdom', value: 'United Kingdom' },
-    { label: 'Canada', value: 'Canada' },
-    { label: 'Australia', value: 'Australia' },
-    { label: 'Germany', value: 'Germany' },
-    { label: 'France', value: 'France' },
-    { label: 'Other', value: 'Other' },
-  ];
 
   useEffect(() => {
     if (isOpen) {
@@ -128,7 +120,6 @@ const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess
     try {
       await Promise.all([
         loadPaymentInfo(),
-        loadStudentRegNo(),
         loadCompletedDegrees(),
         loadDepartments(),
         loadPrograms(),
@@ -141,72 +132,81 @@ const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess
     }
   };
 
-  const loadStudentRegNo = async () => {
-    try {
-      const studentDetailsStr = await getAsyncStoreData('studentDetails');
-      if (studentDetailsStr) {
-        const studentDetails = JSON.parse(studentDetailsStr);
-        setStudentRegNo(studentDetails.regNo || '');
-        return;
-      }
-      
-      const regNo = await getAsyncStoreData('reg');
-      if (regNo) {
-        setStudentRegNo(regNo);
-        return;
-      }
-    } catch (error) {
-      console.error('Error loading student registration number:', error);
-    }
-  };
-
   const loadPaymentInfo = async () => {
     try {
       const response = await getPaymentHeads();
       if (response.success && response.data) {
-        setPaymentHeads(response.data);
-        
-        // Find certificate application fee
-        const applicationHead = response.data.find(head => 
-          head.category === applicationType || 
-          head.name.toLowerCase().includes(applicationType.toLowerCase()) ||
-          head.name.toLowerCase().includes('certificate')
-        );
-        if (applicationHead) {
-          setApplicationFee(applicationHead.unit_price);
+        const heads = response.data;
+        setEmergencyFee(0);
+        setEnvelopeFee(0);
+
+        const normalize = (value) =>
+          typeof value === 'string' ? value.toLowerCase() : String(value || '').toLowerCase();
+
+        const categoryHeads = heads.filter(head => head.category === applicationType);
+        if (categoryHeads.length) {
+          const baseHead = categoryHeads.find(head => {
+            const name = normalize(head.name);
+            if (!name) {
+              return false;
+            }
+            if (name.includes('emergency')) {
+              return false;
+            }
+            if (name.includes('envelop')) {
+              return false;
+            }
+            if (name.includes('hall')) {
+              return false;
+            }
+            return name.includes('fee') || name.includes(applicationType.toLowerCase());
+          });
+          setApplicationFee(baseHead ? baseHead.unit_price : DEFAULT_APPLICATION_FEE);
+
+          const emergencyHead = categoryHeads.find(head => normalize(head.name).includes('emergency'));
+          if (emergencyHead) {
+            setEmergencyFee(emergencyHead.unit_price);
+          }
+
+          const envelopeHead = categoryHeads.find(head => {
+            const name = normalize(head.name);
+            return name.includes('envelop');
+          });
+          if (envelopeHead) {
+            setEnvelopeFee(envelopeHead.unit_price);
+          }
+        } else {
+          setApplicationFee(DEFAULT_APPLICATION_FEE);
         }
 
-        // Find email delivery fee
-        const emailHead = response.data.find(head => 
-          head.name.toLowerCase().includes('email') ||
-          head.name.toLowerCase().includes('soft copy')
-        );
+        const emailHead = heads.find(head => {
+          const name = normalize(head.name);
+          return name.includes('email') || name.includes('soft copy');
+        });
         if (emailHead) {
           setEmailFee(emailHead.unit_price);
         }
 
-        // Find postal delivery fees
-        const postalLocalHead = response.data.find(head => 
-          head.name.toLowerCase().includes('postal') && 
-          head.name.toLowerCase().includes('local')
-        );
+        const postalLocalHead = heads.find(head => {
+          const name = normalize(head.name);
+          return name.includes('postal') && name.includes('local');
+        });
         if (postalLocalHead) {
           setPostalLocalFee(postalLocalHead.unit_price);
         }
 
-        const postalAbroadHead = response.data.find(head => 
-          head.name.toLowerCase().includes('postal') && 
-          head.name.toLowerCase().includes('abroad')
-        );
+        const postalAbroadHead = heads.find(head => {
+          const name = normalize(head.name);
+          return name.includes('postal') && name.includes('abroad');
+        });
         if (postalAbroadHead) {
           setPostalAbroadFee(postalAbroadHead.unit_price);
         }
 
-        // Find hall development fee
-        const hallHead = response.data.find(head => 
-          head.name.toLowerCase().includes('hall') && 
-          head.name.toLowerCase().includes('development')
-        );
+        const hallHead = heads.find(head => {
+          const name = normalize(head.name);
+          return name.includes('hall') && name.includes('development');
+        });
         if (hallHead) {
           setHallDevelopmentFee(hallHead.unit_price);
         }
@@ -260,161 +260,258 @@ const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess
     }
   };
 
-  const handleInputChange = (field, value) => {
-    setFormData(prev => {
-      const newData = { ...prev, [field]: value };
-      
-      // Auto-populate fields when exam is selected
-      if (field === 'examSelect') {
-        if (value === 'CUSTOM_DEGREE') {
-          // User selected "My Degree not in listed"
-          newData.isCustomDegree = true;
-          newData.subjectName = '';
-          newData.subjectId = '';
-          newData.examYearSelect = '';
-          newData.examRollInput = '';
-          newData.program = '';
-          newData.department = '';
-          newData.hall = '';
-        } else {
-          // User selected an existing degree
-          newData.isCustomDegree = false;
-          const selectedDegree = completedDegrees.find(degree => degree.id === value);
-          if (selectedDegree) {
-            newData.subjectName = selectedDegree.subjectsTitle || selectedDegree.degree?.degree_name || '';
-            newData.subjectId = selectedDegree.subjectsId || selectedDegree.degree?.subjects_id || '';
-            newData.examYearSelect = selectedDegree.examYear || selectedDegree.exam?.registered_exam_year || '';
-            newData.examRollInput = selectedDegree.examRoll || '';
-            newData.program = selectedDegree.programsId?.toString() || selectedDegree.degree?.program_id?.toString() || '';
-            newData.department = selectedDegree.departmentId?.toString() || '';
-            newData.hall = selectedDegree.hallId?.toString() || '';
+  const programOptions = useMemo(
+    () =>
+      programs
+        .map(program => ({
+          label: program.programsName,
+          value: program.programsId ? program.programsId.toString() : '',
+        }))
+        .filter(option => option.value),
+    [programs],
+  );
+
+  const degreeOptions = useMemo(() => {
+    const formattedDegrees = completedDegrees
+      .map(degree => {
+        const id = degree.id ?? degree.degree?.id;
+        if (!id) {
+          return null;
+        }
+
+        const labelParts = [
+          degree.degreeName ||
+            degree.degree?.degree_name ||
+            degree.subjectsTitle ||
+            'Degree',
+        ];
+
+        const year = degree.examYear || degree.exam?.registered_exam_year;
+        if (year) {
+          labelParts.push(`(${year})`);
+        }
+
+        return {
+          label: labelParts.join(' '),
+          value: id.toString(),
+        };
+      })
+      .filter(Boolean);
+
+    return [
+      ...formattedDegrees,
+      {label: '🔸 My Degree not in listed', value: 'CUSTOM_DEGREE'},
+    ];
+  }, [completedDegrees]);
+
+  const departmentOptions = useMemo(
+    () =>
+      departments
+        .map(department => {
+          const label =
+            department.subjectsTitleEn ||
+            department.subjectsTitle ||
+            department.name ||
+            'Unnamed Department';
+          const valueSource = department.subjectsId ?? department.id;
+          return {
+            label,
+            value: valueSource != null ? valueSource.toString() : '',
+          };
+        })
+        .filter(option => option.value),
+    [departments],
+  );
+
+  const hallOptions = useMemo(
+    () =>
+      halls
+        .map(hall => {
+          const label =
+            hall.hallTitleEn || hall.hallTitle || hall.name || 'Unnamed Hall';
+          const valueSource = hall.id ?? hall.hall_id;
+          return {
+            label,
+            value: valueSource != null ? valueSource.toString() : '',
+          };
+        })
+        .filter(option => option.value),
+    [halls],
+  );
+
+  const handleInputChange = useCallback(
+    (field, value) => {
+      setFormData(prev => {
+        const next = {...prev, [field]: value};
+
+        if (field === 'examSelect') {
+          if (value === 'CUSTOM_DEGREE') {
+            next.isCustomDegree = true;
+            next.isShowPdf = true;
+            next.subjectName = '';
+            next.subjectId = '';
+            next.examYearSelect = '';
+            next.examRollInput = '';
+            next.program = '';
+            next.department = '';
+            next.hall = '';
+          } else if (value) {
+            next.isCustomDegree = false;
+            const selectedDegree = completedDegrees.find(degree => {
+              const degreeId = degree.id ?? degree.degree?.id;
+              return degreeId?.toString() === value;
+            });
+
+            if (selectedDegree) {
+              next.subjectName =
+                selectedDegree.subjectsTitle ||
+                selectedDegree.degree?.degree_name ||
+                '';
+
+              const subjectId =
+                selectedDegree.subjectsId ??
+                selectedDegree.degree?.subjects_id ??
+                selectedDegree.subject_id ??
+                selectedDegree.subject?.id;
+              next.subjectId = subjectId != null ? subjectId.toString() : '';
+
+              next.examYearSelect =
+                selectedDegree.examYear ||
+                selectedDegree.exam?.registered_exam_year ||
+                '';
+              next.examRollInput =
+                selectedDegree.examRoll ||
+                selectedDegree.exam?.registered_exam_roll ||
+                '';
+
+              const programId =
+                selectedDegree.programsId ??
+                selectedDegree.degree?.program_id ??
+                selectedDegree.program_id;
+              next.program = programId != null ? programId.toString() : '';
+
+              const departmentId =
+                selectedDegree.departmentId ??
+                selectedDegree.department_id ??
+                selectedDegree.subjectsId ??
+                selectedDegree.degree?.subjects_id ??
+                selectedDegree.department?.id;
+              next.department =
+                departmentId != null ? departmentId.toString() : '';
+
+              const hallId =
+                selectedDegree.hallId ??
+                selectedDegree.hall_id ??
+                selectedDegree.hall?.id;
+              next.hall = hallId != null ? hallId.toString() : '';
+
+              const resultFlag = (
+                selectedDegree.all_result_available ||
+                selectedDegree.allResultAvailable ||
+                ''
+              )
+                .toString()
+                .toUpperCase();
+              next.isShowPdf = resultFlag !== 'YES';
+            }
+          } else {
+            next.isCustomDegree = false;
           }
         }
-      }
 
-      // Handle postal type based on country
-      if (field === 'postalCountry') {
-        newData.postalType = value === 'Bangladesh' ? 'Local' : 'Abroad';
-      }
-      
-      return newData;
-    });
-  };
+        if (field === 'postalCountry') {
+          next.postalType = value === 'Bangladesh' ? 'Local' : 'Abroad';
+        }
+
+        return next;
+      });
+    },
+    [completedDegrees],
+  );
 
   const validateForm = () => {
+    const warn = description =>
+      toast.show({
+        description,
+        status: 'warning',
+      });
+
     if (!formData.program) {
-      toast.show({
-        description: 'Please select program',
-        status: 'warning'
-      });
-      return false;
-    }
-    
-    if (!formData.examSelect) {
-      toast.show({
-        description: 'Please select exam or degree',
-        status: 'warning'
-      });
+      warn('Please select program');
       return false;
     }
 
-    // Validate custom degree fields if selected
+    if (!formData.examSelect) {
+      warn('Please select exam or degree');
+      return false;
+    }
+
     if (formData.isCustomDegree) {
       if (!formData.department) {
-        toast.show({
-          description: 'Please select department',
-          status: 'warning'
-        });
+        warn('Please select department');
         return false;
       }
 
       if (!formData.examYearSelect) {
-        toast.show({
-          description: 'Please enter exam year',
-          status: 'warning'
-        });
+        warn('Please enter exam year');
         return false;
       }
 
       if (!formData.examRollInput) {
-        toast.show({
-          description: 'Please enter exam roll number',
-          status: 'warning'
-        });
+        warn('Please enter exam roll number');
         return false;
       }
 
       if (!formData.hall) {
-        toast.show({
-          description: 'Please select hall',
-          status: 'warning'
-        });
+        warn('Please select hall');
         return false;
       }
     }
-    
+
+    if (formData.isShowPdf && !formData.admitCard) {
+      warn('Please upload admit card (PDF)');
+      return false;
+    }
+
     if (!formData.certificateType) {
-      toast.show({
-        description: 'Please select certificate type',
-        status: 'warning'
-      });
+      warn('Please select certificate type');
       return false;
     }
-    
+
     if (!formData.deliveryTypeMethod) {
-      toast.show({
-        description: 'Please select delivery type',
-        status: 'warning'
-      });
+      warn('Please select delivery type');
       return false;
     }
-    
+
     if (!formData.reasonOfApplication) {
-      toast.show({
-        description: 'Please select reason for application',
-        status: 'warning'
-      });
+      warn('Please select reason for application');
       return false;
     }
 
-    // At least one delivery method must be selected
-    if (!formData.overCounter && !formData.emailDelivery && !formData.postalMail) {
-      toast.show({
-        description: 'Please select at least one delivery method',
-        status: 'warning'
-      });
+    if (
+      !formData.overCounter &&
+      !formData.emailDelivery &&
+      !formData.postalMail
+    ) {
+      warn('Please select at least one delivery method');
       return false;
     }
 
-    // Validate delivery method specific fields
     if (formData.overCounter) {
       if (!formData.overCounterName || !formData.overCounterMobile) {
-        toast.show({
-          description: 'Please fill receiver name and mobile for counter delivery',
-          status: 'warning'
-        });
+        warn('Please fill receiver name and mobile for counter delivery');
         return false;
       }
     }
 
-    if (formData.emailDelivery) {
-      if (!formData.emailAddress) {
-        toast.show({
-          description: 'Please enter email address for email delivery',
-          status: 'warning'
-        });
-        return false;
-      }
+    if (formData.emailDelivery && !formData.emailAddress) {
+      warn('Please enter email address for email delivery');
+      return false;
     }
 
-    if (formData.postalMail) {
-      if (!formData.postalAddress) {
-        toast.show({
-          description: 'Please enter postal address for mail delivery',
-          status: 'warning'
-        });
-        return false;
-      }
+    if (formData.postalMail && !formData.postalAddress) {
+      warn('Please enter postal address for mail delivery');
+      return false;
     }
 
     return true;
@@ -422,59 +519,142 @@ const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess
 
   const prepareFormData = () => {
     const submitData = new URLSearchParams();
-    
-    // Basic information
+
     submitData.append('program', formData.program);
     submitData.append('examSelect', formData.examSelect);
     submitData.append('subject_name', formData.subjectName);
     submitData.append('subject_id', formData.subjectId);
     submitData.append('examYearSelect', formData.examYearSelect);
     submitData.append('examRollInput', formData.examRollInput);
-    
-    // Certificate details
+    submitData.append('department', formData.department);
+    submitData.append('hall', formData.hall);
     submitData.append('certificate_type', formData.certificateType);
     submitData.append('deliveryTypeMethod', formData.deliveryTypeMethod);
     submitData.append('reason_of_application', formData.reasonOfApplication);
     submitData.append('application_type', formData.applicationType);
-    
-    // Delivery methods
+
     if (formData.overCounter) {
       submitData.append('overCounter', 'on');
       if (formData.isSelf) {
         submitData.append('isSelf', 'on');
+      } else if (formData.isAuthorisedPerson) {
+        submitData.append('isAuthorisedPerson', 'on');
       }
       submitData.append('overCounterName', formData.overCounterName);
       submitData.append('overCounterMobile', formData.overCounterMobile);
     }
-    
+
     if (formData.emailDelivery) {
       submitData.append('emailDelivery', 'on');
       submitData.append('emailAddress', formData.emailAddress);
     }
-    
+
     if (formData.postalMail) {
       submitData.append('postalMail', 'on');
       submitData.append('postalCountry', formData.postalCountry);
       submitData.append('postalAddress', formData.postalAddress);
+      submitData.append('postalType', formData.postalType);
     }
-    
+
     return submitData;
   };
 
+  const totalAmount = useMemo(() => {
+    const autoIncludeHallDevelopment =
+      applicationType === 'CERTIFICATE' || applicationType === 'MARKSHEET';
+
+    let total = applicationFee;
+
+    if (formData.deliveryTypeMethod === 'Emergency') {
+      total += emergencyFee > 0 ? emergencyFee : applicationFee;
+    }
+
+    if (
+      hallDevelopmentFee > 0 &&
+      (autoIncludeHallDevelopment || Boolean(formData.hall))
+    ) {
+      total += hallDevelopmentFee;
+    }
+
+    if (applicationType === 'TRANSCRIPT' && envelopeFee > 0) {
+      total += envelopeFee;
+    }
+
+    if (formData.emailDelivery) {
+      total += emailFee;
+    }
+
+    if (formData.postalMail) {
+      total +=
+        formData.postalType === 'Abroad' ? postalAbroadFee : postalLocalFee;
+    }
+
+    return total;
+  }, [
+    applicationFee,
+    applicationType,
+    emergencyFee,
+    envelopeFee,
+    emailFee,
+    hallDevelopmentFee,
+    postalAbroadFee,
+    postalLocalFee,
+    formData.deliveryTypeMethod,
+    formData.emailDelivery,
+    formData.hall,
+    formData.postalMail,
+    formData.postalType,
+  ]);
+
+  const baseFeeLabel = useMemo(() => {
+    switch (applicationType) {
+      case 'TRANSCRIPT':
+        return 'Transcript Fee';
+      case 'MARKSHEET':
+        return 'Marksheet Fee';
+      case 'CERTIFICATE':
+      default:
+        return 'Certificate Fee';
+    }
+  }, [applicationType]);
+
+  const shouldShowHallDevelopment = useMemo(() => {
+    const autoIncludeHallDevelopment =
+      applicationType === 'CERTIFICATE' || applicationType === 'MARKSHEET';
+    return (
+      hallDevelopmentFee > 0 &&
+      (autoIncludeHallDevelopment || Boolean(formData.hall))
+    );
+  }, [applicationType, formData.hall, hallDevelopmentFee]);
+
+  const getModalTitle = () => {
+    switch (applicationType) {
+      case 'CERTIFICATE':
+        return '📋 New Certificate Application';
+      case 'TRANSCRIPT':
+        return '📜 New Transcript Application';
+      default:
+        return '📝 New Application';
+    }
+  };
+
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
 
     setSubmitLoading(true);
     try {
       const submitData = prepareFormData();
       const response = await submitCertificateApplication(submitData);
-      
+
       if (response.success) {
         toast.show({
-          description: response.message || 'Application submitted successfully!',
-          status: 'success'
+          description:
+            response.message || 'Application submitted successfully!',
+          status: 'success',
         });
-        
+
         handleClose();
         if (onApplicationSuccess) {
           onApplicationSuccess();
@@ -482,14 +662,14 @@ const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess
       } else {
         toast.show({
           description: response.message || 'Failed to submit application',
-          status: 'error'
+          status: 'error',
         });
       }
     } catch (error) {
       console.error('Error submitting application:', error);
       toast.show({
         description: 'Failed to submit application. Please try again.',
-        status: 'error'
+        status: 'error',
       });
     } finally {
       setSubmitLoading(false);
@@ -510,7 +690,9 @@ const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess
       certificateType: 'Provisional',
       deliveryTypeMethod: 'Regular',
       reasonOfApplication: 'New Application',
-      applicationType: applicationType,
+      applicationType,
+      admitCard: null,
+      isShowPdf: true,
       overCounter: false,
       emailDelivery: false,
       postalMail: false,
@@ -527,48 +709,6 @@ const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess
     onClose();
   };
 
-  const calculateAmount = () => {
-    let totalAmount = applicationFee;
-    
-    // Add urgent delivery charges
-    if (formData.deliveryTypeMethod === 'Urgent') {
-      totalAmount = totalAmount * 2;
-    }
-
-    // Add delivery method fees
-    if (formData.emailDelivery) {
-      totalAmount += emailFee;
-    }
-
-    if (formData.postalMail) {
-      if (formData.postalType === 'Abroad') {
-        totalAmount += postalAbroadFee;
-      } else {
-        totalAmount += postalLocalFee;
-      }
-    }
-
-    // Add hall development fee
-    if (formData.hall) {
-      totalAmount += hallDevelopmentFee;
-    }
-
-    // Over the counter has no additional fee (fee = 0)
-    
-    return totalAmount;
-  };
-
-  const getModalTitle = () => {
-    switch (applicationType) {
-      case 'CERTIFICATE':
-        return '📋 New Certificate Application';
-      case 'TRANSCRIPT':
-        return '📜 New Transcript Application';
-      default:
-        return '📝 New Application';
-    }
-  };
-
   return (
     <Modal isOpen={isOpen} onClose={handleClose} size="full">
       <Modal.Content maxWidth="95%" maxHeight="90%">
@@ -578,7 +718,7 @@ const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess
             {getModalTitle()}
           </Text>
         </Modal.Header>
-        
+
         <Modal.Body bg={color.background}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <VStack space={4} py={2}>
@@ -588,302 +728,296 @@ const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess
                 </Box>
               ) : (
                 <>
-                  {/* Program Selection */}
-                  <FormControl isRequired>
-                    <FormControl.Label>Program</FormControl.Label>
-                    <Select
-                      selectedValue={formData.program}
-                      onValueChange={(value) => handleInputChange('program', value)}
-                      placeholder="Select program"
-                      _selectedItem={{
-                        bg: color.primary,
-                        endIcon: <CheckIcon size="5" color="white" />,
-                      }}
-                    >
-                      {programs.map((program) => (
-                        <Select.Item 
-                          key={program.programsId} 
-                          label={program.programsName} 
-                          value={program.programsId.toString()} 
-                        />
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  {/* Exam/Degree Selection */}
                   <FormControl isRequired>
                     <FormControl.Label>Completed Degree</FormControl.Label>
-                    <Select
-                      selectedValue={formData.examSelect}
-                      onValueChange={(value) => handleInputChange('examSelect', value)}
+                    <DropdownSelect
+                      value={formData.examSelect}
+                      onValueChange={value =>
+                        handleInputChange('examSelect', value)
+                      }
                       placeholder="Select completed degree"
-                      _selectedItem={{
-                        bg: color.primary,
-                        endIcon: <CheckIcon size="5" color="white" />,
-                      }}
-                    >
-                      {completedDegrees.map((degree) => (
-                        <Select.Item 
-                          key={degree.id} 
-                          label={`${degree.degreeName} (${degree.examYear})`} 
-                          value={degree.id} 
-                        />
-                      ))}
-                      <Select.Item 
-                        label="🔸 My Degree not in listed" 
-                        value="CUSTOM_DEGREE" 
-                      />
-                    </Select>
+                      options={degreeOptions}
+                      label="Completed Degree"
+                    />
                   </FormControl>
 
-                  {/* Custom Degree Fields */}
                   {formData.isCustomDegree && (
                     <VStack space={3} bg={color.light} p={4} borderRadius={8}>
-                      <Text fontSize="sm" fontWeight="600" color={color.primary}>
+                      <Text
+                        fontSize="sm"
+                        fontWeight="600"
+                        color={color.primary}>
                         📝 Enter Degree Information
                       </Text>
-
-                      {/* Department Selection */}
+                      <FormControl isRequired>
+                        <FormControl.Label>Program</FormControl.Label>
+                        <DropdownSelect
+                          value={formData.program}
+                          onValueChange={value =>
+                            handleInputChange('program', value)
+                          }
+                          placeholder="Select program"
+                          options={programOptions}
+                          label="Program"
+                        />
+                      </FormControl>
                       <FormControl isRequired>
                         <FormControl.Label>Department</FormControl.Label>
-                        <Select
-                          selectedValue={formData.department}
-                          onValueChange={(value) => handleInputChange('department', value)}
+                        <DropdownSelect
+                          value={formData.department}
+                          onValueChange={value =>
+                            handleInputChange('department', value)
+                          }
                           placeholder="Select department"
-                          _selectedItem={{
-                            bg: color.primary,
-                            endIcon: <CheckIcon size="5" color="white" />,
-                          }}
-                        >
-                          {departments.map((dept) => (
-                            <Select.Item 
-                              key={dept.id} 
-                              label={dept.name} 
-                              value={dept.id.toString()} 
-                            />
-                          ))}
-                        </Select>
+                          options={departmentOptions}
+                          label="Department"
+                        />
                       </FormControl>
 
-                      {/* Exam Year Input */}
                       <FormControl isRequired>
                         <FormControl.Label>Exam Year</FormControl.Label>
                         <Input
                           value={formData.examYearSelect}
-                          onChangeText={(value) => handleInputChange('examYearSelect', value)}
+                          onChangeText={value =>
+                            handleInputChange('examYearSelect', value)
+                          }
                           placeholder="Enter exam year (e.g., 2020)"
                           keyboardType="numeric"
                         />
                       </FormControl>
 
-                      {/* Roll Number Input */}
                       <FormControl isRequired>
                         <FormControl.Label>Roll Number</FormControl.Label>
                         <Input
                           value={formData.examRollInput}
-                          onChangeText={(value) => handleInputChange('examRollInput', value)}
+                          onChangeText={value =>
+                            handleInputChange('examRollInput', value)
+                          }
                           placeholder="Enter roll number"
                           keyboardType="numeric"
                         />
                       </FormControl>
 
-                      {/* Hall Selection */}
                       <FormControl isRequired>
                         <FormControl.Label>Hall</FormControl.Label>
-                        <Select
-                          selectedValue={formData.hall}
-                          onValueChange={(value) => handleInputChange('hall', value)}
+                        <DropdownSelect
+                          value={formData.hall}
+                          onValueChange={value =>
+                            handleInputChange('hall', value)
+                          }
                           placeholder="Select hall"
-                          _selectedItem={{
-                            bg: color.primary,
-                            endIcon: <CheckIcon size="5" color="white" />,
+                          options={hallOptions}
+                          label="Hall"
+                        />
+                      </FormControl>
+                      <FormControl isRequired>
+                        <FormControl.Label>Admit Card (PDF)</FormControl.Label>
+                        <Button
+                          variant="outline"
+                          onPress={() => {
+                            toast.show({
+                              description:
+                                'PDF file picker will be implemented',
+                              status: 'info',
+                            });
                           }}
-                        >
-                          {halls.map((hall) => (
-                            <Select.Item 
-                              key={hall.id} 
-                              label={hall.name} 
-                              value={hall.id.toString()} 
-                            />
-                          ))}
-                        </Select>
+                          leftIcon={<Text>📄</Text>}
+                          borderColor={
+                            formData.admitCard ? 'green.500' : 'gray.300'
+                          }
+                          _text={{
+                            color: formData.admitCard
+                              ? 'green.600'
+                              : 'gray.600',
+                          }}>
+                          {formData.admitCard
+                            ? 'PDF Uploaded ✓'
+                            : 'Choose PDF File'}
+                        </Button>
+                        <Text fontSize="xs" color="gray.600" mt={1}>
+                          Upload your admit card in PDF format
+                        </Text>
                       </FormControl>
                     </VStack>
                   )}
 
-                  {/* Auto-populated fields for selected degree */}
-                  {formData.examSelect && !formData.isCustomDegree && (
-                    <VStack space={3} bg={color.light} p={3} borderRadius={8}>
-                      <Text fontSize="sm" fontWeight="600" color={color.primary}>
-                        📋 Degree Information
-                      </Text>
-                      <VStack space={1}>
-                        <HStack justifyContent="space-between">
-                          <Text fontSize="xs">Subject:</Text>
-                          <Text fontSize="xs" fontWeight="500">{formData.subjectName}</Text>
-                        </HStack>
-                        <HStack justifyContent="space-between">
-                          <Text fontSize="xs">Exam Year:</Text>
-                          <Text fontSize="xs" fontWeight="500">{formData.examYearSelect}</Text>
-                        </HStack>
-                        <HStack justifyContent="space-between">
-                          <Text fontSize="xs">Exam Roll:</Text>
-                          <Text fontSize="xs" fontWeight="500">{formData.examRollInput}</Text>
-                        </HStack>
-                      </VStack>
-                    </VStack>
-                  )}
-
-                  {/* Certificate Type */}
                   <FormControl isRequired>
                     <FormControl.Label>Certificate Type</FormControl.Label>
-                    <Select
-                      selectedValue={formData.certificateType}
-                      onValueChange={(value) => handleInputChange('certificateType', value)}
+                    <DropdownSelect
+                      value={formData.certificateType}
+                      onValueChange={value =>
+                        handleInputChange('certificateType', value)
+                      }
                       placeholder="Select certificate type"
-                      _selectedItem={{
-                        bg: color.primary,
-                        endIcon: <CheckIcon size="5" color="white" />,
-                      }}
-                    >
-                      {certificateTypes.map((type) => (
-                        <Select.Item key={type.value} label={type.label} value={type.value} />
-                      ))}
-                    </Select>
+                      options={certificateTypes}
+                      label="Certificate Type"
+                    />
                   </FormControl>
 
-                  {/* Delivery Type */}
                   <FormControl isRequired>
                     <FormControl.Label>Delivery Type</FormControl.Label>
-                    <Select
-                      selectedValue={formData.deliveryTypeMethod}
-                      onValueChange={(value) => handleInputChange('deliveryTypeMethod', value)}
+                    <DropdownSelect
+                      value={formData.deliveryTypeMethod}
+                      onValueChange={value =>
+                        handleInputChange('deliveryTypeMethod', value)
+                      }
                       placeholder="Select delivery type"
-                      _selectedItem={{
-                        bg: color.primary,
-                        endIcon: <CheckIcon size="5" color="white" />,
-                      }}
-                    >
-                      {deliveryTypes.map((type) => (
-                        <Select.Item key={type.value} label={type.label} value={type.value} />
-                      ))}
-                    </Select>
+                      options={deliveryTypes}
+                      label="Delivery Type"
+                    />
                   </FormControl>
 
-                  {/* Reason for Application */}
                   <FormControl isRequired>
-                    <FormControl.Label>Reason for Application</FormControl.Label>
-                    <Select
-                      selectedValue={formData.reasonOfApplication}
-                      onValueChange={(value) => handleInputChange('reasonOfApplication', value)}
+                    <FormControl.Label>
+                      Reason for Application
+                    </FormControl.Label>
+                    <DropdownSelect
+                      value={formData.reasonOfApplication}
+                      onValueChange={value =>
+                        handleInputChange('reasonOfApplication', value)
+                      }
                       placeholder="Select reason"
-                      _selectedItem={{
-                        bg: color.primary,
-                        endIcon: <CheckIcon size="5" color="white" />,
-                      }}
-                    >
-                      {reasonOptions.map((reason) => (
-                        <Select.Item key={reason.value} label={reason.label} value={reason.value} />
-                      ))}
-                    </Select>
+                      options={reasonOptions}
+                      label="Reason for Application"
+                    />
                   </FormControl>
 
                   <Divider />
 
-                  {/* Delivery Methods */}
                   <FormControl>
-                    <FormControl.Label>Delivery Methods (Select at least one)</FormControl.Label>
-                    
-                    {/* Over the Counter */}
+                    <FormControl.Label>
+                      Delivery Methods (Select at least one)
+                    </FormControl.Label>
+
                     <VStack space={3} mt={2}>
                       <Checkbox
                         isChecked={formData.overCounter}
-                        onChange={(value) => handleInputChange('overCounter', value)}
-                        value="overCounter"
-                      >
+                        onChange={value =>
+                          handleInputChange('overCounter', value)
+                        }
+                        value="overCounter">
                         Over the Counter
                       </Checkbox>
-                      
+
                       {formData.overCounter && (
-                        <VStack space={3} pl={6} bg={color.secondaryBackground} p={3} borderRadius={8}>
-                          <Text fontSize="sm" fontWeight="600">Collection Type</Text>
-                          
+                        <VStack
+                          space={3}
+                          pl={6}
+                          bg={color.secondaryBackground}
+                          p={3}
+                          borderRadius={8}>
+                          <Text fontSize="sm" fontWeight="600">
+                            Collection Type
+                          </Text>
+
                           <Radio.Group
                             name="collectionType"
                             value={formData.isSelf ? 'self' : 'authorised'}
-                            onChange={(value) => {
+                            onChange={value => {
                               handleInputChange('isSelf', value === 'self');
-                              handleInputChange('isAuthorisedPerson', value === 'authorised');
-                            }}
-                          >
+                              handleInputChange(
+                                'isAuthorisedPerson',
+                                value === 'authorised',
+                              );
+                            }}>
                             <VStack space={2}>
                               <Radio value="self">Self Collection</Radio>
-                              <Radio value="authorised">Authorised Person</Radio>
+                              <Radio value="authorised">
+                                Authorised Person
+                              </Radio>
                             </VStack>
                           </Radio.Group>
-                          
+
+
+                          {!formData.isSelf && (
+<>
                           <FormControl isRequired>
                             <FormControl.Label>
-                              {formData.isSelf ? 'Your Name' : 'Authorised Person Name'}
+                              {formData.isSelf
+                                ? 'Your Name'
+                                : 'Authorised Person Name'}
                             </FormControl.Label>
                             <Input
                               value={formData.overCounterName}
-                              onChangeText={(value) => handleInputChange('overCounterName', value)}
-                              placeholder={formData.isSelf ? "Enter your name" : "Enter authorised person's name"}
+                              onChangeText={value =>
+                                handleInputChange('overCounterName', value)
+                              }
+                              placeholder={
+                                formData.isSelf
+                                  ? 'Enter your name'
+                                  : "Enter authorised person's name"
+                              }
                             />
                           </FormControl>
-                          
+
                           <FormControl isRequired>
                             <FormControl.Label>
-                              {formData.isSelf ? 'Your Mobile' : 'Authorised Person Mobile'}
+                              {formData.isSelf
+                                ? 'Your Mobile'
+                                : 'Authorised Person Mobile'}
                             </FormControl.Label>
                             <Input
                               value={formData.overCounterMobile}
-                              onChangeText={(value) => handleInputChange('overCounterMobile', value)}
-                              placeholder={formData.isSelf ? "Enter your mobile number" : "Enter authorised person's mobile"}
+                              onChangeText={value =>
+                                handleInputChange('overCounterMobile', value)
+                              }
+                              placeholder={
+                                formData.isSelf
+                                  ? 'Enter your mobile number'
+                                  : "Enter authorised person's mobile"
+                              }
                               keyboardType="phone-pad"
                             />
                           </FormControl>
 
-                          {!formData.isSelf && (
                             <FormControl>
-                              <FormControl.Label>Photo Upload (Optional)</FormControl.Label>
+                              <FormControl.Label>
+                                Photo Upload (Optional)
+                              </FormControl.Label>
                               <Button
                                 variant="outline"
                                 onPress={() => {
-                                  // TODO: Implement photo upload functionality
                                   toast.show({
-                                    description: 'Photo upload feature will be implemented',
-                                    status: 'info'
+                                    description:
+                                      'Photo upload feature will be implemented',
+                                    status: 'info',
                                   });
                                 }}
-                                leftIcon={<Text>📷</Text>}
-                              >
-                                {formData.photoUpload ? 'Change Photo' : 'Upload Photo'}
+                                leftIcon={<Text>📷</Text>}>
+                                {formData.photoUpload
+                                  ? 'Change Photo'
+                                  : 'Upload Photo'}
                               </Button>
                             </FormControl>
+                            </>
                           )}
                         </VStack>
                       )}
                     </VStack>
 
-                    {/* Email Delivery */}
                     <VStack space={3} mt={4}>
                       <Checkbox
                         isChecked={formData.emailDelivery}
-                        onChange={(value) => handleInputChange('emailDelivery', value)}
-                        value="emailDelivery"
-                      >
+                        onChange={value =>
+                          handleInputChange('emailDelivery', value)
+                        }
+                        value="emailDelivery">
                         Email Delivery
                       </Checkbox>
-                      
+
                       {formData.emailDelivery && (
-                        <VStack pl={6} bg={color.secondaryBackground} p={3} borderRadius={8}>
+                        <VStack
+                          pl={6}
+                          bg={color.secondaryBackground}
+                          p={3}
+                          borderRadius={8}>
                           <FormControl isRequired>
                             <FormControl.Label>Email Address</FormControl.Label>
                             <Input
                               value={formData.emailAddress}
-                              onChangeText={(value) => handleInputChange('emailAddress', value)}
+                              onChangeText={value =>
+                                handleInputChange('emailAddress', value)
+                              }
                               placeholder="Enter email address"
                               keyboardType="email-address"
                             />
@@ -892,52 +1026,54 @@ const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess
                       )}
                     </VStack>
 
-                    {/* Postal Mail */}
                     <VStack space={3} mt={4}>
                       <Checkbox
                         isChecked={formData.postalMail}
-                        onChange={(value) => handleInputChange('postalMail', value)}
-                        value="postalMail"
-                      >
+                        onChange={value =>
+                          handleInputChange('postalMail', value)
+                        }
+                        value="postalMail">
                         Postal Mail
                       </Checkbox>
-                      
+
                       {formData.postalMail && (
-                        <VStack space={3} pl={6} bg={color.secondaryBackground} p={3} borderRadius={8}>
+                        <VStack
+                          space={3}
+                          pl={6}
+                          bg={color.secondaryBackground}
+                          p={3}
+                          borderRadius={8}>
                           <FormControl isRequired>
                             <FormControl.Label>Country</FormControl.Label>
-                            <Select
-                              selectedValue={formData.postalCountry}
-                              onValueChange={(value) => handleInputChange('postalCountry', value)}
+                            <DropdownSelect
+                              value={formData.postalCountry}
+                              onValueChange={value =>
+                                handleInputChange('postalCountry', value)
+                              }
                               placeholder="Select country"
-                              _selectedItem={{
-                                bg: color.primary,
-                                endIcon: <CheckIcon size="5" color="white" />,
-                              }}
-                            >
-                              {countries.map((country) => (
-                                <Select.Item 
-                                  key={country.value} 
-                                  label={country.label} 
-                                  value={country.value} 
-                                />
-                              ))}
-                            </Select>
+                              options={countryOptions}
+                              label="Country"
+                            />
                           </FormControl>
 
                           {formData.postalCountry !== 'Bangladesh' && (
                             <Box bg="amber.100" p={2} borderRadius={6}>
                               <Text fontSize="xs" color="amber.800">
-                                📮 International delivery selected - additional charges apply
+                                📮 International delivery selected - additional
+                                charges apply
                               </Text>
                             </Box>
                           )}
-                          
+
                           <FormControl isRequired>
-                            <FormControl.Label>Complete Postal Address</FormControl.Label>
+                            <FormControl.Label>
+                              Complete Postal Address
+                            </FormControl.Label>
                             <Input
                               value={formData.postalAddress}
-                              onChangeText={(value) => handleInputChange('postalAddress', value)}
+                              onChangeText={value =>
+                                handleInputChange('postalAddress', value)
+                              }
                               placeholder="Enter complete postal address with postal code"
                               multiline
                               numberOfLines={4}
@@ -948,75 +1084,99 @@ const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess
                     </VStack>
                   </FormControl>
 
-                  {/* Amount Preview with Breakdown */}
                   <Box bg={color.light} p={4} borderRadius={8}>
-                    <Text fontSize="md" fontWeight="600" mb={3}>💰 Fee Breakdown</Text>
-                    
+                    <Text fontSize="md" fontWeight="600" mb={3}>
+                      💰 Charges Breakdown
+                    </Text>
+
                     <VStack space={2}>
-                      {/* Base Application Fee */}
                       <HStack justifyContent="space-between">
-                        <Text fontSize="sm">Certificate Application Fee:</Text>
+                        <Text fontSize="sm">{baseFeeLabel}:</Text>
                         <Text fontSize="sm" fontWeight="500">৳{applicationFee}</Text>
                       </HStack>
 
-                      {/* Urgent Delivery Fee */}
-                      {formData.deliveryTypeMethod === 'Urgent' && (
+                      {formData.deliveryTypeMethod === 'Emergency' && (
                         <HStack justifyContent="space-between">
-                          <Text fontSize="sm" color="orange.600">Urgent Processing Fee:</Text>
-                          <Text fontSize="sm" fontWeight="500" color="orange.600">৳{applicationFee}</Text>
+                          <Text fontSize="sm">Emergency Processing Fee:</Text>
+                          <Text fontSize="sm" fontWeight="500">
+                            ৳{(emergencyFee > 0 ? emergencyFee : applicationFee).toFixed(2)}
+                          </Text>
                         </HStack>
                       )}
 
-                      {/* Email Delivery Fee */}
+                      {shouldShowHallDevelopment && (
+                        <HStack justifyContent="space-between">
+                          <Text fontSize="sm">Hall Development Fee:</Text>
+                          <Text fontSize="sm" fontWeight="500">
+                            ৳{hallDevelopmentFee}
+                          </Text>
+                        </HStack>
+                      )}
+
+                      {applicationType === 'TRANSCRIPT' && envelopeFee > 0 && (
+                        <HStack justifyContent="space-between">
+                          <Text fontSize="sm">Transcript Envelope Fee:</Text>
+                          <Text fontSize="sm" fontWeight="500">৳{envelopeFee}</Text>
+                        </HStack>
+                      )}
+
                       {formData.emailDelivery && emailFee > 0 && (
                         <HStack justifyContent="space-between">
                           <Text fontSize="sm">Email Delivery Fee:</Text>
-                          <Text fontSize="sm" fontWeight="500">৳{emailFee}</Text>
+                          <Text fontSize="sm" fontWeight="500">
+                            ৳{emailFee}
+                          </Text>
                         </HStack>
                       )}
 
-                      {/* Postal Delivery Fee */}
                       {formData.postalMail && (
                         <HStack justifyContent="space-between">
                           <Text fontSize="sm">
-                            Postal Delivery ({formData.postalType}) Fee:
+                            Postal Mail ({formData.postalType}):
                           </Text>
                           <Text fontSize="sm" fontWeight="500">
-                            ৳{formData.postalType === 'Abroad' ? postalAbroadFee : postalLocalFee}
+                            ৳
+                            {formData.postalType === 'Abroad'
+                              ? postalAbroadFee
+                              : postalLocalFee}
                           </Text>
                         </HStack>
                       )}
 
-                      {/* Hall Development Fee */}
-                      {formData.hall && hallDevelopmentFee > 0 && (
-                        <HStack justifyContent="space-between">
-                          <Text fontSize="sm">Hall Development Fee:</Text>
-                          <Text fontSize="sm" fontWeight="500">৳{hallDevelopmentFee}</Text>
-                        </HStack>
-                      )}
-
-                      {/* Over Counter (Free) */}
                       {formData.overCounter && (
                         <HStack justifyContent="space-between">
-                          <Text fontSize="sm" color="green.600">Over Counter Delivery:</Text>
-                          <Text fontSize="sm" fontWeight="500" color="green.600">FREE</Text>
+                          <Text fontSize="sm" color="green.600">
+                            Over Counter Delivery:
+                          </Text>
+                          <Text
+                            fontSize="sm"
+                            fontWeight="500"
+                            color="green.600">
+                            FREE
+                          </Text>
                         </HStack>
                       )}
 
                       <Divider />
 
-                      {/* Total Amount */}
-                      <HStack justifyContent="space-between" alignItems="center">
-                        <Text fontSize="lg" fontWeight="700">Total Amount:</Text>
-                        <Text fontSize="xl" fontWeight="bold" color={color.primary}>
-                          ৳{calculateAmount()}
+                      <HStack
+                        justifyContent="space-between"
+                        alignItems="center">
+                        <Text fontSize="lg" fontWeight="700">
+                          Total Charge:
+                        </Text>
+                        <Text
+                          fontSize="xl"
+                          fontWeight="bold"
+                          color={color.primary}>
+                          ৳{totalAmount.toFixed(2)}
                         </Text>
                       </HStack>
                     </VStack>
 
-                    {formData.deliveryTypeMethod === 'Urgent' && (
+                    {formData.deliveryTypeMethod === 'Emergency' && (
                       <Text fontSize="xs" color={color.secondary} mt={2}>
-                        *Urgent delivery processing time: 2-3 business days
+                        *Emergency processing: 2-3 business days
                       </Text>
                     )}
                   </Box>
@@ -1032,8 +1192,7 @@ const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess
               variant="ghost"
               colorScheme="blueGray"
               onPress={handleClose}
-              disabled={submitLoading}
-            >
+              disabled={submitLoading}>
               Cancel
             </Button>
             <Button
@@ -1041,10 +1200,9 @@ const NewApplicationModal = ({ isOpen, onClose, navigation, onApplicationSuccess
               onPress={handleSubmit}
               isLoading={submitLoading}
               isLoadingText="Submitting..."
-              _pressed={{ bg: color.primaryLight }}
-              disabled={loading}
-            >
-              💳 Submit Application - ৳{calculateAmount()}
+              _pressed={{bg: color.primaryLight}}
+              disabled={loading}>
+              💳 Submit Application - ৳{totalAmount.toFixed(2)}
             </Button>
           </Button.Group>
         </Modal.Footer>

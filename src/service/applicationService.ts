@@ -49,7 +49,7 @@ export async function getCompletedDegrees(): Promise<{ success: boolean; data?: 
     const response = await axios.get(buildUrl('/student/get-completed-degrees'), {
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': API_CONFIG.HEADERS.CONTENT_TYPE,
+        'Content-Type': 'application/json',
       }
     });
 
@@ -75,8 +75,8 @@ export async function getCompletedDegrees(): Promise<{ success: boolean; data?: 
       return { success: false, message: 'No completed degrees found' };
     }
   } catch (error: any) {
-    console.error('Error fetching completed degrees:', error);
-    return { success: false, message: error.message || 'Failed to fetch degrees' };
+    console.error('Error fetching completed degrees:', buildUrl('/student/get-completed-degrees'));
+    return { success: false, message: error.message + 'Failed to fetch degrees' };
   }
 }
 
@@ -159,25 +159,55 @@ export async function getAllHalls(): Promise<{ success: boolean; data?: Hall[]; 
         message: 'Authentication token not found. Please login again.',
       };
     }
+    const endpoints = ['/get-all-halls', '/get-all-hall'];
 
-    const response = await axios.get(buildUrl('/student/get-all-halls'), {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': API_CONFIG.HEADERS.CONTENT_TYPE,
+    for (const endpoint of endpoints) {
+      try {
+        const response = await axios.get(buildUrl(endpoint), {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': API_CONFIG.HEADERS.CONTENT_TYPE,
+          }
+        });
+
+        const payload = response.data?.data || response.data?.halls || response.data?.hallList;
+
+        if (response.data?.status && Array.isArray(payload)) {
+          const halls: Hall[] = (payload as any[])
+            .map<Hall | null>((item: any) => {
+              const id = item.id ?? item.hall_id;
+              const hallTitle = item.hall_title ?? item.hallTitle ?? item.name;
+              const hallTitleEn = item.hall_title_en ?? item.hallTitleEn ?? item.name_en ?? hallTitle;
+
+              if (id == null || !hallTitle) {
+                return null;
+              }
+
+              return {
+                id,
+                hallTitle,
+                hallTitleEn,
+              };
+            })
+            .filter((hall): hall is Hall => hall !== null);
+
+          if (halls.length) {
+            return { success: true, data: halls };
+          }
+        }
+
+        if (response.data?.status === false && response.data?.message) {
+          return { success: false, message: response.data.message };
+        }
+      } catch (error: any) {
+        if (error?.response?.status === 404) {
+          continue;
+        }
+        throw error;
       }
-    });
-
-    if (response.data?.status && response.data?.data) {
-      const halls: Hall[] = response.data.data.map((item: any) => ({
-        id: item.id,
-        hallTitle: item.hall_title,
-        hallTitleEn: item.hall_title_en,
-      }));
-
-      return { success: true, data: halls };
-    } else {
-      return { success: false, message: 'No halls found' };
     }
+
+    return { success: false, message: 'No halls found' };
   } catch (error: any) {
     console.error('Error fetching halls:', error);
     return { success: false, message: error.message || 'Failed to fetch halls' };

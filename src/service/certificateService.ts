@@ -51,7 +51,6 @@ export async function getAllCertificates(page: number = 1, limit: number = 20): 
       }
     });
 
-    console.log("🚀 ~ getAllCertificates ~ response:", response?.data?.applications);
 
     if (response.data?.status && response.data?.applications) {
       // Map the API response to our interface
