@@ -231,7 +231,8 @@ export async function submitCertificateApplication(formData: any): Promise<{ suc
       {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'multipart/form-data',
+          'Accept': 'application/json',
         }
       }
     );

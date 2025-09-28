@@ -38,7 +38,7 @@ const deliveryTypes = [
 ];
 
 const reasonOptions = [
-  {label: 'New Application', value: 'New Application'},
+  {label: 'New application', value: 'New application'},
   {label: 'Lost or Stolen', value: 'Lost or Stolen'},
   {label: 'Information Updated', value: 'Information Updated'},
   {label: 'Destroyed', value: 'Destroyed'},
@@ -91,7 +91,7 @@ const NewApplicationModal = ({
     isCustomDegree: false,
     certificateType: 'Provisional',
     deliveryTypeMethod: 'Regular',
-    reasonOfApplication: 'New Application',
+    reasonOfApplication: 'New application',
     applicationType,
     admitCard: null,
     isShowPdf: true,
@@ -165,7 +165,9 @@ const NewApplicationModal = ({
 
           const emergencyHead = categoryHeads.find(head => normalize(head.name).includes('emergency'));
           if (emergencyHead) {
-            setEmergencyFee(emergencyHead.unit_price);
+            setEmergencyFee(emergencyHead.unit_price - applicationFee);
+            console.log("🚀 ~ loadPaymentInfo ~ applicationFee:", applicationFee)
+            console.log("🚀 ~ loadPaymentInfo ~ emergencyHead.unit_price:", emergencyHead.unit_price)
           }
 
           const envelopeHead = categoryHeads.find(head => {
@@ -468,7 +470,7 @@ const NewApplicationModal = ({
       }
     }
 
-    if (formData.isShowPdf && !formData.admitCard) {
+    if (formData.isShowPdf &&  formData.isCustomDegree && !formData.admitCard) {
       warn('Please upload admit card (PDF)');
       return false;
     }
@@ -497,7 +499,7 @@ const NewApplicationModal = ({
       return false;
     }
 
-    if (formData.overCounter) {
+    if (formData.overCounter && !formData.isSelf && formData.isAuthorisedPerson) {
       if (!formData.overCounterName || !formData.overCounterMobile) {
         warn('Please fill receiver name and mobile for counter delivery');
         return false;
@@ -518,7 +520,7 @@ const NewApplicationModal = ({
   };
 
   const prepareFormData = () => {
-    const submitData = new URLSearchParams();
+    const submitData = new FormData();
 
     submitData.append('program', formData.program);
     submitData.append('examSelect', formData.examSelect);
@@ -526,34 +528,35 @@ const NewApplicationModal = ({
     submitData.append('subject_id', formData.subjectId);
     submitData.append('examYearSelect', formData.examYearSelect);
     submitData.append('examRollInput', formData.examRollInput);
-    submitData.append('department', formData.department);
-    submitData.append('hall', formData.hall);
-    submitData.append('certificate_type', formData.certificateType);
-    submitData.append('deliveryTypeMethod', formData.deliveryTypeMethod);
-    submitData.append('reason_of_application', formData.reasonOfApplication);
-    submitData.append('application_type', formData.applicationType);
-
-    if (formData.overCounter) {
-      submitData.append('overCounter', 'on');
-      if (formData.isSelf) {
-        submitData.append('isSelf', 'on');
-      } else if (formData.isAuthorisedPerson) {
-        submitData.append('isAuthorisedPerson', 'on');
+    if (formData.isCustomDegree) {
+      if (formData.department) {
+        submitData.append('department', formData.department);
       }
-      submitData.append('overCounterName', formData.overCounterName);
-      submitData.append('overCounterMobile', formData.overCounterMobile);
+      if (formData.hall) {
+        submitData.append('hall', formData.hall);
+      }
     }
-
-    if (formData.emailDelivery) {
-      submitData.append('emailDelivery', 'on');
-      submitData.append('emailAddress', formData.emailAddress);
-    }
-
+    submitData.append('deliveryTypeMethod', formData.deliveryTypeMethod);
+    submitData.append('overCounter', formData.overCounter ? 'on' : 'off');
+    submitData.append('isSelf', formData.isSelf ? 'on' : 'off');
+    submitData.append('overCounterName', formData.overCounterName || '');
+    submitData.append('overCounterMobile', formData.overCounterMobile || '');
+    submitData.append('emailDelivery', formData.emailDelivery ? 'on' : 'off');
+    submitData.append('emailAddress', formData.emailAddress || '');
+    submitData.append('postalMail', formData.postalMail ? 'on' : 'off');
     if (formData.postalMail) {
-      submitData.append('postalMail', 'on');
-      submitData.append('postalCountry', formData.postalCountry);
-      submitData.append('postalAddress', formData.postalAddress);
-      submitData.append('postalType', formData.postalType);
+      submitData.append('postalCountry', formData.postalCountry || '');
+      submitData.append('postalType', formData.postalType || '');
+    }
+    submitData.append('postalAddress', formData.postalAddress || '');
+    submitData.append('reason_of_application', formData.reasonOfApplication);
+    submitData.append('certificate_type', formData.certificateType);
+    submitData.append('application_type', formData.applicationType);
+    if (formData.admitCard) {
+      submitData.append('admitCard', formData.admitCard);
+    }
+    if (formData.photoUpload) {
+      submitData.append('overCounterPhoto', formData.photoUpload);
     }
 
     return submitData;
@@ -563,9 +566,10 @@ const NewApplicationModal = ({
     const autoIncludeHallDevelopment =
       applicationType === 'CERTIFICATE' || applicationType === 'MARKSHEET';
 
-    let total = applicationFee;
+    const isEmergency = formData.deliveryTypeMethod === 'Emergency';
+    let total = isEmergency ? 0 : applicationFee;
 
-    if (formData.deliveryTypeMethod === 'Emergency') {
+    if (isEmergency) {
       total += emergencyFee > 0 ? emergencyFee : applicationFee;
     }
 
@@ -689,7 +693,7 @@ const NewApplicationModal = ({
       isCustomDegree: false,
       certificateType: 'Provisional',
       deliveryTypeMethod: 'Regular',
-      reasonOfApplication: 'New Application',
+      reasonOfApplication: 'New application',
       applicationType,
       admitCard: null,
       isShowPdf: true,
@@ -711,7 +715,7 @@ const NewApplicationModal = ({
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} size="full">
-      <Modal.Content maxWidth="95%" maxHeight="90%">
+      <Modal.Content>
         <Modal.CloseButton />
         <Modal.Header bg={color.primary}>
           <Text color="white" fontSize="lg" fontWeight="600">
@@ -810,7 +814,7 @@ const NewApplicationModal = ({
                           label="Hall"
                         />
                       </FormControl>
-                      <FormControl isRequired>
+                      <FormControl isRequired={formData.isCustomDegree}>
                         <FormControl.Label>Admit Card (PDF)</FormControl.Label>
                         <Button
                           variant="outline"
@@ -1099,7 +1103,7 @@ const NewApplicationModal = ({
                         <HStack justifyContent="space-between">
                           <Text fontSize="sm">Emergency Processing Fee:</Text>
                           <Text fontSize="sm" fontWeight="500">
-                            ৳{(emergencyFee > 0 ? emergencyFee : applicationFee).toFixed(2)}
+                            ৳{(emergencyFee > 0 ? emergencyFee : applicationFee).toFixed(0)}
                           </Text>
                         </HStack>
                       )}
@@ -1202,7 +1206,7 @@ const NewApplicationModal = ({
               isLoadingText="Submitting..."
               _pressed={{bg: color.primaryLight}}
               disabled={loading}>
-              💳 Submit Application - ৳{totalAmount.toFixed(2)}
+              💳 Submit Application - ৳{totalAmount.toFixed(0)}
             </Button>
           </Button.Group>
         </Modal.Footer>
