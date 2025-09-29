@@ -302,7 +302,7 @@ const NewApplicationModal = ({
 
     return [
       ...formattedDegrees,
-      {label: '🔸 My Degree not in listed', value: 'CUSTOM_DEGREE'},
+      // {label: '🔸 My Degree not in listed', value: 'CUSTOM_DEGREE'},
     ];
   }, [completedDegrees]);
 
@@ -634,9 +634,9 @@ const NewApplicationModal = ({
   const getModalTitle = () => {
     switch (applicationType) {
       case 'CERTIFICATE':
-        return '📋 New Certificate Application';
+        return '📋 Apply for Certificate';
       case 'TRANSCRIPT':
-        return '📜 New Transcript Application';
+        return '📜 Apply for Transcript';
       default:
         return '📝 New Application';
     }
@@ -650,6 +650,7 @@ const NewApplicationModal = ({
     setSubmitLoading(true);
     try {
       const submitData = prepareFormData();
+      console.log("🚀 ~ handleSubmit ~ submitData:", submitData)
       const response = await submitCertificateApplication(submitData);
 
       if (response.success) {
@@ -916,17 +917,17 @@ const NewApplicationModal = ({
 
                           <Radio.Group
                             name="collectionType"
-                            value={formData.isSelf ? 'self' : 'authorised'}
+                            value={formData.isSelf ? 'on' : 'off'}
                             onChange={value => {
-                              handleInputChange('isSelf', value === 'self');
+                              handleInputChange('isSelf', value === 'on');
                               handleInputChange(
                                 'isAuthorisedPerson',
                                 value === 'authorised',
                               );
                             }}>
                             <VStack space={2}>
-                              <Radio value="self">Self Collection</Radio>
-                              <Radio value="authorised">
+                              <Radio value="on">Self Collection</Radio>
+                              <Radio value="off">
                                 Authorised Person
                               </Radio>
                             </VStack>

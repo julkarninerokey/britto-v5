@@ -65,6 +65,7 @@ export async function getAllCertificates(page: number = 1, limit: number = 20): 
         examName: item.exam_name || 'N/A',
         examYear: item.exam_year || 'N/A',
         passingYear: item.passing_acyr || item.exam_year || 'N/A',
+        degreeLevel: item.degree_level || 'N/A',
         rollNo: item.roll_no || 'N/A',
         reasonOfApplication: item.reason_of_application || 'N/A',
         createAt: item.create_at,

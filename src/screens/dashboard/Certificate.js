@@ -46,14 +46,14 @@ const getCertificateStatus = (certificate) => {
   } else if (paymentDone) {
     return {
       status: 'Payment Completed',
-      icon: '💰',
+      icon: '⏳',
       color: '#191970',
       bgColor: '#1e293b'
     };
   } else {
     return {
       status: 'Payment Pending',
-      icon: '💳',
+      icon: '⏳',
       color: '#191970',
       bgColor: '#3e4857ff'
     };
@@ -75,8 +75,7 @@ const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certif
   >
     {/* Card Header - Always Visible */}
     <Pressable onPress={onToggle}>
-      {({ isPressed }) => (
-        <Box
+      {({ isPressed }) => (         <Box
           bg={isPressed ? color.light : 'transparent'}
           p={4}
           borderTopRadius={8}
@@ -106,17 +105,12 @@ const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certif
                     color={color.text}
                     numberOfLines={2}
                   >
-                    {certificate.certificateType} Certificate
+                    {certificate.certificateType} Certificate - {certificate.degreeLevel}
                   </Text>
                   
                   {/* Unified Status */}
                   <Text fontSize="xs" fontWeight="500" color={statusInfo.color}>
-                    {statusInfo.status}
-                  </Text>
-                  
-                  {/* Application ID */}
-                  <Text fontSize="xs" color={color.secondary}>
-                    ID: {certificate.applicationId}
+                    {certificate.applicationStatus || statusInfo.status}
                   </Text>
                 </VStack>
               </HStack>
@@ -145,14 +139,36 @@ const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certif
             <VStack space={1} pl={4}>
               <DetailRow label="Certificate Type" value={certificate.certificateType} bold />
               <DetailRow label="Delivery Type" value={certificate.deliveryType} />
-              <DetailRow label="Exam Year" value={certificate.examYear} />
               <DetailRow label="Passing Year" value={certificate.passingYear} />
               <DetailRow label="Roll Number" value={certificate.rollNo} />
               <DetailRow label="Reason" value={certificate.reasonOfApplication} />
               <DetailRow label="Application Date" value={formatDate(certificate.createAt)} />
               <DetailRow label="Amount" value={`৳${certificate.amount}`} bold />
+              <DetailRow label="Application ID" value={certificate.applicationId}  />
+               <HStack justifyContent="space-between" alignItems="center">
+                <Text fontSize="xs" color={color.text}>Application Status</Text>
+                <Text fontSize="xs" fontWeight="500" color={color.info}>
+                  {certificate.applicationStatus}
+                </Text>
+              </HStack>
             </VStack>
           </VStack>
+                  <Divider />
+
+{/* Delivery Methods */}
+          {certificate.deliveryMethods && certificate.deliveryMethods.length > 0 && (
+            <VStack space={2}>
+              <Text fontSize="sm" fontWeight="600" color={color.primary}>
+                🚚 Delivery Methods
+              </Text>
+              <VStack space={1} pl={4}>
+                {certificate.deliveryMethods.map((method, index) => (
+                  <DeliveryMethodRow key={index} method={method} />
+                ))}
+              </VStack>
+            </VStack>
+          )}
+                  <Divider />
 
           {/* Status Information */}
           <VStack space={2}>
@@ -160,10 +176,12 @@ const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certif
               ⚡ Status Information
             </Text>
             <VStack space={1} pl={4}>
-              <HStack justifyContent="space-between" alignItems="center">
-                <Text fontSize="xs" color={color.text}>Application Status</Text>
-                <Text fontSize="xs" fontWeight="500" color={color.info}>
-                  {certificate.applicationStatus}
+                           <HStack justifyContent="space-between" alignItems="center">
+                <Text fontSize="xs" color={color.text}>Hall Verification</Text>
+                <Text fontSize="xs" fontWeight="500" color={
+                  certificate.hallVerification === 'Verified' ? color.success : color.warning
+                }>
+                  {certificate.hallVerification}
                 </Text>
               </HStack>
               <HStack justifyContent="space-between" alignItems="center">
@@ -175,24 +193,8 @@ const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certif
                 </Text>
               </HStack>
               <HStack justifyContent="space-between" alignItems="center">
-                <Text fontSize="xs" color={color.text}>Hall Verification</Text>
-                <Text fontSize="xs" fontWeight="500" color={
-                  certificate.hallVerification === 'Verified' ? color.success : color.warning
-                }>
-                  {certificate.hallVerification}
-                </Text>
-              </HStack>
-              <HStack justifyContent="space-between" alignItems="center">
-                <Text fontSize="xs" color={color.text}>Certificate Verification</Text>
-                <Text fontSize="xs" fontWeight="500" color={
-                  certificate.certificateVerification === 'Verified' ? color.success : color.warning
-                }>
-                  {certificate.certificateVerification}
-                </Text>
-              </HStack>
-              <HStack justifyContent="space-between" alignItems="center">
                 <Text fontSize="xs" color={color.text}>Delivery Status</Text>
-                <Text fontSize="xs" fontWeight="500" color={color.info}>
+                <Text fontSize="xs" fontWeight="500" color={color.warning}>
                   {certificate.deliveryStatus}
                 </Text>
               </HStack>
@@ -206,32 +208,25 @@ const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certif
               )}
             </VStack>
           </VStack>
-
-          {/* Delivery Methods */}
-          {certificate.deliveryMethods && certificate.deliveryMethods.length > 0 && (
-            <VStack space={2}>
-              <Text fontSize="sm" fontWeight="600" color={color.primary}>
-                🚚 Delivery Methods
-              </Text>
-              <VStack space={1} pl={4}>
-                {certificate.deliveryMethods.map((method, index) => (
-                  <DeliveryMethodRow key={index} method={method} />
-                ))}
-              </VStack>
-            </VStack>
-          )}
+        <Divider />
 
           {/* Action Buttons */}
           <VStack space={2}>
             {/* Payment Button - Show if payment is pending */}
-            {certificate.paymentStatus !== 'Paid' && certificate.id && (
+            {certificate.paymentStatus !== 'Paid' && (
               <Button
                 size="sm"
-                bg={color.primary}
+                bg={certificate.hallVerification !== 'Verified' ? color.gray : color.green}
+                // disabled={certificate.hallVerification !== 'Verified'}
                 borderRadius={8}
                 _pressed={{ bg: color.primaryLight }}
                 onPress={async () => {
                   const paymentAmount = parseFloat(certificate.amount) || certificateFee;
+                  if (certificate.hallVerification !== 'Verified') {
+                    // Show a message or handle the case when hall verification is not done
+                    toast('warning', 'Hall Verification Pending', 'Please complete hall verification first.');
+                    return;
+                  }
                   if (isDirectPaymentEnabled()) {
                     await handleDirectPayment({
                       applicationId: certificate.id,
@@ -270,21 +265,19 @@ const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certif
             )}
             
             {/* Download Button */}
-            {(certificate.certificateVerification === 'Verified' && certificate.paymentStatus === 'Paid') && (
               <Button
                 size="sm"
-                bg={color.success}
+                bg={color.primaryDark}
                 borderRadius={8}
-                _pressed={{ bg: color.light }}
+                _pressed={{ bg: color.primaryLight }}
                 onPress={() => {
                   toast('info', 'Download Certificate', 'This feature will be available soon.');
                 }}
               >
                 <Text color="white" fontSize="xs" fontWeight="600">
-                  📥 Download Certificate
+                  📥 Download Application
                 </Text>
               </Button>
-            )}
           </VStack>
         </VStack>
       </VStack>
@@ -312,15 +305,25 @@ const DetailRow = ({ label, value, bold }) => (
 const DeliveryMethodRow = ({ method }) => (
   <VStack space={1} bg={color.secondaryBackground} p={2} borderRadius={4}>
     <Text fontSize="xs" fontWeight="500" color={color.primary}>
-      {method.method === 'OverTheCounter' ? 'Over the Counter' : 
-       method.method === 'Email' ? 'Email' : 'Postal Mail'}
+      {method.method === 'OverTheCounter' ? 'Over the Counter Pickup' : 
+       method.method === 'Email' ? 'Email Delivery' : 'Postal Mail Delivery'}
     </Text>
     {method.details && (
       <VStack space={0.5}>
-        {method.details.receiverName && (
+        {method.details.isSelf && (
           <Text fontSize="2xs" color={color.text}>
-            Receiver: {method.details.receiverName}
+            Authorised Person: Self
           </Text>
+        )}
+        {!method.details.isSelf && method.details.receiverName && (
+          <>
+          <Text fontSize="2xs" color={color.text}>
+            Authorised Person: {method.details.receiverName} 
+          </Text>
+          <Text fontSize="2xs" color={color.text}> 
+          Phone: {method.details.receiverMobile}
+          </Text>
+          </>
         )}
         {method.details.emailAddress && (
           <Text fontSize="2xs" color={color.text}>
@@ -527,7 +530,7 @@ const Certificate = ({navigation}) => {
           icon={
             <VStack alignItems="center" space={0}>
               <Text color="white" fontSize="xs" fontWeight="500">
-               📋 New Certificate
+               📋 Apply for Certificate
               </Text>
             </VStack>
           }
