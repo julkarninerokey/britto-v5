@@ -29,6 +29,8 @@ import { color } from './src/service/utils';
 import FormFillup from './src/screens/dashboard/FormFillup';
 import { isAuthenticated } from './src/service/auth';
 import Enrollment from './src/screens/dashboard/Enrollment';
+import { navigationRef } from './src/navigation/navigationService';
+import './src/service/axiosConfig';
 
 
 const Stack = createStackNavigator();
@@ -71,7 +73,7 @@ const App = () => {
       <NativeBaseProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: color.primary }}>
       <StatusBar barStyle="light-content" animated />
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
             <Stack.Navigator initialRouteName={initialRoute}>
               <Stack.Screen
                 name="Login"

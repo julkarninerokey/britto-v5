@@ -1,6 +1,6 @@
-import axios, { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { API_CONFIG, buildUrl } from '../config/api';
-import { getAsyncStoreData } from '../utils/async-storage';
+import { configureAxiosInstances } from './axiosConfig';
 
 class ApiService {
   private api: AxiosInstance;
@@ -23,25 +23,7 @@ class ApiService {
       },
     });
 
-    // Add request interceptor to include auth token
-    this.setupInterceptors();
-  }
-
-  private setupInterceptors() {
-    const addAuthToken = async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
-      try {
-        const token = await getAsyncStoreData('token');
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-      } catch (error) {
-        console.error('Error adding auth token:', error);
-      }
-      return config;
-    };
-
-    this.api.interceptors.request.use(addAuthToken);
-    this.fileApi.interceptors.request.use(addAuthToken);
+    configureAxiosInstances([this.api, this.fileApi]);
   }
 
   // Auth methods
