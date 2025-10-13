@@ -69,7 +69,7 @@ const LoginScreen = ({navigation}) => {
             Welcome to Britto
           </Heading>
           <Heading mt="1" color={color.secondary} fontWeight="medium" size="xs">
-            Please sign in to continue!
+            Student Portal for University of Dhaka
           </Heading>
           <VStack space={3} mt="5" width="100%">
             <FormControl>

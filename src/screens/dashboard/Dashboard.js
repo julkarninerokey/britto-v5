@@ -1,15 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  useWindowDimensions,
-} from 'react-native';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {Image, TouchableOpacity, useWindowDimensions} from 'react-native';
 import {VStack, Text, HStack, View, Skeleton, Button, Box} from 'native-base';
-import {color, dashboardButtons} from '../../service/utils';
+import {color, dashboardButtons, toast} from '../../service/utils';
 import ProfileCard from '../../components/ProfileCard';
 import AppBar from '../../components/AppBar';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {FlatGrid} from 'react-native-super-grid';
 import {logout} from '../../service/auth';
 
@@ -17,14 +11,11 @@ const Dashboard = ({navigation}) => {
   const [buttons, setButtons] = useState([]);
 
   useEffect(() => {
-    const checkForButtons = async () => {
-      const storedToken = dashboardButtons;
-      if (storedToken) {
-        setButtons(storedToken);
-      }
-    };
+    const availableButtons = dashboardButtons
+      .filter(button => button?.status)
+      .sort((a, b) => (a?.priority ?? 0) - (b?.priority ?? 0));
 
-    checkForButtons();
+    setButtons(availableButtons);
   }, []);
 
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -49,85 +40,133 @@ const Dashboard = ({navigation}) => {
     }
   };
 
-  const windowWidth = useWindowDimensions().width;
-  const columnCount = Math.floor(windowWidth / 120);
-  const itemDimension = windowWidth / columnCount - 10;
+  const windowWidth = useWindowDimensions().width || 0;
+  const gridSpacing = 16;
+  const effectiveWidth = windowWidth > 0 ? windowWidth : 320;
+  const itemDimension = (effectiveWidth - gridSpacing * 3) / 2;
+  const gridWidth = itemDimension * 2 + gridSpacing * 3;
 
-  // eslint-disable-next-line react/no-unstable-nested-components
-  const Item = ({item}) => (
-    <TouchableOpacity onPress={() => navigation.navigate(item.screen)}>
+  const skeletonPlaceholders = useMemo(
+    () =>
+      Array.from({length: 12}, (_, index) => ({
+        id: `skeleton-${index}`,
+      })),
+    [],
+  );
+
+  const hasButtons = buttons.length > 0;
+  const gridData = hasButtons ? buttons : skeletonPlaceholders;
+
+  const keyExtractor = useCallback(
+    (item, index) =>
+      item?.id ? item.id.toString() : `dashboard-item-${index}`,
+    [],
+  );
+
+  const renderSkeletonItem = useCallback(
+    () => (
       <VStack
-        background={'white'}
+        background="white"
         padding={3}
         borderRadius={10}
         alignItems="flex-end">
         <HStack justifyContent="flex-end" width="45%">
-          <VStack width={7} height={7}>
-            <Image
-              source={{uri: item.icon}}
-              alt={item.icon}
-              style={{width: '100%', height: '100%'}}
-              onError={error => console.log('Dashboard Icon Error:')}
-            />
-          </VStack>
+          <Skeleton width={7} height={7} borderRadius="full" />
         </HStack>
-
-        {/* Text */}
         <HStack justifyContent="flex-start" width="100%">
-          <Text fontSize="md" color={color.primary} bold>
-            {item.title}
-          </Text>
+          <Skeleton.Text lines={1} width="70%" />
         </HStack>
       </VStack>
-    </TouchableOpacity>
+    ),
+    [],
   );
 
-  // eslint-disable-next-line react/no-unstable-nested-components
-  const ItemSkeleton = () => (
-    <VStack
-      background={'white'}
-      padding={3}
-      borderRadius={10}
-      alignItems="flex-end">
-      <HStack justifyContent="flex-end" width="45%">
-        <Skeleton width={7} height={7} borderRadius="full" />
-      </HStack>
-      <HStack justifyContent="flex-start" width="100%">
-        <Skeleton.Text lines={1} width="70%" />
-      </HStack>
-    </VStack>
+  const renderGridItem = useCallback(
+    ({item}) => {
+      if (!hasButtons) {
+        return renderSkeletonItem();
+      }
+
+      const handlePress = () => {
+        if (!item?.screen) {
+          toast('warning', 'Screen not available', 'Please try again later.');
+          return;
+        }
+
+        navigation.navigate(item.screen);
+      };
+
+      return (
+        <TouchableOpacity onPress={handlePress} activeOpacity={0.8}>
+          <VStack
+            background="white"
+            padding={3}
+            borderRadius={10}
+            >
+            <HStack>
+              <VStack width={7} height={7}>
+                <Image
+                  source={{uri: item.icon}}
+                  alt={item.icon}
+                  style={{width: '100%', height: '100%'}}
+                  onError={error => {
+                    console.log('Dashboard Icon Error:', error);
+                  }}
+                />
+              </VStack>
+            </HStack>
+
+            <HStack justifyContent="flex-start" width="100%">
+              <Text fontSize="md" color={color.primary} bold>
+                {item.title}
+              </Text>
+            </HStack>
+          </VStack>
+        </TouchableOpacity>
+      );
+    },
+    [hasButtons, navigation, renderSkeletonItem],
   );
 
   return (
-    <View h={'70%'}>
+    <View flex={1}>
       <AppBar title="Dashboard" />
-      <VStack w={'100%'}>
+      <VStack flex={1}>
         <ProfileCard />
-        {buttons && buttons.length > 0 ? (
-          <ScrollView>
-            <FlatGrid
-              itemDimension={itemDimension}
-              data={buttons}
-              renderItem={({item}) => <Item item={item} />}
-            />
-            <Box w="80%" margin="auto" bg="white" shadow={2}>
-              <Button
-                bg={color.danger || 'red.500'}
-                onPress={handleLogout}
-                isLoading={isLoggingOut}
-                isLoadingText="Logging out..."
-                _pressed={{bg: 'red.600'}}>
-                Logout
-              </Button>
-            </Box>
-          </ScrollView>
-        ) : (
+        <Box flex={1}>
           <FlatGrid
+            data={gridData}
+            spacing={gridSpacing}
             itemDimension={itemDimension}
-            data={[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]}
-            renderItem={({item}) => <ItemSkeleton item={item} />}
+            staticDimension={gridWidth}
+            renderItem={renderGridItem}
+            keyExtractor={keyExtractor}
+            showsVerticalScrollIndicator={false}
+            ListFooterComponent={
+              hasButtons ? (
+                <Box w="100%" mt={4} mb={6} alignItems="center">
+                  <Box
+                    shadow={2}
+                    borderRadius="md"
+                    px={4}
+                    py={3}>
+                    <Button
+                      bg={color.danger || 'red.500'}
+                      onPress={handleLogout}
+                      isLoading={isLoggingOut}
+                      isLoadingText="Logging out..."
+                      _pressed={{bg: 'red.600'}}>
+                      Logout
+                    </Button>
+                  </Box>
+                </Box>
+              ) : null
+            }
+            contentContainerStyle={{
+              paddingVertical: gridSpacing,
+            }}
           />
-        )}
+        </Box>
       </VStack>
     </View>
   );
