@@ -109,9 +109,6 @@ const Dashboard = ({navigation}) => {
                   source={{uri: item.icon}}
                   alt={item.icon}
                   style={{width: '100%', height: '100%'}}
-                  onError={error => {
-                    console.log('Dashboard Icon Error:', error);
-                  }}
                 />
               </VStack>
             </HStack>
@@ -144,12 +141,12 @@ const Dashboard = ({navigation}) => {
             showsVerticalScrollIndicator={false}
             ListFooterComponent={
               hasButtons ? (
-                <Box w="100%" mt={4} mb={6} alignItems="center">
+                <Box w="100%" alignItems="center">
                   <Box
                     shadow={2}
                     borderRadius="md"
-                    px={4}
-                    py={3}>
+                    px={1}
+                    py={1}>
                     <Button
                       bg={color.danger || 'red.500'}
                       onPress={handleLogout}
