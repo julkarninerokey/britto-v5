@@ -91,12 +91,7 @@ const FourthRoute = ({data}) => (
           {data.completedDegrees.map((degree, index) => (
             <Box 
               key={degree.id} 
-              bg={color.secondaryBackground} 
               p={4} 
-              borderRadius={12} 
-              borderWidth={1} 
-              borderColor={color.primary}
-              shadow={2}
             >
               <Text 
                 fontSize="lg" 
