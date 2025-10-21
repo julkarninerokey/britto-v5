@@ -461,86 +461,85 @@ const FormFillup = ({navigation}) => {
   return (
     <View style={{flex: 1, backgroundColor: color.secondaryBackground}}>
       <AppBar title="Form Fill-up" />
-      <VStack w={'100%'} flex={1} bg={color.secondaryBackground}>
-        {loading ? (
-          <LoadingSkeleton />
-        ) : (
-          <FlatList
-            data={examinations}
-            keyExtractor={(item, index) => formItemKey(item, index)}
-            renderItem={({item, index}) => {
-              const itemKey = formItemKey(item, index);
-              return (
-                <ExaminationCard
-                  examination={item}
-                  isExpanded={expandedCards.has(itemKey)}
-                  onToggle={() => toggleCard(itemKey)}
-                  navigation={navigation}
-                  examinationFee={examinationFee}
-                  studentRegNo={studentRegNo}
-                />
-              );
-            }}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingVertical: 12,
-              flexGrow: examinations.length === 0 ? 1 : undefined,
-            }}
-            extraData={expandedCards}
-            ListEmptyComponent={
-              <Box flex={1} alignItems="center" justifyContent="center" p={6}>
-                <Text 
-                  color={color.secondary} 
-                  fontSize="sm" 
-                  textAlign="center" 
-                  lineHeight={20}
-                >
-                  {errorMessage}
-                </Text>
-                <Button
-                  mt={4}
-                  size="sm"
-                  variant="outline"
-                  borderColor={color.primary}
-                  _text={{ color: color.primary }}
-                  onPress={loadExaminations}
-                >
-                  🔄 Try Again
-                </Button>
-              </Box>
-            }
-          />
-        )}
-        
-        {/* New Examination Modal */}
-        <NewExaminationModal
-          isOpen={showNewExaminationModal}
-          onClose={() => setShowNewExaminationModal(false)}
-          navigation={navigation}
-          onExaminationSuccess={handleExaminationSuccess}
-        />
-
-        {/* Floating Action Button */}
-        <Fab
-          renderInPortal={false}
-          shadow={2}
-          icon={
-            <VStack alignItems="center" space={0}>
-              <Text color="white" fontSize="xs" fontWeight="500">
-               📝 New Form Fill-up
-              </Text>
-            </VStack>
-          }
-          bg={color.primary}
-          onPress={() => setShowNewExaminationModal(true)}
-          position="absolute"
-          _pressed={{ 
-            bg: color.primaryLight,
-            transform: [{ scale: 0.95 }]
+      {loading ? (
+        <LoadingSkeleton />
+      ) : (
+        <FlatList
+          data={examinations}
+          keyExtractor={(item, index) => formItemKey(item, index)}
+          renderItem={({item, index}) => {
+            const itemKey = formItemKey(item, index);
+            return (
+              <ExaminationCard
+                examination={item}
+                isExpanded={expandedCards.has(itemKey)}
+                onToggle={() => toggleCard(itemKey)}
+                navigation={navigation}
+                examinationFee={examinationFee}
+                studentRegNo={studentRegNo}
+              />
+            );
           }}
-          _hover={{ bg: color.primaryLight }}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingVertical: 12,
+            flexGrow: examinations.length === 0 ? 1 : undefined,
+            backgroundColor: color.secondaryBackground,
+          }}
+          extraData={expandedCards}
+          ListEmptyComponent={
+            <Box flex={1} alignItems="center" justifyContent="center" p={6}>
+              <Text 
+                color={color.secondary} 
+                fontSize="sm" 
+                textAlign="center" 
+                lineHeight={20}
+              >
+                {errorMessage}
+              </Text>
+              <Button
+                mt={4}
+                size="sm"
+                variant="outline"
+                borderColor={color.primary}
+                _text={{ color: color.primary }}
+                onPress={loadExaminations}
+              >
+                🔄 Try Again
+              </Button>
+            </Box>
+          }
         />
-      </VStack>
+      )}
+        
+      {/* New Examination Modal */}
+      <NewExaminationModal
+        isOpen={showNewExaminationModal}
+        onClose={() => setShowNewExaminationModal(false)}
+        navigation={navigation}
+        onExaminationSuccess={handleExaminationSuccess}
+      />
+
+      {/* Floating Action Button */}
+      <Fab
+        renderInPortal={false}
+        shadow={2}
+        icon={
+          <VStack alignItems="center" space={0}>
+            <Text color="white" fontSize="xs" fontWeight="500">
+             📝 New Form Fill-up
+            </Text>
+          </VStack>
+        }
+        bg={color.primary}
+        onPress={() => setShowNewExaminationModal(true)}
+        position="absolute"
+        _pressed={{ 
+          bg: color.primaryLight,
+          transform: [{ scale: 0.95 }]
+        }}
+        _hover={{ bg: color.primaryLight }}
+      />
     </View>
   );
 };

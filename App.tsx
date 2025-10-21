@@ -3,6 +3,29 @@ import './src/setup/disableSSRWarning';
 import React, { useEffect, useState } from 'react';
 import { enableScreens } from 'react-native-screens';
 // enableScreens(); // <- this line is mandatory
+import { Animated, LogBox } from "react-native";
+
+// Disable all warnings and logs
+(console as any).disableYellowBox = true;
+LogBox.ignoreAllLogs(true);
+LogBox.ignoreLogs([
+  'Warning',
+  'Failed',
+  'Error',
+  'VirtualizedLists should never be nested',
+  'componentWillReceiveProps',
+  'componentWillUpdate',
+  'componentWillMount',
+  'Require cycle',
+  'Module',
+  'Unable to resolve',
+  'Remote debugger',
+  'Setting a timer',
+  'Animated',
+  'FlashList',
+  'FlatList',
+  'ScrollView',
+]);
 
 import { NativeBaseProvider } from 'native-base';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -62,7 +85,7 @@ const App = () => {
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <NativeBaseProvider>
           <SafeAreaView style={{ flex: 1, backgroundColor: color.primary }}>
-            <StatusBar barStyle="light-content" animated />
+            <StatusBar barStyle="light-content"  />
             {/* Add a loading screen here if needed */}
           </SafeAreaView>
         </NativeBaseProvider>
@@ -74,7 +97,7 @@ const App = () => {
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <NativeBaseProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: color.primary }}>
-      <StatusBar barStyle="light-content" animated />
+      <StatusBar barStyle="light-content"  />
         <NavigationContainer ref={navigationRef}>
             <Stack.Navigator initialRouteName={initialRoute}>
               <Stack.Screen
