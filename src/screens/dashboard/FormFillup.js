@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import {
   VStack,
-  ScrollView,
   Text,
   HStack,
   Button,
@@ -355,6 +354,14 @@ const LoadingSkeleton = () => (
   </VStack>
 );
 
+const formItemKey = (item, index) => {
+  if (item?.id != null && item.id !== '') {
+    return String(item.id);
+  }
+
+  return `index-${index}`;
+};
+
 const FormFillup = ({navigation}) => {
   const [examinations, setExaminations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -364,14 +371,14 @@ const FormFillup = ({navigation}) => {
   const [examinationFee, setExaminationFee] = useState(100); // Default fee
   const [studentRegNo, setStudentRegNo] = useState('');
 
-  const toggleCard = (index) => {
-    const newExpanded = new Set(expandedCards);
-    if (newExpanded.has(index)) {
-      newExpanded.delete(index);
+  const toggleCard = key => {
+    const next = new Set(expandedCards);
+    if (next.has(key)) {
+      next.delete(key);
     } else {
-      newExpanded.add(index);
+      next.add(key);
     }
-    setExpandedCards(newExpanded);
+    setExpandedCards(next);
   };
 
   useEffect(() => {
@@ -457,45 +464,52 @@ const FormFillup = ({navigation}) => {
       <VStack w={'100%'} flex={1} bg={color.secondaryBackground}>
         {loading ? (
           <LoadingSkeleton />
-        ) : examinations && examinations.length > 0 ? (
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <VStack space={1} py={3}>
-              {examinations.map((examination, index) => (
+        ) : (
+          <FlatList
+            data={examinations}
+            keyExtractor={(item, index) => formItemKey(item, index)}
+            renderItem={({item, index}) => {
+              const itemKey = formItemKey(item, index);
+              return (
                 <ExaminationCard
-                  key={examination.id || index}
-                  examination={examination}
-                  isExpanded={expandedCards.has(index)}
-                  onToggle={() => toggleCard(index)}
+                  examination={item}
+                  isExpanded={expandedCards.has(itemKey)}
+                  onToggle={() => toggleCard(itemKey)}
                   navigation={navigation}
                   examinationFee={examinationFee}
                   studentRegNo={studentRegNo}
                 />
-              ))}
-            </VStack>
-          </ScrollView>
-        ) : (
-          <Box flex={1} alignItems="center" justifyContent="center" p={6}>
-            <Text 
-              color={color.secondary} 
-              fontSize="sm" 
-              textAlign="center" 
-              lineHeight={20}
-            >
-              {errorMessage}
-            </Text>
-            <Button
-              mt={4}
-              size="sm"
-              variant="outline"
-              borderColor={color.primary}
-              _text={{ color: color.primary }}
-              onPress={() => {
-                loadExaminations();
-              }}
-            >
-              🔄 Try Again
-            </Button>
-          </Box>
+              );
+            }}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingVertical: 12,
+              flexGrow: examinations.length === 0 ? 1 : undefined,
+            }}
+            extraData={expandedCards}
+            ListEmptyComponent={
+              <Box flex={1} alignItems="center" justifyContent="center" p={6}>
+                <Text 
+                  color={color.secondary} 
+                  fontSize="sm" 
+                  textAlign="center" 
+                  lineHeight={20}
+                >
+                  {errorMessage}
+                </Text>
+                <Button
+                  mt={4}
+                  size="sm"
+                  variant="outline"
+                  borderColor={color.primary}
+                  _text={{ color: color.primary }}
+                  onPress={loadExaminations}
+                >
+                  🔄 Try Again
+                </Button>
+              </Box>
+            }
+          />
         )}
         
         {/* New Examination Modal */}

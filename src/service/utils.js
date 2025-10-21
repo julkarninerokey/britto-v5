@@ -78,33 +78,33 @@ export const dashboardButtons = [
   //   status: 1,
   //   createdAt: "2024-04-25 12:26:34",
   // },
-  // {
-  //   id: 10,
-  //   screen: "Hall",
-  //   title: "Hall",
-  //   priority: 2,
-  //   icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/hall.png",
-  //   status: 1,
-  //   createdAt: "2024-04-25 12:31:48",
-  // },
-  // {
-  //   id: 11,
-  //   screen: "Syllabus",
-  //   title: "Syllabus",
-  //   priority: 5,
-  //   icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/book.png",
-  //   status: 1,
-  //   createdAt: "2024-04-25 12:31:48",
-  // },
-  // {
-  //   id: 20,
-  //   screen: "Department",
-  //   title: "Department",
-  //   priority: 3,
-  //   icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/department.png",
-  //   status: 1,
-  //   createdAt: "2024-04-25 01:47:05",
-  // },
+  {
+    id: 10,
+    screen: "Hall",
+    title: "Hall",
+    priority: 2,
+    icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/hall.png",
+    status: 1,
+    createdAt: "2024-04-25 12:31:48",
+  },
+  {
+    id: 11,
+    screen: "Syllabus",
+    title: "Syllabus",
+    priority: 5,
+    icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/book.png",
+    status: 1,
+    createdAt: "2024-04-25 12:31:48",
+  },
+  {
+    id: 20,
+    screen: "Department",
+    title: "Department",
+    priority: 3,
+    icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/department.png",
+    status: 1,
+    createdAt: "2024-04-25 01:47:05",
+  },
   // {
   //   id: 21,
   //   screen: "Department",
@@ -203,39 +203,42 @@ export const deviceInfo = () => {
 };
 
 export const netInfo = async () => {
-  // Removed call to checkNetworkConnection to prevent infinite recursion
   const state = await NetInfo.fetch();
-  const ip = state.details?.ipAddress; // Use optional chaining for safety
+  const ip = state.details?.ipAddress;
   return {ip, state};
 };
 
-export const appInfo = async () => {
-  return version;
+export const appInfo = async () => version;
+
+const hasInternetAccess = state => {
+  if (!state) {
+    return false;
+  }
+
+  if (state.isInternetReachable == null) {
+    return Boolean(state.isConnected);
+  }
+
+  return Boolean(state.isConnected && state.isInternetReachable);
 };
 
-// Function to check network connection and handle the response
-async function checkNetworkConnection() {
-  try {
-    const { state } = await netInfo();
-    if (state.isConnected && state.isInternetReachable) {
-      return state;
-      console.log('Internet is reachable');  
-    } else {
-       console.log('No internet connection or internet is not reachable');
-    }
-  } catch (error) {
-    console.error('Error fetching network information:', error);
-  }
-}
+let lastKnownOnlineStatus = null;
 
-// Add an event listener to monitor network changes
-NetInfo.addEventListener(state => {
-  if (state.isConnected) {
-    checkNetworkConnection();
-  } else {
-    console.log('No network connection');
+const handleNetworkChange = state => {
+  const isOnline = hasInternetAccess(state);
+
+  if (lastKnownOnlineStatus === isOnline) {
+    return;
   }
-});
+
+  lastKnownOnlineStatus = isOnline;
+
+  if (!isOnline) {
+    console.warn('No internet connection or internet is not reachable');
+  }
+};
+
+NetInfo.addEventListener(handleNetworkChange);
 
 // For application installation info, you might need to implement custom methods or find suitable packages
 // react-native-device-info provides some relevant methods
@@ -265,25 +268,54 @@ export const color = {
   gradientBackground: ['#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#dbeafe'], // Softer gradient
 };
 
+const FALLBACK_COLOR = color.text || '#000000';
+
 // Defensive color getter to prevent empty string errors
-export const getColor = (colorName) => {
-  const colorValue = color[colorName];
-  if (!colorValue || colorValue === '' || colorValue === 'undefined') {
-    console.warn(`Color '${colorName}' is undefined or empty, falling back to default`);
-    return color.text || '#000000'; // fallback to text color or black
+export const getColor = colorName => {
+  if (typeof colorName !== 'string' || colorName.trim() === '') {
+    return FALLBACK_COLOR;
   }
-  return colorValue;
+
+  const colorValue = color[colorName];
+
+  if (typeof colorValue === 'string' && colorValue.trim() !== '') {
+    return colorValue;
+  }
+
+  if (colorValue) {
+    return colorValue;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(color, colorName)) {
+    console.warn(`Color '${colorName}' is undefined or empty, falling back to default`);
+  }
+
+  return FALLBACK_COLOR;
 };
 
 // Safe color object with validation
 export const safeColor = new Proxy(color, {
-  get(target, prop) {
-    const value = target[prop];
-    if (!value || value === '' || value === 'undefined') {
-      console.warn(`Color '${prop}' is undefined or empty, using fallback`);
-      return target.text || '#000000';
+  get(target, prop, receiver) {
+    if (typeof prop !== 'string') {
+      return Reflect.get(target, prop, receiver);
     }
-    return value;
+
+    const value = Reflect.get(target, prop, receiver);
+
+    if (typeof value === 'string' && value.trim() !== '') {
+      return value;
+    }
+
+    if (value) {
+      return value;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(target, prop)) {
+      console.warn(`Color '${prop}' is undefined or empty, using fallback`);
+      return FALLBACK_COLOR;
+    }
+
+    return FALLBACK_COLOR;
   }
 });
 

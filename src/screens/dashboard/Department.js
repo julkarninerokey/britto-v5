@@ -13,7 +13,7 @@ import ProfileCard from '../../components/ProfileCard';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {deptData} from '../../service/api';
-import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
+import {TabView, SceneMap, TabBar, TabBarItem} from 'react-native-tab-view';
 import 'react-native-pager-view';
 import {color} from '../../service/utils';
 import UserList from '../../components/UserList';
@@ -126,6 +126,9 @@ const Department = ({navigation}) => {
       }}>
       <TabBar
         {...props}
+        renderTabBarItem={({key, ...tabItemProps}) => (
+          <TabBarItem key={key} {...tabItemProps} />
+        )}
         indicatorStyle={{
           backgroundColor: color.primary,
         }}

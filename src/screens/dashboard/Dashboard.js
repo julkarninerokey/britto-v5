@@ -1,10 +1,9 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Image, TouchableOpacity, useWindowDimensions} from 'react-native';
+import {FlatList, Image, TouchableOpacity, useWindowDimensions} from 'react-native';
 import {VStack, Text, HStack, View, Skeleton, Button, Box} from 'native-base';
 import {color, dashboardButtons, toast} from '../../service/utils';
 import ProfileCard from '../../components/ProfileCard';
 import AppBar from '../../components/AppBar';
-import {FlatGrid} from 'react-native-super-grid';
 import {logout} from '../../service/auth';
 
 const Dashboard = ({navigation}) => {
@@ -41,10 +40,19 @@ const Dashboard = ({navigation}) => {
   };
 
   const windowWidth = useWindowDimensions().width || 0;
-  const gridSpacing = 16;
+  const gridSpacing = 2;
+  const minItemWidth = 160;
   const effectiveWidth = windowWidth > 0 ? windowWidth : 320;
-  const itemDimension = (effectiveWidth - gridSpacing * 3) / 2;
-  const gridWidth = itemDimension * 2 + gridSpacing * 3;
+
+  const numColumns = useMemo(() => {
+    const availableWidth = Math.max(effectiveWidth - gridSpacing * 2, minItemWidth);
+    const tentativeColumns = Math.max(
+      2,
+      Math.floor((availableWidth + gridSpacing) / (minItemWidth + gridSpacing)),
+    );
+
+    return Math.min(tentativeColumns, 4); // Prevent overly wide rows on large screens
+  }, [effectiveWidth, gridSpacing]);
 
   const skeletonPlaceholders = useMemo(
     () =>
@@ -69,7 +77,8 @@ const Dashboard = ({navigation}) => {
         background="white"
         padding={3}
         borderRadius={10}
-        alignItems="flex-end">
+        alignItems="flex-end"
+        width="100%">
         <HStack justifyContent="flex-end" width="45%">
           <Skeleton width={7} height={7} borderRadius="full" />
         </HStack>
@@ -84,7 +93,11 @@ const Dashboard = ({navigation}) => {
   const renderGridItem = useCallback(
     ({item}) => {
       if (!hasButtons) {
-        return renderSkeletonItem();
+        return (
+          <Box flex={1} mb={gridSpacing}>
+            {renderSkeletonItem()}
+          </Box>
+        );
       }
 
       const handlePress = () => {
@@ -97,32 +110,34 @@ const Dashboard = ({navigation}) => {
       };
 
       return (
-        <TouchableOpacity onPress={handlePress} activeOpacity={0.8}>
-          <VStack
-            background="white"
-            padding={3}
-            borderRadius={10}
+        <Box flex={1} margin={gridSpacing}>
+          <TouchableOpacity onPress={handlePress} activeOpacity={0.8} style={{flex: 1}}>
+            <VStack
+              background="white"
+              padding={3}
+              borderRadius={10}
             >
-            <HStack>
-              <VStack width={7} height={7}>
-                <Image
-                  source={{uri: item.icon}}
-                  alt={item.icon}
-                  style={{width: '100%', height: '100%'}}
-                />
-              </VStack>
-            </HStack>
+              <HStack>
+                <VStack width={7} height={7} style={{marginLeft: 'auto'}}>
+                  <Image
+                    source={{uri: item.icon}}
+                    alt={item.icon}
+                    style={{width: '100%', height: '100%', tintColor: color.primary}}
+                  />
+                </VStack>
+              </HStack>
 
-            <HStack justifyContent="flex-start" width="100%">
-              <Text fontSize="md" color={color.primary} bold>
-                {item.title}
-              </Text>
-            </HStack>
-          </VStack>
-        </TouchableOpacity>
+              <HStack justifyContent="flex-start" width="100%">
+                <Text fontSize="md" color={color.primary} bold>
+                  {item.title}
+                </Text>
+              </HStack>
+            </VStack>
+          </TouchableOpacity>
+        </Box>
       );
     },
-    [hasButtons, navigation, renderSkeletonItem],
+    [gridSpacing, hasButtons, navigation, renderSkeletonItem],
   );
 
   return (
@@ -131,14 +146,13 @@ const Dashboard = ({navigation}) => {
       <VStack flex={1}>
         <ProfileCard />
         <Box flex={1}>
-          <FlatGrid
+          <FlatList
             data={gridData}
-            spacing={gridSpacing}
-            itemDimension={itemDimension}
-            staticDimension={gridWidth}
+            numColumns={numColumns}
             renderItem={renderGridItem}
             keyExtractor={keyExtractor}
             showsVerticalScrollIndicator={false}
+            columnWrapperStyle={numColumns > 1 ? {columnGap: gridSpacing} : undefined}
             ListFooterComponent={
               hasButtons ? (
                 <Box w="100%" alignItems="center">
@@ -146,7 +160,8 @@ const Dashboard = ({navigation}) => {
                     shadow={2}
                     borderRadius="md"
                     px={1}
-                    py={1}>
+                    py={1}
+                    bg={color.background}>
                     <Button
                       bg={color.danger || 'red.500'}
                       onPress={handleLogout}
@@ -160,6 +175,7 @@ const Dashboard = ({navigation}) => {
               ) : null
             }
             contentContainerStyle={{
+              paddingHorizontal: gridSpacing,
               paddingVertical: gridSpacing,
             }}
           />

@@ -1,4 +1,5 @@
 import 'react-native-gesture-handler'; // <- this should be first
+import './src/setup/disableSSRWarning';
 import React, { useEffect, useState } from 'react';
 import { enableScreens } from 'react-native-screens';
 // enableScreens(); // <- this line is mandatory
@@ -31,6 +32,7 @@ import { isAuthenticated } from './src/service/auth';
 import Enrollment from './src/screens/dashboard/Enrollment';
 import { navigationRef } from './src/navigation/navigationService';
 import './src/service/axiosConfig';
+import './src/setup/disableSSRWarning';
 
 
 const Stack = createStackNavigator();
