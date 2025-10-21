@@ -1178,12 +1178,6 @@ const NewApplicationModal = ({
                         </Text>
                       </HStack>
                     </VStack>
-
-                    {formData.deliveryTypeMethod === 'Emergency' && (
-                      <Text fontSize="xs" color={color.secondary} mt={2}>
-                        *Emergency processing: 2-3 business days
-                      </Text>
-                    )}
                   </Box>
                 </>
               )}
@@ -1207,7 +1201,7 @@ const NewApplicationModal = ({
               isLoadingText="Submitting..."
               _pressed={{bg: color.primaryLight}}
               disabled={loading}>
-              💳 Submit Application - ৳{totalAmount.toFixed(0)}
+               Submit Application
             </Button>
           </Button.Group>
         </Modal.Footer>

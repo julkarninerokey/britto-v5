@@ -448,7 +448,7 @@ const Certificate = ({navigation}) => {
       if (response.success && response.data) {
         setCertificates(response.data);
         if (response.data.length === 0) {
-          setErrorMessage('📋 No certificate applications found at the moment.');
+          setErrorMessage(response?.message || '🎓 You haven’t applied for any certificates yet. Apply now if you’re ready.');
         }
       } else {
         setErrorMessage(response.message || 'Failed to load certificate data.');
@@ -509,7 +509,7 @@ const Certificate = ({navigation}) => {
                 loadCertificates();
               }}
             >
-              🔄 Try Again
+              🔄 Refresh
             </Button>
           </Box>
         )}

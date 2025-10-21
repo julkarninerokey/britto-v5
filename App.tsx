@@ -7,19 +7,19 @@ import { Animated, LogBox } from "react-native";
 
 // Disable all warnings and logs
 (console as any).disableYellowBox = true;
-LogBox.ignoreAllLogs(true);
+// LogBox.ignoreAllLogs(true);
 LogBox.ignoreLogs([
   'Warning',
-  'Failed',
-  'Error',
+  // 'Failed',
+  // 'Error',
   'VirtualizedLists should never be nested',
-  'componentWillReceiveProps',
+  // 'componentWillReceiveProps',
   'componentWillUpdate',
   'componentWillMount',
   'Require cycle',
-  'Module',
-  'Unable to resolve',
-  'Remote debugger',
+  // 'Module',
+  // 'Unable to resolve',
+  // 'Remote debugger',
   'Setting a timer',
   'Animated',
   'FlashList',

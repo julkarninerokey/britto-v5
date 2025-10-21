@@ -438,7 +438,7 @@ const FormFillup = ({navigation}) => {
       if (response.success && response.data) {
         setExaminations(response.data);
         if (response.data.length === 0) {
-          setErrorMessage('📝 No examination data available at the moment.');
+          setErrorMessage(response.message ||'📝 You haven’t completed any form fill-ups yet. If you’re eligible, you can start a new one');
         }
       } else {
         setErrorMessage(response.message || 'Failed to load examination data.');
@@ -505,7 +505,7 @@ const FormFillup = ({navigation}) => {
                 _text={{ color: color.primary }}
                 onPress={loadExaminations}
               >
-                🔄 Try Again
+                🔄 Refresh
               </Button>
             </Box>
           }
