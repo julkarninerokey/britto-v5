@@ -107,6 +107,8 @@ const NewApplicationModal = ({
     postalCountry: 'Bangladesh',
     postalAddress: '',
     postalType: 'Local',
+    numberOfTranscripts: '1',
+    numberOfEnvelopes: '1',
   });
 
   useEffect(() => {
@@ -490,6 +492,18 @@ const NewApplicationModal = ({
       return false;
     }
 
+    // Validate transcript-specific fields
+    if (applicationType === 'TRANSCRIPT') {
+      if (!formData.numberOfTranscripts || parseInt(formData.numberOfTranscripts) < 1) {
+        warn('Please enter valid number of transcripts');
+        return false;
+      }
+      if (!formData.numberOfEnvelopes || parseInt(formData.numberOfEnvelopes) < 1) {
+        warn('Please enter valid number of envelopes');
+        return false;
+      }
+    }
+
     if (
       !formData.overCounter &&
       !formData.emailDelivery &&
@@ -552,6 +566,13 @@ const NewApplicationModal = ({
     submitData.append('reason_of_application', formData.reasonOfApplication);
     submitData.append('certificate_type', formData.certificateType);
     submitData.append('application_type', formData.applicationType);
+    
+    // Add transcript-specific fields
+    if (applicationType === 'TRANSCRIPT') {
+      submitData.append('num_of_transcript', formData.numberOfTranscripts || '1');
+      submitData.append('num_of_envelop', formData.numberOfEnvelopes || '1');
+    }
+    
     if (formData.admitCard) {
       submitData.append('admitCard', formData.admitCard);
     }
@@ -858,6 +879,37 @@ const NewApplicationModal = ({
                       label="Certificate Type"
                     />
                   </FormControl>
+
+                  {/* Transcript-specific fields */}
+                  {applicationType === 'TRANSCRIPT' && (
+                    <>
+                      <FormControl isRequired>
+                        <FormControl.Label>Number of Transcripts</FormControl.Label>
+                        <Input
+                          value={formData.numberOfTranscripts}
+                          onChangeText={value => 
+                            handleInputChange('numberOfTranscripts', value.replace(/[^0-9]/g, ''))
+                          }
+                          placeholder="Enter number of transcripts"
+                          keyboardType="numeric"
+                          maxLength={2}
+                        />
+                      </FormControl>
+
+                      <FormControl isRequired>
+                        <FormControl.Label>Number of Envelopes</FormControl.Label>
+                        <Input
+                          value={formData.numberOfEnvelopes}
+                          onChangeText={value => 
+                            handleInputChange('numberOfEnvelopes', value.replace(/[^0-9]/g, ''))
+                          }
+                          placeholder="Enter number of envelopes"
+                          keyboardType="numeric"
+                          maxLength={2}
+                        />
+                      </FormControl>
+                    </>
+                  )}
 
                   <FormControl isRequired>
                     <FormControl.Label>Delivery Type</FormControl.Label>
