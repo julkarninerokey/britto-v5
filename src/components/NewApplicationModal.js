@@ -163,11 +163,11 @@ const NewApplicationModal = ({
           });
           setApplicationFee(baseHead ? baseHead.unit_price : DEFAULT_APPLICATION_FEE);
 
-          const emergencyHead = categoryHeads.find(head => normalize(head.name).includes('emergency'));
+          const emergencyHead = categoryHeads.find(head => normalize(head.id).includes(9));
           if (emergencyHead) {
             setEmergencyFee(emergencyHead.unit_price - applicationFee);
             console.log("🚀 ~ loadPaymentInfo ~ applicationFee:", applicationFee)
-            console.log("🚀 ~ loadPaymentInfo ~ emergencyHead.unit_price:", emergencyHead.unit_price)
+            console.log("🚀 ~ loadPaymentInfo ~ emergencyHead:", emergencyHead)
           }
 
           const envelopeHead = categoryHeads.find(head => {
@@ -570,7 +570,7 @@ const NewApplicationModal = ({
     let total = isEmergency ? 0 : applicationFee;
 
     if (isEmergency) {
-      total += emergencyFee > 0 ? emergencyFee : applicationFee;
+      total += emergencyFee + applicationFee;
     }
 
     if (
@@ -1104,7 +1104,7 @@ const NewApplicationModal = ({
                         <HStack justifyContent="space-between">
                           <Text fontSize="sm">Emergency Processing Fee:</Text>
                           <Text fontSize="sm" fontWeight="500">
-                            ৳{(emergencyFee > 0 ? emergencyFee : applicationFee).toFixed(0)}
+                            ৳{(emergencyFee).toFixed(0)}
                           </Text>
                         </HStack>
                       )}
