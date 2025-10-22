@@ -3,29 +3,21 @@ import './src/setup/disableSSRWarning';
 import React, { useEffect, useState } from 'react';
 import { enableScreens } from 'react-native-screens';
 // enableScreens(); // <- this line is mandatory
-import { Animated, LogBox } from "react-native";
+import { Animated } from "react-native";
 
-// Disable all warnings and logs
-(console as any).disableYellowBox = true;
-// LogBox.ignoreAllLogs(true);
-LogBox.ignoreLogs([
-  'Warning',
-  // 'Failed',
-  // 'Error',
-  'VirtualizedLists should never be nested',
-  // 'componentWillReceiveProps',
-  'componentWillUpdate',
-  'componentWillMount',
-  'Require cycle',
-  // 'Module',
-  // 'Unable to resolve',
-  // 'Remote debugger',
-  'Setting a timer',
-  'Animated',
-  'FlashList',
-  'FlatList',
-  'ScrollView',
-]);
+// Import and setup console management
+import { setupConsole, ConsoleManager } from './src/utils/consoleManager';
+
+// Setup console based on configuration
+setupConsole();
+
+// Example: You can control logging at runtime
+// ConsoleManager.setAppLogging(false);    // Disable app warnings
+// ConsoleManager.setTerminalLogging(true); // Enable terminal output
+
+// For debugging, you can force logs that bypass all filters:
+// ConsoleManager.forceLog('This will always show in terminal');
+// ConsoleManager.forceError('This error will always show in terminal');
 
 import { NativeBaseProvider } from 'native-base';
 import { createStackNavigator } from '@react-navigation/stack';
