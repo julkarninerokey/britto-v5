@@ -1,8 +1,11 @@
 import axios from 'axios';
-import {API_SECRET_TOKEN, API_URL, appInfo, deviceInfo, netInfo, saveLogin, toast} from './utils';
+import { appInfo, deviceInfo, netInfo, saveLogin, toast} from './utils';
 import DeviceInfo from 'react-native-device-info';
 import {getLocales} from 'react-native-localize';
 
+// export const API_URL = 'http://172.20.10.8:4100/api/britto';
+export const API_URL = 'https://resapi.eco.du.ac.bd/api/britto';
+export const API_SECRET_TOKEN = '8f3c1e2d3a4b5c6d7e8f9a0b1c2d3e4f';
 
 export const statusCheck = async () => {
   try {
