@@ -119,7 +119,7 @@ export const dashboardButtons = [
     screen: "Department",
     title: "Bus Schedule",
     priority: 14,
-    icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/",
+    icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/transport.png",
     status: 1,
     createdAt: "2024-04-25 01:47:05",
   },

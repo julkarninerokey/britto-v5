@@ -17,12 +17,7 @@ import {
 import { WebView } from 'react-native-webview';
 import AppBar from '../../components/AppBar';
 import { color, toast } from '../../service/utils';
-import { 
-  getApplicationPaymentDetails,
-  initializeSSLCommerzPayment, 
-  verifyPayment, 
-  getPaymentStatus
-} from '../../service/paymentService';
+import paymentService from '../../service/payments/paymentService';
 import { getAsyncStoreData } from '../../utils/async-storage';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
@@ -103,7 +98,7 @@ const Payment = ({ route, navigation }) => {
 
     setDetailsLoading(true);
     try {
-      const response = await getApplicationPaymentDetails(applicationId, type);
+      const response = await paymentService.getApplicationPaymentDetails(Number(applicationId), type);
       
       if (response.success && response.data) {
         setApplicationDetails(response.data);
@@ -158,11 +153,23 @@ const Payment = ({ route, navigation }) => {
         passedStudentRegNo: passedStudentRegNo
       });
       
-      const response = await initializeSSLCommerzPayment(
-        applicationId,
-        calculatedTotal,
+      // Auto-select first available gateway
+      let gatewayId = 1;
+      try {
+        const gateways = await paymentService.getAvailableGateways();
+        if (Array.isArray(gateways) && gateways.length > 0) {
+          gatewayId = gateways[0].id || 1;
+        }
+      } catch (e) {
+        console.warn('Failed to fetch gateways, defaulting to 1:', e?.message || e);
+      }
+
+      const response = await paymentService.initializePayment(
+        Number(applicationId),
+        Number(calculatedTotal),
         type,
-        depositor
+        depositor,
+        gatewayId
       );
       
       console.log("🚀 ~ initPayment ~ response:", response);
@@ -186,7 +193,7 @@ const Payment = ({ route, navigation }) => {
   const checkPaymentStatus = async () => {
     setVerifying(true);
     try {
-      const response = await getPaymentStatus(applicationId);
+      const response = await paymentService.verifyPayment(Number(applicationId));
       
       if (response.success && response.data) {
         setPaymentStatus(response.data);

@@ -94,10 +94,6 @@ const getCertificateStatus = (certificate) => {
 
 const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certificateFee, studentRegNo }) => {
 
-  console.log("🚀 -------------------------------------------------------------------🚀")
-  console.log("🚀 ~ Certificate.js:97 ~ CertificateCard ~ certificate:", certificate)
-  console.log("🚀 -------------------------------------------------------------------🚀")
-
   const statusInfo = getCertificateStatus(certificate);
   
   return (
@@ -285,7 +281,7 @@ const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certif
                   // }
                   if (isDirectPaymentEnabled()) {
                     await handleDirectPayment({
-                      applicationId: certificate.id,
+                      applicationId: certificate.applicationId || certificate.id,
                       amount: paymentAmount,
                       type: 'CERTIFICATE',
                       studentRegNo: studentRegNo,
@@ -304,7 +300,7 @@ const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certif
                     });
                   } else {
                     navigation.navigate('Payment', {
-                      applicationId: certificate.id,
+                      applicationId: certificate.applicationId || certificate.id,
                       type: 'CERTIFICATE',
                       amount: paymentAmount,
                       certificateType: certificate.certificateType,

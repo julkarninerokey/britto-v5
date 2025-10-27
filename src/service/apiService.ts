@@ -55,6 +55,29 @@ class ApiService {
     return response.data;
   }
 
+  // Simple helpers to align with payments service expectations
+  async getClient<T = any>(url: string, config?: AxiosRequestConfig): Promise<{ success: boolean; data?: T; error?: any }> {
+    try {
+      const data = await this.request({ method: 'GET', url, ...(config || {}) });
+      return { success: true, data };
+    } catch (error: any) {
+      const raw = error?.response?.data ?? error?.message ?? 'Unknown error';
+      const normalized = typeof raw === 'string' ? raw : (raw?.message || JSON.stringify(raw));
+      return { success: false, error: normalized };
+    }
+  }
+
+  async postClient<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<{ success: boolean; data?: T; error?: any }> {
+    try {
+      const resData = await this.request({ method: 'POST', url, data, ...(config || {}) });
+      return { success: true, data: resData };
+    } catch (error: any) {
+      const raw = error?.response?.data ?? error?.message ?? 'Unknown error';
+      const normalized = typeof raw === 'string' ? raw : (raw?.message || JSON.stringify(raw));
+      return { success: false, error: normalized };
+    }
+  }
+
   // Helper methods
   getImageUrl(fileName: string): string {
     if (!fileName) return '';

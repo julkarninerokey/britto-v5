@@ -11,7 +11,7 @@ import {
 import { WebView } from 'react-native-webview';
 import AppBar from '../../components/AppBar';
 import { color, toast } from '../../service/utils';
-import { getPaymentStatus } from '../../service/paymentService';
+import paymentService from '../../service/payments/paymentService';
 
 const DirectPaymentWebView = ({ route, navigation }) => {
   const { 
@@ -50,7 +50,7 @@ const DirectPaymentWebView = ({ route, navigation }) => {
   const checkPaymentStatus = async () => {
     setVerifying(true);
     try {
-      const response = await getPaymentStatus(applicationId);
+      const response = await paymentService.verifyPayment(applicationId);
       
       if (response.success && response.data) {
         const status = response.data.status;

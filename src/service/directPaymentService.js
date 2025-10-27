@@ -1,5 +1,6 @@
 import { Alert } from 'react-native';
-import { initializeSSLCommerzPayment } from './paymentService';
+// Use the newer payment service (TypeScript) for consistency
+import paymentService from './payments/paymentService';
 import { getAsyncStoreData } from '../utils/async-storage';
 import { toast } from './utils';
 import { PAYMENT_CONFIG } from '../config/paymentConfig';
@@ -83,12 +84,27 @@ export const handleDirectPayment = async ({
     // Show loading toast
     // toast('info', 'Initializing Payment', 'Please wait while we prepare your payment...');
 
-    // Initialize payment
-    const response = await initializeSSLCommerzPayment(
-      applicationId,
+    // Auto-select first available gateway
+    let gatewayId = 1;
+    try {
+      const gateways = await paymentService.getAvailableGateways();
+      if (Array.isArray(gateways) && gateways.length > 0) {
+        gatewayId = gateways[0].id || 1;
+      }
+    } catch (e) {
+      console.warn('Failed to fetch gateways, defaulting to 1:', e?.message || e);
+    }
+
+    // Ensure applicationId is numeric for backend
+    const appIdNumber = Number(applicationId);
+
+    // Initialize payment using the new service
+    const response = await paymentService.initializePayment(
+      appIdNumber,
       amount,
       type,
-      finalDepositor
+      finalDepositor,
+      gatewayId
     );
 
     console.log('🚀 Direct Payment - Response:', response);

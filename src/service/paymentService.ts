@@ -295,14 +295,25 @@ export const initializeSSLCommerzPayment = async (
       return `${baseUrl}?applicationId=${applicationId}&type=${type}`;
     };
 
-    // Payload matching web implementation
+    // Get application details to get payment heads
+    const appDetails = await getApplicationPaymentDetails(applicationId, type);
+    
+    // Format the heads payload like the web implementation
+    const headsPayload = appDetails.success 
+      ? appDetails.data?.payment_details.map(item => ({
+          head_id: Number(item.payment_head_id),
+          count: Number(item.quantity)
+        }))
+      : [];
+
+    // Convert numeric fields to proper numbers
+    const numTranscriptId = Number(applicationId);
+
+    // Payload exactly matching web implementation
     const payload = {
-      gateway_id: 1, // SSLCommerz gateway ID
-      application_id: Number(applicationId),
-      total_amount: totalAmount,
-      type: type,
-      psid: getPsidByType(type),
-      depositor: depositor || '',
+      gateway_id: 1,
+      transcript_id: numTranscriptId,
+      heads: headsPayload,
       success_url: getCallbackUrl('success'),
       fail_url: getCallbackUrl('fail'),
       cancel_url: getCallbackUrl('cancel')
@@ -310,19 +321,32 @@ export const initializeSSLCommerzPayment = async (
 
     console.log('Initializing SSLCommerz payment with payload:', payload);
     console.log('PSID for type', type, ':', getPsidByType(type));
-    console.log('API URL:', buildPaymentUrl('/management/eco/initiate_payment'));
+    
+    // Get authentication token
+    const authToken = await getAsyncStoreData('token');
+    
+    if (!authToken) {
+      return {
+        success: false,
+        message: 'Authentication token not found. Please login again.',
+      };
+    }
 
-    // Use the same endpoint as web
-    const response = await axios.post(
-      buildPaymentUrl('/management/eco/initiate_payment'),
-      payload,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
+    // Import the configured API service
+    const apiService = require('./apiService').default;
+    
+    // Use the configured API service with proper interceptors
+    const response = await apiService.request({
+      method: 'POST',
+      url: 'management/eco/initiate_payment',
+      data: payload,
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'application/json'
       }
-    );
+    });
 
     console.log("🚀 ~ initializeSSLCommerzPayment ~ response:", response.data);
 
@@ -347,6 +371,11 @@ export const initializeSSLCommerzPayment = async (
       };
     }
   } catch (error: any) {
+
+    console.log("🚀 -----------------------------------------------------------------------🚀")
+    console.log("🚀 ~ paymentService.ts:371 ~ initializeSSLCommerzPayment ~ error:", error)
+    console.log("🚀 -----------------------------------------------------------------------🚀")
+
     console.error('Error initializing SSLCommerz payment:', error);
     console.error('Error response:', error?.response?.data);
     console.error('Error status:', error?.response?.status);
