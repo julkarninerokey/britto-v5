@@ -289,22 +289,32 @@ export const initializeSSLCommerzPayment = async (
       return service?.psid ?? "1"; // Default to 1 for enrollment
     };
 
-    // Payload exactly matching web app
+    // Construct success/fail/cancel URLs
+    const getCallbackUrl = (status: 'success' | 'fail' | 'cancel') => {
+      const baseUrl = 'brittoapp://payment/' + status;
+      return `${baseUrl}?applicationId=${applicationId}&type=${type}`;
+    };
+
+    // Payload matching web implementation
     const payload = {
-      total_amount: totalAmount,
+      gateway_id: 1, // SSLCommerz gateway ID
       application_id: Number(applicationId),
+      total_amount: totalAmount,
+      type: type,
       psid: getPsidByType(type),
       depositor: depositor || '',
-      type: type,
+      success_url: getCallbackUrl('success'),
+      fail_url: getCallbackUrl('fail'),
+      cancel_url: getCallbackUrl('cancel')
     };
 
     console.log('Initializing SSLCommerz payment with payload:', payload);
     console.log('PSID for type', type, ':', getPsidByType(type));
-    console.log('API URL:', buildPaymentUrl('/api/payment/ssl'));
+    console.log('API URL:', buildPaymentUrl('/management/eco/initiate_payment'));
 
-    // Use the payment-specific URL builder
+    // Use the same endpoint as web
     const response = await axios.post(
-      buildPaymentUrl('/api/payment/ssl'),
+      buildPaymentUrl('/management/eco/initiate_payment'),
       payload,
       {
         headers: {

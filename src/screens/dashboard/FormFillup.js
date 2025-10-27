@@ -437,6 +437,7 @@ const FormFillup = ({navigation}) => {
       
       if (response.success && response.data) {
         setExaminations(response.data);
+
         if (response.data.length === 0) {
           setErrorMessage(response.message ||'📝 You haven’t completed any form fill-ups yet. If you’re eligible, you can start a new one');
         }

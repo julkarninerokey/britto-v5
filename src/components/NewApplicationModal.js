@@ -542,6 +542,13 @@ const NewApplicationModal = ({
     submitData.append('subject_id', formData.subjectId);
     submitData.append('examYearSelect', formData.examYearSelect);
     submitData.append('examRollInput', formData.examRollInput);
+    
+    // Add degree-related fields from degree selection
+    if (formData.selectedDegree) {
+      submitData.append('degree_id', formData.selectedDegree.id || '');
+      submitData.append('degree_name', formData.selectedDegree.name || '');
+    }
+
     if (formData.isCustomDegree) {
       if (formData.department) {
         submitData.append('department', formData.department);
@@ -550,19 +557,36 @@ const NewApplicationModal = ({
         submitData.append('hall', formData.hall);
       }
     }
+
     submitData.append('deliveryTypeMethod', formData.deliveryTypeMethod);
-    submitData.append('overCounter', formData.overCounter ? 'on' : 'off');
-    submitData.append('isSelf', formData.isSelf ? 'on' : 'off');
-    submitData.append('overCounterName', formData.overCounterName || '');
-    submitData.append('overCounterMobile', formData.overCounterMobile || '');
-    submitData.append('emailDelivery', formData.emailDelivery ? 'on' : 'off');
-    submitData.append('emailAddress', formData.emailAddress || '');
-    submitData.append('postalMail', formData.postalMail ? 'on' : 'off');
-    if (formData.postalMail) {
-      submitData.append('postalCountry', formData.postalCountry || '');
-      submitData.append('postalType', formData.postalType || '');
-    }
-    submitData.append('postalAddress', formData.postalAddress || '');
+
+    // Prepare delivery info objects
+    const deliveryDetails = {
+      counter: {
+        option: formData.isSelf ? 'self' : 'authorized',
+        quantity: 1,
+        authorizedName: formData.overCounterName || '',
+        authorizedPhone: formData.overCounterMobile || ''
+      },
+      email: [],
+      postal: []
+    };
+
+    // Add delivery method info
+    const deliverCounterInfo = {
+      quantity: 1,
+      is_self: formData.isSelf,
+      authorized_name: formData.overCounterName || '',
+      authorized_phone: formData.overCounterMobile || ''
+    };
+
+    // Add all delivery-related fields
+    submitData.append('deliver_counter_info', JSON.stringify(deliverCounterInfo));
+    submitData.append('deliver_email_infos', JSON.stringify([]));
+    submitData.append('deliver_postal_infos', JSON.stringify([]));
+    submitData.append('delivery_details', JSON.stringify(deliveryDetails));
+    submitData.append('deliveryDetails', JSON.stringify(deliveryDetails));
+
     submitData.append('reason_of_application', formData.reasonOfApplication);
     submitData.append('certificate_type', formData.certificateType);
     submitData.append('application_type', formData.applicationType);
@@ -665,6 +689,7 @@ const NewApplicationModal = ({
 
   const handleSubmit = async () => {
     if (!validateForm()) {
+      console.log("🚀 ~ handleSubmit ~ form validation failed")
       return;
     }
 
@@ -673,6 +698,11 @@ const NewApplicationModal = ({
       const submitData = prepareFormData();
       console.log("🚀 ~ handleSubmit ~ submitData:", submitData)
       const response = await submitCertificateApplication(submitData);
+
+      console.log("🚀 -------------------------------------------------------------------🚀")
+      console.log("🚀 ~ NewApplicationModal.js:678 ~ handleSubmit ~ response:", response)
+      console.log("🚀 -------------------------------------------------------------------🚀")
+
 
       if (response.success) {
         toast.show({
@@ -692,6 +722,11 @@ const NewApplicationModal = ({
         });
       }
     } catch (error) {
+
+      console.log("🚀 -------------------------------------------------------------🚀")
+      console.log("🚀 ~ NewApplicationModal.js:702 ~ handleSubmit ~ error:", error)
+      console.log("🚀 -------------------------------------------------------------🚀")
+
       console.error('Error submitting application:', error);
       toast.show({
         description: 'Failed to submit application. Please try again.',
@@ -866,7 +901,7 @@ const NewApplicationModal = ({
                       </FormControl>
                     </VStack>
                   )}
-
+{applicationType === 'CERTIFICATE' && (
                   <FormControl isRequired>
                     <FormControl.Label>Certificate Type</FormControl.Label>
                     <DropdownSelect
@@ -879,7 +914,7 @@ const NewApplicationModal = ({
                       label="Certificate Type"
                     />
                   </FormControl>
-
+)}
                   {/* Transcript-specific fields */}
                   {applicationType === 'TRANSCRIPT' && (
                     <>

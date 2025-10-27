@@ -25,42 +25,79 @@ import NewApplicationModal from '../../components/NewApplicationModal';
 
 // Helper function to get certificate status and icon
 const getCertificateStatus = (certificate) => {
-  const paymentDone = certificate.paymentStatus === 'Paid';
   const hallVerified = certificate.hallVerification === 'Verified';
-  const certificateVerified = certificate.certificateVerification === 'Verified';
+  const accountsVerified = certificate.accountsVerification === 'Verified';
+  const paymentDone = certificate.paymentStatus === 'Paid';
+  const readyForPickup = certificate.deliveryStatus === 'Ready for Pickup';
+  const delivered = certificate.deliveryStatus === 'Delivered';
+
+  // Generate application status based on verification states
+  let applicationStatus;
+  if (delivered) {
+    applicationStatus = 'Certificate Delivered';
+  } else if (readyForPickup) {
+    applicationStatus = 'Ready for Pickup';
+  } else if (paymentDone) {
+    applicationStatus = 'Certificate Processing';
+  } else if (accountsVerified) {
+    applicationStatus = 'Payment Required';
+  } else if (hallVerified) {
+    applicationStatus = 'Pending Accounts Verification';
+  } else {
+    applicationStatus = 'Pending Hall Verification';
+  }
   
-  if (paymentDone && hallVerified && certificateVerified) {
+  if (delivered) {
     return {
-      status: 'Certificate Ready',
+      status: applicationStatus,
       icon: '✅',
-      color: '#191970',
+      color: color.success,
       bgColor: '#1e293b'
     };
-  } else if (paymentDone && (hallVerified || certificateVerified)) {
+  } else if (readyForPickup) {
     return {
-      status: 'Under Verification',
-      icon: '⏳',
-      color: '#191970',
+      status: applicationStatus,
+      icon: '�',
+      color: color.success,
       bgColor: '#1e293b'
     };
   } else if (paymentDone) {
     return {
-      status: 'Payment Completed',
+      status: applicationStatus,
+      icon: '🔄',
+      color: color.info,
+      bgColor: '#1e293b'
+    };
+  } else if (accountsVerified) {
+    return {
+      status: applicationStatus,
+      icon: '💳',
+      color: color.warning,
+      bgColor: '#1e293b'
+    };
+  } else if (hallVerified) {
+    return {
+      status: applicationStatus,
       icon: '⏳',
-      color: '#191970',
+      color: color.warning,
       bgColor: '#1e293b'
     };
   } else {
     return {
-      status: 'Payment Pending',
+      status: applicationStatus,
       icon: '⏳',
-      color: '#191970',
+      color: color.warning,
       bgColor: '#3e4857ff'
     };
   }
 };
 
 const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certificateFee, studentRegNo }) => {
+
+  console.log("🚀 -------------------------------------------------------------------🚀")
+  console.log("🚀 ~ Certificate.js:97 ~ CertificateCard ~ certificate:", certificate)
+  console.log("🚀 -------------------------------------------------------------------🚀")
+
   const statusInfo = getCertificateStatus(certificate);
   
   return (
@@ -110,7 +147,7 @@ const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certif
                   
                   {/* Unified Status */}
                   <Text fontSize="xs" fontWeight="500" color={statusInfo.color}>
-                    {certificate.applicationStatus || statusInfo.status}
+                    { statusInfo.status}
                   </Text>
                 </VStack>
               </HStack>
@@ -148,7 +185,7 @@ const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certif
                <HStack justifyContent="space-between" alignItems="center">
                 <Text fontSize="xs" color={color.text}>Application Status</Text>
                 <Text fontSize="xs" fontWeight="500" color={color.info}>
-                  {certificate.applicationStatus}
+                  {statusInfo.status}
                 </Text>
               </HStack>
             </VStack>
@@ -176,12 +213,20 @@ const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certif
               ⚡ Status Information
             </Text>
             <VStack space={1} pl={4}>
-                           <HStack justifyContent="space-between" alignItems="center">
+              <HStack justifyContent="space-between" alignItems="center">
                 <Text fontSize="xs" color={color.text}>Hall Verification</Text>
                 <Text fontSize="xs" fontWeight="500" color={
                   certificate.hallVerification === 'Verified' ? color.success : color.warning
                 }>
-                  {certificate.hallVerification}
+                  {certificate.hallVerification === 'Verified' ? '✓ ' : '⌛ '}{certificate.hallVerification}
+                </Text>
+              </HStack>
+              <HStack justifyContent="space-between" alignItems="center">
+                <Text fontSize="xs" color={color.text}>Accounts Verification</Text>
+                <Text fontSize="xs" fontWeight="500" color={
+                  certificate.accountsVerification === 'Verified' ? color.success : color.warning
+                }>
+                  {certificate.accountsVerification === 'Verified' ? '✓ ' : '⌛ '}{certificate.accountsVerification}
                 </Text>
               </HStack>
               <HStack justifyContent="space-between" alignItems="center">
@@ -189,13 +234,24 @@ const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certif
                 <Text fontSize="xs" fontWeight="500" color={
                   certificate.paymentStatus === 'Paid' ? color.success : color.warning
                 }>
-                  {certificate.paymentStatus}
+                  {certificate.paymentStatus === 'Paid' ? '✓ ' : '💳 '}{certificate.paymentStatus}
                 </Text>
               </HStack>
+              
               <HStack justifyContent="space-between" alignItems="center">
                 <Text fontSize="xs" color={color.text}>Delivery Status</Text>
-                <Text fontSize="xs" fontWeight="500" color={color.warning}>
-                  {certificate.deliveryStatus}
+                <Text fontSize="xs" fontWeight="500" color={
+                  certificate.deliveryStatus === 'Delivered' 
+                    ? color.success 
+                    : certificate.deliveryStatus === 'Ready for Pickup'
+                    ? color.info
+                    : color.warning
+                }>
+                  {certificate.deliveryStatus === 'Delivered' 
+                    ? '✅ ' 
+                    : certificate.deliveryStatus === 'Ready for Pickup'
+                    ? '📦 '
+                    : '⌛ '}{certificate.deliveryStatus || 'Pending'}
                 </Text>
               </HStack>
               {certificate.transactionId && certificate.transactionId !== 'N/A' && (
@@ -216,17 +272,17 @@ const CertificateCard = ({ certificate, isExpanded, onToggle, navigation, certif
             {certificate.paymentStatus !== 'Paid' && (
               <Button
                 size="sm"
-                bg={certificate.hallVerification !== 'Verified' ? color.gray : color.green}
+                bg={certificate.accountsVerification !== 'Verified' ? color.gray : color.green}
                 // disabled={certificate.hallVerification !== 'Verified'}
                 borderRadius={8}
                 _pressed={{ bg: color.primaryLight }}
                 onPress={async () => {
                   const paymentAmount = parseFloat(certificate.amount) || certificateFee;
-                  if (certificate.hallVerification !== 'Verified') {
-                    // Show a message or handle the case when hall verification is not done
-                    toast('warning', 'Hall Verification Pending', 'Please complete hall verification first.');
-                    return;
-                  }
+                  // if (certificate.accountsVerification !== 'Verified' || certificate.accountsVerification === 'Pending') {
+                  //   // Show a message or handle the case when accounts verification is not done
+                  //   toast('warning', 'Verification Pending', 'Please complete verification first.');
+                  //   return;
+                  // }
                   if (isDirectPaymentEnabled()) {
                     await handleDirectPayment({
                       applicationId: certificate.id,
