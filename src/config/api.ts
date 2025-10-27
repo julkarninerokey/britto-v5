@@ -7,7 +7,7 @@ export const API_CONFIG = {
   PAYMENT_BASE_URL: 'https://student.eco.du.ac.bd',
   
   // Legacy API (if still needed)
-  LEGACY_BASE_URL: 'https://du-backend.pitech.com.bd/api/britto',
+  LEGACY_BASE_URL: 'https://resapi.eco.du.ac.bd/api/britto',
   
   // API endpoints
   ENDPOINTS: {

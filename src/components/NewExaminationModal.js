@@ -73,7 +73,7 @@ const NewExaminationModal = ({ isOpen, onClose, navigation, onExaminationSuccess
       }
       
     } catch (error) {
-      console.error('Error loading examination data:', error);
+      // silently ignore
     } finally {
       setLoading(false);
     }
@@ -132,7 +132,7 @@ const NewExaminationModal = ({ isOpen, onClose, navigation, onExaminationSuccess
         course_code_title_id: selectedCourses.map(course => course.course_code_title_id)
       };
 
-      console.log('Submitting examination:', examinationData);
+      // submitting examination
       
       // Submit examination (using same API as enrollment for now)
       const response = await submitEnrollment(examinationData);
@@ -153,7 +153,7 @@ const NewExaminationModal = ({ isOpen, onClose, navigation, onExaminationSuccess
         // Handle payment based on configuration
         setTimeout(async () => {
           if (applicationId) {
-            console.log(`Processing payment for examination application ID: ${applicationId}`);
+            // processing payment for examination
             
             if (isDirectPaymentEnabled()) {
               // Direct payment - open gateway immediately
@@ -172,11 +172,11 @@ const NewExaminationModal = ({ isOpen, onClose, navigation, onExaminationSuccess
                     studentRegNo = regNo || '';
                   }
                 } catch (error) {
-                  console.error('Error loading student reg no:', error);
+                  // silently ignore
                 }
                 
                 await handleDirectPayment({
-                  applicationId: applicationId,
+                  applicationId: Number(applicationId),
                   amount: getTotalCost(),
                   type: 'EXAMINATION',
                   studentRegNo: studentRegNo,
@@ -184,20 +184,17 @@ const NewExaminationModal = ({ isOpen, onClose, navigation, onExaminationSuccess
                   courses: selectedCourses.length,
                   navigation: navigation, // Pass navigation object
                   onSuccess: (paymentData) => {
-                    console.log('Payment initiated successfully:', paymentData);
+                    // payment initiated
                   },
                   onError: (error) => {
-                    console.error('Payment error:', error);
                     // Fallback to manual payment instruction
                     toast('warning', 'Payment Required', `Application ID: ${applicationId}\nAmount: ৳${getTotalCost()}\nPlease complete your payment manually.`);
                   },
                   onCancel: () => {
-                    console.log('Payment cancelled by user');
                     toast('info', 'Payment Cancelled', 'You can make payment later from the examination section.');
                   }
                 });
               } catch (error) {
-                console.error('Direct payment error:', error);
                 // Fallback to manual payment instruction
                 toast('warning', 'Payment Required', `Application ID: ${applicationId}\nAmount: ৳${getTotalCost()}\nPlease complete your payment manually.`);
               }
@@ -226,7 +223,6 @@ const NewExaminationModal = ({ isOpen, onClose, navigation, onExaminationSuccess
       }
       
     } catch (error) {
-      console.error('Examination error:', error);
       toast('error', 'Error', 'An unexpected error occurred during examination registration');
     } finally {
       setLoading(false);

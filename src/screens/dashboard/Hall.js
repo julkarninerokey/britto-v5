@@ -86,7 +86,17 @@ const Hall = ({navigation}) => {
   useEffect(() => {
     const checkForData = async () => {
       const reg = await AsyncStorage.getItem('reg');
-      const response = await hallData(reg);
+
+      console.log("🚀 -----------------------------------------🚀")
+      console.log("🚀 ~ Hall.js:90 ~ checkForData ~ reg:", reg)
+      console.log("🚀 -----------------------------------------🚀")
+
+      const response = await hallData(2017417693);
+
+      console.log("🚀 ---------------------------------------------------🚀")
+      console.log("🚀 ~ Hall.js:91 ~ checkForData ~ response:", response)
+      console.log("🚀 ---------------------------------------------------🚀")
+
       setData(response.data);
       const emp = response?.staff;
       if (emp.length > 0) {

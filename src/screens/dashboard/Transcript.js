@@ -243,7 +243,7 @@ const TranscriptCard = ({ transcript, isExpanded, onToggle, navigation, transcri
                     }
                     if (isDirectPaymentEnabled()) {
                       await handleDirectPayment({
-                        applicationId: transcript.id,
+                        applicationId: transcript.applicationId || transcript.id,
                         amount: paymentAmount,
                         type: 'TRANSCRIPT',
                         studentRegNo: studentRegNo,
@@ -262,7 +262,7 @@ const TranscriptCard = ({ transcript, isExpanded, onToggle, navigation, transcri
                       });
                     } else {
                       navigation.navigate('Payment', {
-                        applicationId: transcript.id,
+                        applicationId: transcript.applicationId || transcript.id,
                         type: 'TRANSCRIPT',
                         amount: paymentAmount,
                         transcriptType: transcript.transcriptType,
@@ -429,9 +429,9 @@ const Transcript = ({navigation}) => {
         return;
       }
       
-      console.warn('Student registration number not found in storage');
+      // no-op: student registration number not found in storage
     } catch (error) {
-      console.error('Error loading student registration number:', error);
+      // silently ignore
     }
   };
 
@@ -448,7 +448,7 @@ const Transcript = ({navigation}) => {
         }
       }
     } catch (error) {
-      console.error('Error loading payment info:', error);
+      // silently ignore
     }
   };
 
@@ -469,7 +469,7 @@ const Transcript = ({navigation}) => {
         setTranscripts([]);
       }
     } catch (error) {
-      console.error('Error loading transcripts:', error);
+      // silently ignore
       setErrorMessage('An unexpected error occurred.');
       setTranscripts([]);
     } finally {
