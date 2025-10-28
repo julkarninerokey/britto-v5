@@ -165,7 +165,7 @@ const NewApplicationModal = ({
           });
           setApplicationFee(baseHead ? baseHead.unit_price : DEFAULT_APPLICATION_FEE);
 
-          const emergencyHead = categoryHeads.find(head => normalize(head.id).includes(9));
+          const emergencyHead = applicationType === 'CERTIFICATE' ? categoryHeads.find(head => normalize(head.id).includes(9)) : applicationType === 'TRANSCRIPT' ? categoryHeads.find(head => normalize(head.id).includes(2)) : applicationType === 'MARKSHEET' ? categoryHeads.find(head => normalize(head.id).includes(21)) : null;
           if (emergencyHead) {
             setEmergencyFee(emergencyHead.unit_price - applicationFee);
             console.log("🚀 ~ loadPaymentInfo ~ applicationFee:", applicationFee)

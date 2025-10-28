@@ -24,7 +24,7 @@ const Marksheet = ({navigation}) => {
           item => item.screen === 'Marksheet',
         )?.icon;
         setIconUrl(syllabusIcon);
-        const response = await getMarksheet(reg);
+        const response = await getMarksheet('2017417693');
 
         const renderMarksheetDetails = (item) => (
           <Box p={2}>
