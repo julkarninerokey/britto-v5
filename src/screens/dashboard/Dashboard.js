@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {FlatList, Image, TouchableOpacity, useWindowDimensions} from 'react-native';
 import {VStack, Text, HStack, View, Skeleton, Button, Box} from 'native-base';
-import {color, dashboardButtons, toast} from '../../service/utils';
+import {color, toast, dashboardButtons} from '../../service/utils';
 import ProfileCard from '../../components/ProfileCard';
 import AppBar from '../../components/AppBar';
 import {logout} from '../../service/auth';
@@ -10,11 +10,9 @@ const Dashboard = ({navigation}) => {
   const [buttons, setButtons] = useState([]);
 
   useEffect(() => {
-    const availableButtons = dashboardButtons
-      .filter(button => button?.status)
-      .sort((a, b) => (a?.priority ?? 0) - (b?.priority ?? 0));
-
-    setButtons(availableButtons);
+    const all = dashboardButtons || [];
+    const sortedButtons = all.sort((a, b) => (a?.priority ?? 0) - (b?.priority ?? 0));
+    setButtons(sortedButtons);
   }, []);
 
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -100,18 +98,22 @@ const Dashboard = ({navigation}) => {
         );
       }
 
+      const isEnabled = item?.status ? true : false;
       const handlePress = () => {
         if (!item?.screen) {
           toast('warning', 'Screen not available', 'Please try again later.');
           return;
         }
-
+        if (!isEnabled) {
+          toast('info', 'Coming soon', 'This feature will be available soon.');
+          return;
+        }
         navigation.navigate(item.screen);
       };
 
       return (
         <Box flex={1} margin={gridSpacing}>
-          <TouchableOpacity onPress={handlePress} activeOpacity={0.8} style={{flex: 1}}>
+          <TouchableOpacity onPress={handlePress} activeOpacity={0.8} style={{flex: 1, opacity: isEnabled ? 1 : 0.5}}>
             <VStack
               background="white"
               padding={3}
@@ -122,13 +124,13 @@ const Dashboard = ({navigation}) => {
                   <Image
                     source={{uri: item.icon}}
                     alt={item.icon}
-                    style={{width: '100%', height: '100%', tintColor: color.primary}}
+                    style={{width: '100%', height: '100%', tintColor: isEnabled ? color.primary : color.muted}}
                   />
                 </VStack>
               </HStack>
 
               <HStack justifyContent="flex-start" width="100%">
-                <Text fontSize="md" color={color.primary} bold>
+                <Text fontSize="md" color={isEnabled ? color.primary : color.muted} bold>
                   {item.title}
                 </Text>
               </HStack>

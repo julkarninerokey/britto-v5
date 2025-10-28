@@ -14,7 +14,7 @@ export const checkUserLoginStatus = async () => {
   return token;
 };
 
-export const DASHBOARD_BUTTONS_KEY = 'dashboardButtons';
+//
 
 export const dashboardButtons = [
   {
@@ -113,7 +113,7 @@ export const dashboardButtons = [
     title: "Class Schedule",
     priority: 100,
     icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/class.png",
-    status: 1,
+    status: 0,
     createdAt: "2024-04-25 01:47:05",
   },
   {
@@ -122,7 +122,7 @@ export const dashboardButtons = [
     title: "Bus Schedule",
     priority: 14,
     icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/transport.png",
-    status: 1,
+    status: 0,
     createdAt: "2024-04-25 01:47:05",
   },
   {
@@ -131,7 +131,7 @@ export const dashboardButtons = [
     title: "Campus Map",
     priority: 12,
     icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/map.png",
-    status: 1,
+    status: 0,
     createdAt: "2024-04-25 01:47:05",
   },
   {
@@ -140,7 +140,7 @@ export const dashboardButtons = [
     title: "Calender",
     priority: 13,
     icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/calander.png",
-    status: 1,
+    status: 0,
     createdAt: "2024-04-25 01:47:05",
   },
   {
@@ -149,7 +149,7 @@ export const dashboardButtons = [
     title: "Applications",
     priority: 11,
     icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/application.png",
-    status: 1,
+    status: 0,
     createdAt: "2024-04-25 01:47:05",
   },
   {
@@ -163,40 +163,7 @@ export const dashboardButtons = [
   }
 ]
 
-// Persist dashboard buttons to AsyncStorage (defaults on first run)
-export async function saveDashboardButtons(buttons = dashboardButtons) {
-  try {
-    await AsyncStorage.setItem(DASHBOARD_BUTTONS_KEY, JSON.stringify(buttons || []));
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-export async function getDashboardButtons() {
-  try {
-    const stored = await AsyncStorage.getItem(DASHBOARD_BUTTONS_KEY);
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch (_) {}
-  return dashboardButtons;
-}
-
-// Ensure defaults are stored once if not present
-(async () => {
-  try {
-    const existing = await AsyncStorage.getItem(DASHBOARD_BUTTONS_KEY);
-    if (!existing) {
-      await AsyncStorage.setItem(DASHBOARD_BUTTONS_KEY, JSON.stringify(dashboardButtons));
-    }
-    // Ensure legacy 'dashboard' key is also populated for consumers like Syllabus
-    const existingDashboard = await AsyncStorage.getItem('dashboard');
-    if (!existingDashboard) {
-      await AsyncStorage.setItem('dashboard', JSON.stringify(dashboardButtons));
-    }
-  } catch (_) {}
-})();
+//
 export const saveLogin = async (loginData2, reg) => {
   try {
     const user = loginData2?.data || {};
@@ -209,13 +176,10 @@ export const saveLogin = async (loginData2, reg) => {
     await AsyncStorage.setItem('name', user.name || '');
     await AsyncStorage.setItem('hall', user.hall || '');
     await AsyncStorage.setItem('dept', user.dept || '');
-    // Persist dashboard buttons: prefer stored or defaults; fall back to user.dashboard if provided
-    try {
-      const storedButtons = await getDashboardButtons();
-      await AsyncStorage.setItem('dashboard', JSON.stringify(storedButtons || user.dashboard || []));
-    } catch (_) {
-      await AsyncStorage.setItem('dashboard', JSON.stringify(user.dashboard || dashboardButtons || []));
-    }
+    await AsyncStorage.setItem(
+      'dashboard',
+      JSON.stringify(user.dashboard || []),
+    );
 
     return true;
   } catch (error) {
