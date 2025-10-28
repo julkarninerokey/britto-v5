@@ -40,6 +40,8 @@ import Certificate from './src/screens/dashboard/Certificate';
 import Transcript from './src/screens/dashboard/Transcript';
 import CalendarScreen from './src/screens/dashboard/Calendar';
 import CampusMapWeb from './src/screens/dashboard/CampusMapWeb';
+import ProctorScreen from './src/screens/proctor/ProctorScreen';
+import NewProctorReport from './src/screens/proctor/NewProctorReport';
 import Payment from './src/screens/dashboard/Payment';
 import DirectPaymentWebView from './src/screens/payment/DirectPaymentWebView';
 import { SafeAreaView, StatusBar } from 'react-native';
@@ -174,6 +176,16 @@ const App = () => {
                 name="CampusMap"
                 component={CampusMapWeb}
                 options={{title: 'Campus Map', headerShown: false}}
+              />
+              <Stack.Screen
+                name="Proctor"
+                component={ProctorScreen}
+                options={{title: 'Proctor', headerShown: false}}
+              />
+              <Stack.Screen
+                name="NewProctorReport"
+                component={NewProctorReport}
+                options={{title: 'New Report', headerShown: false}}
               />
               <Stack.Screen
                 name="Payment"

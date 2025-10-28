@@ -145,11 +145,11 @@ export const dashboardButtons = [
   },
   {
     id: 25,
-    screen: "Department",
-    title: "Applications",
-    priority: 11,
-    icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/application.png",
-    status: 0,
+    screen: "Proctor",
+    title: "Proctor",
+    priority: 6,
+    icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/proctor.png",
+    status: 1,
     createdAt: "2024-04-25 01:47:05",
   },
   {

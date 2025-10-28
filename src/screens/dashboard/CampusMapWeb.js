@@ -1,7 +1,6 @@
-import React, {useMemo, useState} from 'react';
+import { useMemo, useState } from 'react';
 import {View, Linking} from 'react-native';
-import {Button, Icon, Spinner, Text, VStack} from 'native-base';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { Button, Text, VStack } from 'native-base';
 import AppBar from '../../components/AppBar';
 import {color, toast} from '../../service/utils';
 import {WebView} from 'react-native-webview';
