@@ -24,28 +24,13 @@ export const statusCheck = async () => {
 };
 
 async function fetchByReg(action, reg) {
-  if (!isConnected || isConnected?.status !== '1') {
-    toast('danger', isConnected?.title, isConnected?.subtitle);
-    return null;
-  }
-  if (!reg || reg.length !== 10) {
-    toast( 
-      'danger',
-      'Invalid Registration Number',
-      'Logout & Login Again to Continue.',
-    );
-    return false;
-  }
+
   try {
     const response = await axios.post(
       API_URL,
-      {action, reg:2017417693},
+      {action, reg},
       {headers: {'x-api-token': API_SECRET_TOKEN}},
     );
-
-    console.log("🚀 ------------------------------------------------🚀")
-    console.log("🚀 ~ api.js:43 ~ fetchByReg ~ response:", response)
-    console.log("🚀 ------------------------------------------------🚀")
 
     if (response?.data?.status === 200 || response?.data?.status === 201) {
       return response.data;

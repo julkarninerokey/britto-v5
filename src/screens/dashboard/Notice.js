@@ -7,7 +7,7 @@ import {getNotice} from '../../service/api';
 import 'react-native-pager-view';
 import {IconListLoading} from '../../components/LoadingAnimation';
 import AccordionComponent from '../../components/AccordionComponent';
-import { formatDateTime } from '../../service/utils';
+import {formatDateTime} from '../../service/utils';
 
 const Notice = ({navigation}) => {
   const [data, setData] = useState([]);
@@ -26,9 +26,9 @@ const Notice = ({navigation}) => {
       ).icon;
       setIconUrl(syllabusIcon);
 
-      const response = await getNotice(reg);
+      const response = await getNotice('2017417693');
       const typeList = response?.type || [];
-      const getTypeColor = (name) => {
+      const getTypeColor = name => {
         const found = typeList.find(t => t.name.trim() === name.trim());
         return found ? found.color : 'gray';
       };
@@ -47,14 +47,7 @@ const Notice = ({navigation}) => {
             <ScrollView style={{maxHeight: 200}}>
               <VStack space={2}>
                 <Box>
-                  <Badge
-                    colorScheme={getTypeColor(item.name)}
-                    _text={{ color: "white", fontSize: "xs" }}
-                    alignSelf="flex-start"
-                    mb={1}
-                  >
-                    {item.name}
-                  </Badge>
+                  <Badge variant={'outline'} colorScheme={'error'}>{item.name}</Badge>
                 </Box>
                 <Text fontSize="sm">{item.description}</Text>
                 {item.file ? (
@@ -70,14 +63,14 @@ const Notice = ({navigation}) => {
           ),
           content: `Published: ${formatDateTime(item.dateTime)}`,
           icon: 'ios-arrow-down',
-          badges: [
-            item.name,
-          ],
+          badges: [item.name],
         }));
         setData(accordionData);
       } else {
         setData([]);
-        setNoDataMsg('📢 No notices are available for you at the moment. Please check back later or contact your department or hall for updates.');
+        setNoDataMsg(
+          '📢 No notices are available for you at the moment. Please check back later or contact your department or hall for updates.',
+        );
       }
       setLoading(false);
     };

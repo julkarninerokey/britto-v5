@@ -14,6 +14,8 @@ export const checkUserLoginStatus = async () => {
   return token;
 };
 
+export const DASHBOARD_BUTTONS_KEY = 'dashboardButtons';
+
 export const dashboardButtons = [
   {
     id: 1,
@@ -160,6 +162,41 @@ export const dashboardButtons = [
     createdAt: "2024-04-25 12:23:34",
   }
 ]
+
+// Persist dashboard buttons to AsyncStorage (defaults on first run)
+export async function saveDashboardButtons(buttons = dashboardButtons) {
+  try {
+    await AsyncStorage.setItem(DASHBOARD_BUTTONS_KEY, JSON.stringify(buttons || []));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+export async function getDashboardButtons() {
+  try {
+    const stored = await AsyncStorage.getItem(DASHBOARD_BUTTONS_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (_) {}
+  return dashboardButtons;
+}
+
+// Ensure defaults are stored once if not present
+(async () => {
+  try {
+    const existing = await AsyncStorage.getItem(DASHBOARD_BUTTONS_KEY);
+    if (!existing) {
+      await AsyncStorage.setItem(DASHBOARD_BUTTONS_KEY, JSON.stringify(dashboardButtons));
+    }
+    // Ensure legacy 'dashboard' key is also populated for consumers like Syllabus
+    const existingDashboard = await AsyncStorage.getItem('dashboard');
+    if (!existingDashboard) {
+      await AsyncStorage.setItem('dashboard', JSON.stringify(dashboardButtons));
+    }
+  } catch (_) {}
+})();
 export const saveLogin = async (loginData2, reg) => {
   try {
     const user = loginData2?.data || {};
@@ -172,10 +209,13 @@ export const saveLogin = async (loginData2, reg) => {
     await AsyncStorage.setItem('name', user.name || '');
     await AsyncStorage.setItem('hall', user.hall || '');
     await AsyncStorage.setItem('dept', user.dept || '');
-    await AsyncStorage.setItem(
-      'dashboard',
-      JSON.stringify(user.dashboard || []),
-    );
+    // Persist dashboard buttons: prefer stored or defaults; fall back to user.dashboard if provided
+    try {
+      const storedButtons = await getDashboardButtons();
+      await AsyncStorage.setItem('dashboard', JSON.stringify(storedButtons || user.dashboard || []));
+    } catch (_) {
+      await AsyncStorage.setItem('dashboard', JSON.stringify(user.dashboard || dashboardButtons || []));
+    }
 
     return true;
   } catch (error) {

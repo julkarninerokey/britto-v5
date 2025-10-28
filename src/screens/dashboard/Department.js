@@ -8,12 +8,14 @@ import {
   Center,
   ScrollView,
   Spacer,
+  HStack,
+  Pressable,
 } from 'native-base';
 import ProfileCard from '../../components/ProfileCard';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {deptData} from '../../service/api';
-import {TabView, SceneMap, TabBar, TabBarItem} from 'react-native-tab-view';
+import {TabView, SceneMap} from 'react-native-tab-view';
 import 'react-native-pager-view';
 import {color} from '../../service/utils';
 import UserList from '../../components/UserList';
@@ -86,7 +88,7 @@ const Department = ({navigation}) => {
   useEffect(() => {
     const checkForData = async () => {
       const reg = await AsyncStorage.getItem('reg');
-      const response = await deptData(reg);
+      const response = await deptData('2017417693');
       setData(response.data);
       const emp = response?.staff;
       if (emp.length > 0) {
@@ -117,29 +119,30 @@ const Department = ({navigation}) => {
     {key: 'fourth', title: 'Staffs'},
   ]);
 
-  const renderTabBar = props => (
-    <ScrollView
-      horizontal
-      style={{
-        maxHeight: 50,
-        backgroundColor: color.background,
-      }}>
-      <TabBar
-        {...props}
-        renderTabBarItem={({key, ...tabItemProps}) => (
-          <TabBarItem key={key} {...tabItemProps} />
-        )}
-        indicatorStyle={{
-          backgroundColor: color.primary,
-        }}
-        style={{
-          backgroundColor: color.background,
-        }}
-        tabStyle={{width: 'auto'}}
-        labelStyle={{color: color.primary}}
-        scrollEnabled={true} // Enable scrolling
-      />
-    </ScrollView>
+  const renderTabBar = () => (
+    <HStack px={3} py={2} alignItems="center" bg={color.background}>
+      {routes.map((route, i) => {
+        const focused = i === index;
+        return (
+          <Pressable key={route.key} onPress={() => setIndex(i)} style={{ flex: 1 }}>
+            <Box
+              mx={1}
+              px={3}
+              py={2}
+              borderRadius={1}
+              bg={focused ? color.primary : 'transparent'}
+              borderWidth={1}
+              borderColor={focused ? color.primary : color.light}
+              alignItems="center"
+            >
+              <Text style={{ color: focused ? 'white' : color.primary }}>
+                {route.title}
+              </Text>
+            </Box>
+          </Pressable>
+        );
+      })}
+    </HStack>
   );
 
   const ParagraphSkeleton = () => {
@@ -164,7 +167,7 @@ const Department = ({navigation}) => {
           name={data && data[0]?.name}
           year={data && data[0]?.estyr}
         />
-        {data[0]?.name ? (
+        {data?.[0]?.name ? (
           <TabView
             navigationState={{index, routes}}
             renderScene={renderScene}

@@ -20,6 +20,7 @@ const Syllabus = ({navigation}) => {
       try {
         const reg = await AsyncStorage.getItem('reg');
         const dashboard = await AsyncStorage.getItem('dashboard');
+
         if (!reg) {
           setData([]);
           setNoDataMsg('No syllabus found for your account.');
@@ -30,8 +31,8 @@ const Syllabus = ({navigation}) => {
           item => item.screen === 'Syllabus',
         )?.icon;
         setIconUrl(syllabusIcon);
-        const response = await getSyllabus(reg);
-
+        const response = await getSyllabus('2017417693');
+        
         if (response.status === 201) {
           setData([]);
           setNoDataMsg(response.message || 'No syllabus found.');

@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {Dimensions, View} from 'react-native';
-import {VStack, Text, HStack, Box, Skeleton, ScrollView, Button, Divider} from 'native-base';
+import {VStack, Text, HStack, Box, Skeleton, ScrollView, Button, Divider, Pressable} from 'native-base';
 import ProfileCard from '../../components/ProfileCard';
 import AppBar from '../../components/AppBar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {profileData} from '../../service/api';
-import {TabView, SceneMap, TabBar, TabBarItem} from 'react-native-tab-view';
+import {TabView, SceneMap} from 'react-native-tab-view';
 import 'react-native-pager-view';
 import {color, formatDate, getFullAddress, toast} from '../../service/utils';
 import { getUser } from '../../service/auth';
@@ -210,19 +210,30 @@ const Profile = ({navigation}) => {
     {key: 'fourth', title: 'Degrees'},
   ]);
 
-  const renderTabBar = props => (
-    <TabBar
-      {...props}
-      renderTabBarItem={({key, ...tabItemProps}) => (
-        <TabBarItem key={key} {...tabItemProps} />
-      )}
-      indicatorStyle={{
-        backgroundColor: color.primary,
-        color: 'white',
-      }}
-      style={{backgroundColor: color.background}}
-      labelStyle={{color: color.primary}}
-    />
+  const renderTabBar = () => (
+    <HStack px={3} py={2} alignItems="center" bg={color.background}>
+      {routes.map((route, i) => {
+        const focused = i === index;
+        return (
+          <Pressable key={route.key} onPress={() => setIndex(i)} style={{ flex: 1 }}>
+            <Box
+              mx={1}
+              px={3}
+              py={2}
+              borderRadius={1}
+              bg={focused ? color.primary : 'transparent'}
+              borderWidth={1}
+              borderColor={focused ? color.primary : color.light}
+              alignItems="center"
+            >
+              <Text style={{ color: focused ? 'white' : color.primary }}>
+                {route.title}
+              </Text>
+            </Box>
+          </Pressable>
+        );
+      })}
+    </HStack>
   );
 
   // eslint-disable-next-line react/no-unstable-nested-components
