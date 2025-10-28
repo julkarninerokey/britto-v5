@@ -136,11 +136,11 @@ export const dashboardButtons = [
   },
   {
     id: 24,
-    screen: "Department",
-    title: "Calender",
+    screen: "Calendar",
+    title: "Calendar",
     priority: 13,
     icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/calander.png",
-    status: 0,
+    status: 1,
     createdAt: "2024-04-25 01:47:05",
   },
   {

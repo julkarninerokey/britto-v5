@@ -38,6 +38,7 @@ import Result from './src/screens/dashboard/Result';
 import Marksheet from './src/screens/dashboard/Marksheet';
 import Certificate from './src/screens/dashboard/Certificate';
 import Transcript from './src/screens/dashboard/Transcript';
+import CalendarScreen from './src/screens/dashboard/Calendar';
 import Payment from './src/screens/dashboard/Payment';
 import DirectPaymentWebView from './src/screens/payment/DirectPaymentWebView';
 import { SafeAreaView, StatusBar } from 'react-native';
@@ -162,6 +163,11 @@ const App = () => {
                 name="Transcript"
                 component={Transcript}
                 options={{title: 'Transcript', headerShown: false}}
+              />
+              <Stack.Screen
+                name="Calendar"
+                component={CalendarScreen}
+                options={{title: 'Calendar', headerShown: false}}
               />
               <Stack.Screen
                 name="Payment"
