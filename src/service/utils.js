@@ -127,11 +127,11 @@ export const dashboardButtons = [
   },
   {
     id: 23,
-    screen: "Department",
+    screen: "CampusMap",
     title: "Campus Map",
     priority: 12,
     icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/map.png",
-    status: 0,
+    status: 1,
     createdAt: "2024-04-25 01:47:05",
   },
   {

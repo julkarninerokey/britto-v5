@@ -39,6 +39,7 @@ import Marksheet from './src/screens/dashboard/Marksheet';
 import Certificate from './src/screens/dashboard/Certificate';
 import Transcript from './src/screens/dashboard/Transcript';
 import CalendarScreen from './src/screens/dashboard/Calendar';
+import CampusMapWeb from './src/screens/dashboard/CampusMapWeb';
 import Payment from './src/screens/dashboard/Payment';
 import DirectPaymentWebView from './src/screens/payment/DirectPaymentWebView';
 import { SafeAreaView, StatusBar } from 'react-native';
@@ -168,6 +169,11 @@ const App = () => {
                 name="Calendar"
                 component={CalendarScreen}
                 options={{title: 'Calendar', headerShown: false}}
+              />
+              <Stack.Screen
+                name="CampusMap"
+                component={CampusMapWeb}
+                options={{title: 'Campus Map', headerShown: false}}
               />
               <Stack.Screen
                 name="Payment"
