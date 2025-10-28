@@ -8,6 +8,7 @@ import 'react-native-pager-view';
 import {IconListLoading} from '../../components/LoadingAnimation';
 import AccordionComponent from '../../components/AccordionComponent';
 import {formatDateTime} from '../../service/utils';
+import { dashboardButtons } from '../../service/utils';
 
 const Notice = ({navigation}) => {
   const [data, setData] = useState([]);
@@ -20,8 +21,7 @@ const Notice = ({navigation}) => {
       setLoading(true);
       setNoDataMsg('');
       const reg = await AsyncStorage.getItem('reg');
-      const dashboard = await AsyncStorage.getItem('dashboard');
-      const syllabusIcon = JSON.parse(dashboard).find(
+      const syllabusIcon = dashboardButtons.find(
         item => item.screen === 'Notice',
       ).icon;
       setIconUrl(syllabusIcon);

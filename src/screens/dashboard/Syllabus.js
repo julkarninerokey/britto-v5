@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getSyllabus} from '../../service/api';
 import IconList from '../../components/IconList';
 import {IconListLoading} from '../../components/LoadingAnimation';
+import { dashboardButtons } from '../../service/utils';
 
 const Syllabus = ({navigation}) => {
   const [data, setData] = useState([]);
@@ -17,9 +18,16 @@ const Syllabus = ({navigation}) => {
     const checkForData = async () => {
       setLoading(true);
       setNoDataMsg('');
+      
+
+
+const syllabusIcon = dashboardButtons.find(
+          item => item.screen === 'Syllabus',
+        )?.icon;
+        setIconUrl(syllabusIcon);
+
       try {
         const reg = await AsyncStorage.getItem('reg');
-        const dashboard = await AsyncStorage.getItem('dashboard');
 
         if (!reg) {
           setData([]);
@@ -27,10 +35,7 @@ const Syllabus = ({navigation}) => {
           setLoading(false);
           return;
         }
-        const syllabusIcon = JSON.parse(dashboard).find(
-          item => item.screen === 'Syllabus',
-        )?.icon;
-        setIconUrl(syllabusIcon);
+        
         const response = await getSyllabus('2017417693');
         
         if (response.status === 201) {
@@ -50,6 +55,7 @@ const Syllabus = ({navigation}) => {
       setLoading(false);
     };
 
+    
     checkForData();
   }, []);
 
