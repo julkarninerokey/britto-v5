@@ -1,12 +1,9 @@
 import 'react-native-gesture-handler'; // <- this should be first
 import './src/setup/disableSSRWarning';
-import React, { useEffect, useState } from 'react';
-import { enableScreens } from 'react-native-screens';
-// enableScreens(); // <- this line is mandatory
-import { Animated } from "react-native";
+import { useEffect, useState } from 'react';
 
 // Import and setup console management
-import { setupConsole, ConsoleManager } from './src/utils/consoleManager';
+import { setupConsole } from './src/utils/consoleManager';
 
 // Setup console based on configuration
 setupConsole();
@@ -25,7 +22,6 @@ import { NavigationContainer } from '@react-navigation/native';
 
 import LoginScreen from './src/screens/LoginScreen';
 import OutOfServiceScreen from './src/screens/OutOfServiceScreen';
-import NavigationListener from './src/components/NavigationListener';
 import FlashMessage from 'react-native-flash-message';
 import Dashboard from './src/screens/dashboard/Dashboard';
 import Profile from './src/screens/dashboard/Profile';
@@ -42,6 +38,7 @@ import CalendarScreen from './src/screens/dashboard/Calendar';
 import CampusMapWeb from './src/screens/dashboard/CampusMapWeb';
 import ProctorScreen from './src/screens/proctor/ProctorScreen';
 import NewProctorReport from './src/screens/proctor/NewProctorReport';
+import BusSchedule from './src/screens/dashboard/BusSchedule';
 import Payment from './src/screens/dashboard/Payment';
 import DirectPaymentWebView from './src/screens/payment/DirectPaymentWebView';
 import { SafeAreaView, StatusBar } from 'react-native';
@@ -186,6 +183,11 @@ const App = () => {
                 name="NewProctorReport"
                 component={NewProctorReport}
                 options={{title: 'New Report', headerShown: false}}
+              />
+              <Stack.Screen
+                name="BusSchedule"
+                component={BusSchedule}
+                options={{title: 'Bus Schedule', headerShown: false}}
               />
               <Stack.Screen
                 name="Payment"

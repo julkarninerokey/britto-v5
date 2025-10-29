@@ -1,0 +1,19 @@
+[
+  { "busName": "Ananda", "routeInfo": "Primarily serves the Mirpur area, via Mirpur 1, 10, and 14." },
+  { "busName": "Basanta", "routeInfo": "Split from Srabon (2015). Serves Banasree, Rampura, Merul Badda." },
+  { "busName": "Bikrampur", "routeInfo": "Serves students from Bikrampur (Munshiganj). In‑city stops are community managed." },
+  { "busName": "Boishakhi", "routeInfo": "Covers west Dhaka including Mohammadpur and nearby areas." },
+  { "busName": "Choitaly", "routeInfo": "Travels from north (Mirpur/Pallabi corridor) to DU campus." },
+  { "busName": "Falguni", "routeInfo": "Serves Merul Badda and Notun Bazar; active student community." },
+  { "busName": "Hemanta", "routeInfo": "Route details maintained by ‘Hemonto Family, University of Dhaka’." },
+  { "busName": "Idrakpur", "routeInfo": "Area‑specific route; details via official student group." },
+  { "busName": "Isha Kha", "routeInfo": "Traditional route serving Sonargaon area students." },
+  { "busName": "Kinchit", "routeInfo": "Originates from Pallabi (Mirpur), via Begum Rokeya Avenue to campus." },
+  { "busName": "Khonika", "routeInfo": "Expanded from Mohakhali to cover Airport and Abdullahpur." },
+  { "busName": "Maitree", "routeInfo": "Also serves Mirpur corridor (Begum Rokeya Ave and Mirpur Road)." },
+  { "busName": "Srabon", "routeInfo": "Covers Mugda and Rampura; Basanta separated from it in 2015." },
+  { "busName": "Taranga", "routeInfo": "Historical route for Mohammadpur area students." },
+  { "busName": "Ullash", "routeInfo": "Serves eastern Dhaka including Hatirjheel and Rampura." },
+  { "busName": "Wari-Bateshwar", "routeInfo": "Connects old Dhaka (Wari‑Bateshwar) to DU campus." }
+]
+

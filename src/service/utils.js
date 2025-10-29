@@ -118,11 +118,11 @@ export const dashboardButtons = [
   },
   {
     id: 22,
-    screen: "Department",
+    screen: "BusSchedule",
     title: "Bus Schedule",
     priority: 14,
     icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/transport.png",
-    status: 0,
+    status: 1,
     createdAt: "2024-04-25 01:47:05",
   },
   {
@@ -146,7 +146,7 @@ export const dashboardButtons = [
   {
     id: 25,
     screen: "Proctor",
-    title: "Proctor",
+    title: "Proctor Report",
     priority: 6,
     icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/proctor.png",
     status: 1,
