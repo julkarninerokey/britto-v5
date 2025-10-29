@@ -109,11 +109,11 @@ export const dashboardButtons = [
   },
   {
     id: 21,
-    screen: "Department",
+    screen: "ClassSchedule",
     title: "Class Schedule",
-    priority: 100,
+    priority: 4,
     icon: "https://eco.du.ac.bd/assets/images/rokey/appIcons/class.png",
-    status: 0,
+    status: 1,
     createdAt: "2024-04-25 01:47:05",
   },
   {

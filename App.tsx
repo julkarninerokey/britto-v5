@@ -39,6 +39,7 @@ import CampusMapWeb from './src/screens/dashboard/CampusMapWeb';
 import ProctorScreen from './src/screens/proctor/ProctorScreen';
 import NewProctorReport from './src/screens/proctor/NewProctorReport';
 import BusSchedule from './src/screens/dashboard/BusSchedule';
+import ClassSchedule from './src/screens/dashboard/ClassSchedule';
 import Payment from './src/screens/dashboard/Payment';
 import DirectPaymentWebView from './src/screens/payment/DirectPaymentWebView';
 import { SafeAreaView, StatusBar } from 'react-native';
@@ -188,6 +189,11 @@ const App = () => {
                 name="BusSchedule"
                 component={BusSchedule}
                 options={{title: 'Bus Schedule', headerShown: false}}
+              />
+              <Stack.Screen
+                name="ClassSchedule"
+                component={ClassSchedule}
+                options={{title: 'Class Schedule', headerShown: false}}
               />
               <Stack.Screen
                 name="Payment"
