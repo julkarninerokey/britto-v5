@@ -21,6 +21,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 
 import LoginScreen from './src/screens/LoginScreen';
+import PasswordlessLoginScreen from './src/screens/PasswordlessLoginScreen';
 import OutOfServiceScreen from './src/screens/OutOfServiceScreen';
 import FlashMessage from 'react-native-flash-message';
 import Dashboard from './src/screens/dashboard/Dashboard';
@@ -98,6 +99,11 @@ const App = () => {
                 name="Login"
                 component={LoginScreen}
                 options={{title: 'Login', headerShown: false}}
+              />
+              <Stack.Screen
+                name="PasswordlessLogin"
+                component={PasswordlessLoginScreen}
+                options={{title: 'Passwordless Login', headerShown: false}}
               />
               <Stack.Screen
                 name="OutOfService"

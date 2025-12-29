@@ -110,6 +110,14 @@ const LoginScreen = ({navigation}) => {
               isDisabled={loading}>
               Set Alternative Credentials
             </Button>
+            <Button
+              mt="2"
+              variant="ghost"
+              colorScheme={'indigo'}
+              onPress={() => navigation.navigate('PasswordlessLogin')}
+              isDisabled={loading}>
+              Use Passwordless Login
+            </Button>
           </VStack>
         </Box>
       </Center>

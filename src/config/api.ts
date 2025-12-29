@@ -17,6 +17,8 @@ export const API_CONFIG = {
     GET_ALL_ENROLLMENTS: '/student/get-all-enrollments',
     GET_YEAR_SEMESTER_FOR_ENROLLMENT: '/student/get-year-semester-for-enrollmen',
     GET_PAYMENT_HEAD: '/student/get-payment-head',
+    SEND_LOGIN_OTP: '/otp/send',
+    VERIFY_LOGIN_OTP: '/otp/validate',
     
     // Payment endpoints (these use PAYMENT_BASE_URL)
     PAYMENT_APPLICATION_DETAILS: '/student/application/payment-details',
@@ -52,4 +54,9 @@ export const buildPaymentUrl = (endpoint: string): string => {
 
 export const buildFileUrl = (fileName: string): string => {
   return `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_FILE}/${fileName}`;
+};
+
+export const OTP_API = {
+  sendOtp: `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SEND_LOGIN_OTP}`,
+  verifyOtp: `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.VERIFY_LOGIN_OTP}`,
 };
