@@ -118,6 +118,14 @@ const LoginScreen = ({navigation}) => {
               isDisabled={loading}>
               Use Passwordless Login
             </Button>
+            <Button
+              mt="2"
+              variant="outline"
+              colorScheme={'indigo'}
+              onPress={() => navigation.navigate('StudentRegistration')}
+              isDisabled={loading}>
+              Create a Student Account
+            </Button>
           </VStack>
         </Box>
       </Center>

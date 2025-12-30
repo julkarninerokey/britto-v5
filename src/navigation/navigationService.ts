@@ -2,6 +2,7 @@ import { createNavigationContainerRef } from '@react-navigation/native';
 
 export type RootStackParamList = {
   Login: undefined;
+  StudentRegistration: undefined;
   Dashboard: undefined;
   [key: string]: any;
 };

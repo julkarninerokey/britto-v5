@@ -22,6 +22,7 @@ import { NavigationContainer } from '@react-navigation/native';
 
 import LoginScreen from './src/screens/LoginScreen';
 import PasswordlessLoginScreen from './src/screens/PasswordlessLoginScreen';
+import StudentRegistrationScreen from './src/screens/StudentRegistrationScreen';
 import OutOfServiceScreen from './src/screens/OutOfServiceScreen';
 import FlashMessage from 'react-native-flash-message';
 import Dashboard from './src/screens/dashboard/Dashboard';
@@ -104,6 +105,11 @@ const App = () => {
                 name="PasswordlessLogin"
                 component={PasswordlessLoginScreen}
                 options={{title: 'Passwordless Login', headerShown: false}}
+              />
+              <Stack.Screen
+                name="StudentRegistration"
+                component={StudentRegistrationScreen}
+                options={{title: 'Student Registration', headerShown: false}}
               />
               <Stack.Screen
                 name="OutOfService"

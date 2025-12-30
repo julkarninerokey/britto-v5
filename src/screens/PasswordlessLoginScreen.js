@@ -152,6 +152,14 @@ const PasswordlessLoginScreen = ({navigation}) => {
               isDisabled={sendingOtp || verifyingOtp}>
               Back to Password Login
             </Button>
+            <Button
+              mt="2"
+              variant="outline"
+              colorScheme={'indigo'}
+              onPress={() => navigation.navigate('StudentRegistration')}
+              isDisabled={sendingOtp || verifyingOtp}>
+              Create a Student Account
+            </Button>
           </VStack>
         </Box>
       </Center>
